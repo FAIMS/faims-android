@@ -1,0 +1,57 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "au.org.intersect.faims.android"
+        minSdkVersion 14
+        targetSdkVersion 19
+
+        testApplicationId "au.org.intersect.faims.android.test"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+    packagingOptions {
+        pickFirst  'META-INF/NOTICE.txt'
+        pickFirst  'META-INF/LICENSE.txt'
+    }
+}
+
+dependencies {
+    compile files('libs/android-support-v4.jar')
+    compile files('libs/antlr-4.4-complete.jar')
+    compile files('libs/apache-mime4j-core-0.7.2.jar')
+    compile files('libs/bsh-2.0b4.jar')
+    compile files('libs/commons-codec-1.7.jar')
+    compile files('libs/commons-compress-1.6.jar')
+    compile files('libs/guice-2.0-no_aop.jar')
+    compile files('libs/httpclient-4.2.3.jar')
+    compile files('libs/httpcore-4.2.2.jar')
+    compile files('libs/httpmime-4.2.3.jar')
+    compile files('libs/javaproj-1.0.6-noawt.jar')
+    compile files('libs/javarosa-libraries.jar')
+    compile files('libs/jmustache-1.5.jar')
+    compile files('libs/jsr305-1.3.9.jar')
+    compile files('libs/jts-1.13.jar')
+    compile files('libs/kxml2-2.2.2.jar')
+    compile files('libs/mapsforge-map-0.3.0-jar-with-dependencies.jar')
+    compile files('libs/marineapi.jar')
+    compile files('libs/nativecss.jar')
+    compile files('libs/nutiteq-3d-sdk-2.1.0.jar')
+    compile files('libs/protobuf-java-2.4.1-lite.jar')
+    compile files('libs/roboguice-2.0.jar')
+    compile files('libs/slf4j-android-1.6.1-RC1.jar')
+    androidTestCompile files('libs/gson-2.2.3.jar')
+    androidTestCompile files('libs/robotium-solo-5.1.jar')
+    compile project(':androidfilechooser')
+    compile project(':androidcodescanner')
+}

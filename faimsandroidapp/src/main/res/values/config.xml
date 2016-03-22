@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <integer name="discovery_port">3001</integer>
+    <integer name="device_port">3002</integer>
+    <string name="broadcast_addr">255.255.255.255</string>
+    <integer name="discovery_time">20</integer>
+    <integer name="packet_timeout">20</integer>
+    <integer name="sync_min_interval">5</integer>
+    <integer name="sync_max_interval">30</integer>
+    <integer name="sync_failure_delay">5</integer>
+    <integer name="sync_restart_time">5</integer>
+    <string name="app_dir">files/app</string>
+    <string name="server_dir">files/server</string>
+    <string name="data_dir">files/data</string>
+    <string name="demo_server_host">demo.fedarch.org</string>
+    <string name="demo_server_port">80</string>
+    
+</resources>

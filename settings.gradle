@@ -1,0 +1,3 @@
+include ':faimsandroidapp'
+include ':androidfilechooser'
+include ':androidcodescanner'

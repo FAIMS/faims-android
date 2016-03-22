@@ -1,0 +1,2777 @@
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import au.org.intersect.faims.android.beanshell.callbacks.DeleteCallback;
+import au.org.intersect.faims.android.beanshell.callbacks.FetchCallback;
+import au.org.intersect.faims.android.beanshell.callbacks.SaveCallback;
+import au.org.intersect.faims.android.beanshell.callbacks.ActionButtonCallback;
+import au.org.intersect.faims.android.beanshell.callbacks.ToggleActionButtonCallback;
+import au.org.intersect.faims.android.beanshell.callbacks.ViewTask;
+import au.org.intersect.faims.android.data.EntityAttribute;
+import au.org.intersect.faims.android.data.FormInputDef;
+import au.org.intersect.faims.android.data.NameValuePair;
+import au.org.intersect.faims.android.data.RelationshipAttribute;
+import au.org.intersect.faims.android.data.User;
+import au.org.intersect.faims.android.nutiteq.GeometryStyle;
+import au.org.intersect.faims.android.nutiteq.GeometryTextStyle;
+import au.org.intersect.faims.android.ui.map.LegacyQueryBuilder;
+import au.org.intersect.faims.android.ui.map.QueryBuilder;
+import com.nutiteq.components.MapPos;
+import com.nutiteq.geometry.Geometry;
+import com.nutiteq.geometry.Point;
+import com.nutiteq.geometry.Line;
+import com.nutiteq.geometry.Polygon;
+import com.nutiteq.projections.EPSG3857;
+import com.nutiteq.style.PointStyle;
+import com.nutiteq.style.LineStyle;
+import com.nutiteq.style.PolygonStyle;
+import java.util.Collection;
+import java.util.List;
+
+//========= Persist Functionality ==========
+/**
+  * When android runs low on resources the module activity can be destroyed if its in a
+  * suspended state and then restored when its resumed. This will result in a loss of
+  * variable state in the logic script.
+  *
+  * To restore variable state in the logic script use the following method to define
+  * the name of a single object that will saved and restored when the activity
+  * is destroyed and restored.
+  *
+  * For more information on how to use this function please look at the cookbook.
+  *
+  * @param name the name of the object to restore
+  */
+persistObject(String name) {
+	linker.setPersistedObjectName(name);
+}
+
+//========= Tab / Tab Group Functionality ==========
+/**
+  * Show the tab group with the following reference and clear all values in the tab group.
+  *
+  * @param ref the reference to the tab group
+  */
+newTabGroup(String ref) {
+	linker.newTabGroup(ref);
+}
+
+/**
+  * Show the tab with the following reference and clear all values in the tab.
+  *
+  * @param ref the reference to the tab
+  */
+newTab(String ref) {
+	linker.newTab(ref);
+}
+
+/**
+  * Show the tab group with the following reference.
+  *
+  * This will retain all the current values in the tab group.
+  *
+  * @param ref the reference to the tab group
+  */
+showTabGroup(String ref){
+    linker.showTabGroup(ref);
+}
+
+/**
+  * Show the tab group with the following reference and load the values of the
+  * supplied entity or relationship id into the tab group.
+  *
+  * @param ref the reference of the tab group
+  * @param id the id of the entity or relationship
+  */
+showTabGroup(String ref, String id){
+    linker.showTabGroup(ref, id, null);
+}
+
+/**
+  * Show the tab group with the following reference and load the values of the
+  * supplied entity or relationship id into the tab group.
+  *
+  * @param ref the reference of the tab group
+  * @param id the id of the entity or relationship
+  * @param callback callback to execute when finished loading
+  */
+showTabGroup(String ref, String id, FetchCallback callback){
+    linker.showTabGroup(ref, id, callback);
+}
+
+/**
+  * Show the tab with the following reference.
+  *
+  * This will retain all the current values in the tab.
+  *
+  * @param ref the reference to the tab
+  */
+showTab(String ref) {
+	linker.showTab(ref);
+}
+
+/**
+  * Show the tab with the following reference and load the values of the
+  * supplied entity or relationship id into the tab.
+  *
+  * @param ref the reference to the tab
+  * @param id the id of the entity or relationship
+  */
+showTab(String ref, String id) {
+	linker.showTab(ref, id, null);
+}
+
+/**
+  * Show the tab with the following reference and load the values of the
+  * supplied entity or relationship id into the tab.
+  *
+  * @param ref the reference to the tab
+  * @param id the id of the entity or relationship
+  * @param callback callback to execute when finished loading
+  */
+showTab(String ref, String id, FetchCallback callback) {
+  linker.showTab(ref, id, callback);
+}
+
+/**
+  * Save the tab group with the following reference.
+  *
+  * @param ref the reference of the tab group
+  * @param id the id of the entity or relationship. Can be null to save new record
+  * @param geometry the geometry list of the record
+  * @param attributes additional attributes to save for the record
+  */
+saveTabGroup(String ref, String id, List geometry, List attributes){
+  linker.saveTabGroup(ref, id, geometry, attributes, null);
+}
+
+
+/**
+  * Save the tab group with the following reference.
+  *
+  * @param ref the reference of the tab group
+  * @param id the id of the entity or relationship. Can be null to save new record
+  * @param geometry the geometry list of the record
+  * @param attributes additional attributes to save for the record
+  * @param callback code to execute when saving is finished
+  */
+saveTabGroup(String ref, String id, List geometry, List attributes, SaveCallback callback){
+  linker.saveTabGroup(ref, id, geometry, attributes, callback);
+}
+
+/**
+  * Save the tab group with the following reference.
+  *
+  * @param ref the reference of the tab group
+  * @param id the id of the entity or relationship. Can be null to save new record
+  * @param geometry the geometry list of the record
+  * @param attributes additional attributes to save for the record
+  * @param callback code to execute when saving is finished
+  * @param enableAutoSave specify if you want to enable autosaving
+  */
+saveTabGroup(String ref, String id, List geometry, List attributes, SaveCallback callback, boolean enableAutoSave){
+  linker.saveTabGroup(ref, id, geometry, attributes, callback, enableAutoSave);
+}
+
+/**
+  * Duplicate the tab group with the following reference.
+  *
+  * @param ref the reference of the tab group
+  * @param geometry the geometry list of the record
+  * @param attributes additional attributes to save for the record
+  * @param excludeAttributes exclude attributes from being saved to the record
+  * @param callback code to execute when saving is finished
+  */
+duplicateTabGroup(String ref, List geometry, List attributes, List excludeAttributes, SaveCallback callback){
+  linker.duplicateTabGroup(ref, geometry, attributes, excludeAttributes, callback);
+}
+
+/**
+  * Disable autosave for tabgroup
+  *
+  * @param ref the reference  of the tab group
+  */
+disableAutoSave(String ref) {
+  linker.disableAutoSave(ref);
+}
+
+/**
+  * Save the tab with the following reference.
+  *
+  * @param ref the reference of the tab group
+  * @param id the id of the entity or relationship. Can be null to save new record
+  * @param geometry the geometry list of the record
+  * @param attributes additional attributes to save for the record
+  */
+saveTab(String ref, String id, List geometry, List attributes){
+  linker.saveTab(ref, id, geometry, attributes, null);
+}
+
+/**
+  * Save the tab with the following reference.
+  *
+  * @param ref the reference of the tab group
+  * @param id the id of the entity or relationship. Can be null to save new record
+  * @param geometry the geometry list of the record
+  * @param attributes additional attributes to save for the record
+  * @param callback code to execute when saving is finished
+  */
+saveTab(String ref, String id, List geometry, List attributes, SaveCallback callback){
+  linker.saveTab(ref, id, geometry, attributes, callback);
+}
+
+/**
+  * Keep the current changes on the tab group so auto saving is not triggerred when tab group checks if something needs to be saved.
+  *
+  * @param ref the reference to the tab group
+  */
+keepTabGroupChanges(String ref) {
+  linker.keepTabGroupChanges(ref);
+}
+
+/**
+ * @return whether autosave is enabled
+ */
+boolean isAutosaveEnabled() {
+  linker.isAutosaveEnabled();
+}
+
+/**
+  * Close the tab group with the following reference with an option to show
+  * a warning dialog if there are changes that haven't been saved.
+  *
+  * @param ref the reference to the tab group
+  * @param warn set to true to show a warning dialog if there are changes that haven't been saved
+  */
+cancelTabGroup(String ref, boolean warn){
+	linker.cancelTabGroup(ref, warn);
+}
+
+/**
+  * Close the tab with the following reference with an option to show
+  * a warning dialog if there are changes that haven't been saved.
+  *
+  * @param ref the reference to the tab
+  * @param warn set to true to show a warning dialog if there are changes that haven't been saved
+  */
+cancelTab(String ref, boolean warn){
+	linker.cancelTab(ref, warn);
+}
+
+/**
+  * Refreshes the CSS styling for a tabgroup
+  *
+  * @param ref the reference to the tabgroup
+  */
+refreshTabgroupCSS(String ref) {
+  linker.refreshTabgroupCSS(ref);
+}
+
+/**
+  * Execute a view task to process view changes.
+  *
+  * @param task a view task to execute
+  */
+executeViewTask(ViewTask task) {
+  linker.executeViewTask(task);
+}
+
+/**
+  * Check is dynamic view exists.
+  *
+  * @param ref the reference to the view
+  */
+hasView(String ref) {
+  return linker.hasViewOrContainer(ref);
+}
+
+/**
+  * Create a new view.
+  *
+  * @param ref the reference to the view
+  * @param inputDef the definition of the view
+  */
+createView(String ref, FormInputDef inputDef) {
+  linker.createView(ref, inputDef, null);
+}
+
+/**
+  * create a new view.
+  *
+  * @param ref the reference to the view
+  * @param inputDef the definition of the view
+  * @param conatinerRef the reference ot the container. Can be null.
+  */
+createView(String ref, FormInputDef inputDef, String containerRef) {
+  linker.createView(ref, inputDef, containerRef);
+}
+
+/**
+  * Remove view.
+  *
+  * @param ref the reference to the view
+  */
+removeView(String ref) {
+  linker.removeView(ref);
+}
+
+/**
+  * Check is dynamic container exists.
+  *
+  * @param ref the reference to the container
+  */
+hasContainer(String ref) {
+  return linker.hasViewOrContainer(ref);
+}
+
+/**
+  * Create a new container.
+  *
+  * @param ref the reference to the container
+  * @param style the styles to apply on the container
+  */
+createContainer(String ref, String style) {
+  linker.createContainer(ref, style, null);
+}
+
+/**
+  * Create a new container.
+  *
+  * @param ref the reference to the container
+  * @param style the styles to apply on the container
+  * @param conatinerRef the reference ot the container. Can be null.
+  */
+createContainer(String ref, String style, String containerRef) {
+  linker.createContainer(ref, style, containerRef);
+}
+
+/**
+  * Remove container.
+  *
+  * @param ref the reference to the container
+  */
+removeContainer(String ref) {
+  linker.removeContainer(ref);
+}
+
+/**
+  * Remove all non static views and containers in tabgroup.
+  *
+  * @param ref the reference to the tabgroup
+  */
+removeAllViewsAndContainers(String ref) {
+  linker.removeAllViewsAndContainers(ref);
+}
+
+/**
+  * Create View definition
+  *
+  * @return view definition object
+  */
+createViewDef() {
+  return new FormInputDef();
+}
+
+//========= Dialog Functionality ==========
+/**
+  * Show a toast to the user with the given message, the toast will last for about 1 second.
+  *
+  * @param message the message to be shown to the user
+  */
+showToast(String message) {
+    linker.showToast(message);
+}
+
+/**
+  * Show an alert dialog to the user with the given message.
+  *
+  * @param title the title of the dialog
+  * @param message the message to be shown to the user
+  * @param okCallback the callback that is executed when Ok button is pressed
+  * @param cancelCallback the callback that is executed when Cancel button is pressed
+  */
+showAlert(String title, String message, String okCallback, String cancelCallback){
+    linker.showAlert(title, message, okCallback, cancelCallback);
+}
+
+/**
+  * Show a warning dialog to the user with the given message.
+  *
+  * @param title the title of the dialog
+  * @param message the message to be shown to the user
+  */
+showWarning(String title, String message) {
+	linker.showWarning(title, message);
+}
+
+/**
+  * Show a busy dialog to the user with the given message.
+  *
+  * @param title the title of the dialog
+  * @param message the message to be shown to the user
+  */
+showBusy(String title, String message) {
+	return linker.showBusy(title, message);
+}
+
+/**
+  * Show an alert dialog to the user with the given message and a text box for input.
+  *
+  * @param title the title of the dialog
+  * @param message the message to be shown to the user
+  * @param okCallback the callback that is executed when Ok button is pressed
+  * @param cancelCallback the callback that is executed when Cancel button is pressed
+  */
+showTextAlert(String title, String message, String okCallback, String cancelCallback) {
+  linker.showTextAlert(title, message, okCallback, cancelCallback);
+}
+
+/**
+  * This is used in conjunction with showTextAlert. This returns the input from the last text alert shown.
+  *
+  * @return input received from last text alert
+  */
+String getLastTextAlertInput() {
+  return linker.getLastTextAlertInput();
+}
+
+/**
+  * Show an alert dialog to the user with the given message and a date picker for input.
+  *
+  * @param title the title of the dialog
+  * @param message the message to be shown to the user
+  * @param okCallback the callback that is executed when Ok button is pressed
+  * @param cancelCallback the callback that is executed when Cancel button is pressed
+  */
+showDateAlert(String title, String message, String okCallback, String cancelCallback) {
+  linker.showDateAlert(title, message, okCallback, cancelCallback);
+}
+
+/**
+  * This is used in conjunction with showDateAlert. This returns the input from the last date alert shown.
+  *
+  * @return input received from last date alert
+  */
+String getLastDateAlertInput() {
+  return linker.getLastDateAlertInput();
+}
+
+/**
+  * Show an alert dialog to the user with the given message and a time picker for input.
+  *
+  * @param title the title of the dialog
+  * @param message the message to be shown to the user
+  * @param okCallback the callback that is executed when Ok button is pressed
+  * @param cancelCallback the callback that is executed when Cancel button is pressed
+  */
+showTimeAlert(String title, String message, String okCallback, String cancelCallback) {
+  linker.showTimeAlert(title, message, okCallback, cancelCallback);
+}
+
+/**
+  * This is used in conjunction with showTimeAlert. This returns the input from the last time alert shown.
+  *
+  * @return input received from last time alert
+  */
+String getLastTimeAlertInput() {
+  return linker.getLastTimeAlertInput();
+}
+
+//========= Setter / Getter Functionality ==========
+/**
+  * Set the field with the following reference to the given value.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * For more information on how to use this function please look at the cookbook.
+  *
+  * @param ref the reference to the field
+  * @param value the value to set the field to
+  */
+setFieldValue(String ref, Object value){
+    linker.setFieldValue(ref, value);
+}
+
+/**
+  * Set the certainty of the field with the following reference to the given value
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param value the value to set the certainty for the field to
+  */
+setFieldCertainty(String ref, Object value){
+    linker.setFieldCertainty(ref, value);
+}
+
+/**
+  * Set the annotation of the field with the following reference to the given value
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param value the value to set the annotation for the field to
+  */
+setFieldAnnotation(String ref, Object value){
+    linker.setFieldAnnotation(ref, value);
+}
+
+/**
+  * Get value of the field with the following reference.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @return the value of the field, could be collection or String
+  */
+Object getFieldValue(String ref){
+    return linker.getFieldValue(ref);
+}
+
+/**
+  * Get certainty of the field with the following reference.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @return the certainty of the field
+  */
+Object getFieldCertainty(String ref){
+    return linker.getFieldCertainty(ref);
+}
+
+/**
+  * Get annotation of the field with the following reference.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @return the annotation of the field
+  */
+Object getFieldAnnotation(String ref){
+    return linker.getFieldAnnotation(ref);
+}
+
+/**
+  * Get the current time of the application
+  *
+  * @return the current time e.g. 2013-01-20 13:20:01
+  */
+String getCurrentTime(){
+    return linker.getCurrentTime();
+}
+
+/**
+  * Clear a dirty field with the following reference
+  *
+  * @param ref the reference to the field
+  */
+clearFieldDirty(String ref) {
+	linker.setFieldDirty(ref, false, "");
+}
+
+//========= Event Callback Functionality ==========
+/**
+  * Binding an event to the field with the given reference.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param type the type of event, one of click, show, or load
+  * @param callback the callback that is executed when the event is triggered
+  */
+onEvent(String ref, String type, String callback) {
+	linker.bindViewToEvent(ref, type, callback);
+}
+
+/**
+  * Binding a focus/blur event to the field with the given reference.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param focusCallback the callback that is executed when focus event is triggered
+  * @param blurCallback the callback that is executed when blur event is triggered
+  */
+onFocus(String ref, String focusCallback, String blurCallback) {
+	linker.bindFocusAndBlurEvent(ref, focusCallback, blurCallback);
+}
+
+//========= User Functionality ==========
+/**
+  * Set the current user of the application. Is a requirement for insert records into the database.
+  *
+  * @param user the user of the application
+  */
+setUser(User user){
+	linker.setUser(user);
+}
+
+//========= Archaeological Entity / Relationship Functionality ==========
+/**
+  * Insert a new or update an existing archaeological entity record and return the id of the saved record.
+  *
+  * @param entityId the id of the entity to be saved, set to null to save a new record
+  * @param entityType the type of the entity to be saved, must be one specified in the data schema
+  * @param geometry the list of geometries to be associated with the entity
+  * @param attributes the list of attributes to be associated with the entity
+  */
+saveArchEnt(String entityId, String entityType, List geometry, List attributes) {
+	linker.saveArchEnt(entityId, entityType, geometry, attributes, null);
+}
+
+/**
+  * Insert a new or update an existing archaeological entity record and return the id of the saved record.
+  *
+  * @param entityId the id of the entity to be saved, set to null to save a new record
+  * @param entityType the type of the entity to be saved, must be one specified in the data schema
+  * @param geometry the list of geometries to be associated with the entity
+  * @param attributes the list of attributes to be associated with the entity
+  * @param callback callback to execute when saving is finished
+  */
+saveArchEnt(String entityId, String entityType, List geometry, List attributes, SaveCallback callback) {
+  linker.saveArchEnt(entityId, entityType, geometry, attributes, callback);
+}
+
+/**
+  * Insert a new or update an existing relationship record and return the id of the saved record.
+  *
+  * @param relationshipId the id of the relationship to be saved, set to null to save a new record
+  * @param relationshipType the type of the relationship to be saved, must be one specified in the data schema
+  * @param geometry the list of geometries to be associated with the relationship
+  * @param attributes the list of attributes to be associated with the relationship
+  */
+saveRel(String relationshipId, String relationshipType, List geometry, List attributes) {
+	linker.saveRel(relationshipId, relationshipType, geometry, attributes, null);
+}
+
+/**
+  * Insert a new or update an existing relationship record and return the id of the saved record.
+  *
+  * @param relationshipId the id of the relationship to be saved, set to null to save a new record
+  * @param relationshipType the type of the relationship to be saved, must be one specified in the data schema
+  * @param geometry the list of geometries to be associated with the relationship
+  * @param attributes the list of attributes to be associated with the relationship
+  * @param callback callback to execute when saving is finished
+  */
+saveRel(String relationshipId, String relationshipType, List geometry, List attributes, SaveCallback callback) {
+  linker.saveRel(relationshipId, relationshipType, geometry, attributes, callback);
+}
+
+/**
+  * Deletes the specified archaeological entity.
+  *
+  * @param entityId the id of the entity to be deleted
+  */
+deleteArchEnt(String entityId){
+	linker.deleteArchEnt(entityId, null);
+}
+
+/**
+  * Deletes the specified archaeological entity.
+  *
+  * @param entityId the id of the entity to be deleted
+  * @param callback callback to execute when deletion is finished
+  */
+deleteArchEnt(String entityId, DeleteCallback callback){
+  linker.deleteArchEnt(entityId, callback);
+}
+
+/**
+  * Deletes the specified relationship.
+  *
+  * @param relationshipId the id of the relationship to be deleted
+  */
+deleteRel(String relationshipId){
+	linker.deleteRel(relationshipId, null);
+}
+
+/**
+  * Deletes the specified relationship.
+  *
+  * @param relationshipId the id of the relationship to be deleted
+  * @param callback callback to execute when deletion is finished
+  */
+deleteRel(String relationshipId, DeleteCallback callback){
+  linker.deleteRel(relationshipId, callback);
+}
+
+/**
+  * Add an existing archaeological entity to an existing relationship and the verb of the relation.
+  *
+  * @param entityId the id of the entity
+  * @param relationshipId the id of the relationship
+  * @param verb the relation verb that is defined in the data schema for the specified relationship
+  */
+addReln(String entityId, String relationshipId, String verb) {
+	linker.addReln(entityId, relationshipId, verb, null);
+}
+
+/**
+  * Add an existing archaeological entity to an existing relationship and the verb of the relation.
+  *
+  * @param entityId the id of the entity
+  * @param relationshipId the id of the relationship
+  * @param verb the relation verb that is defined in the data schema for the specified relationship
+  * @param callback callback to execute when saving is finished
+  */
+addReln(String entityId, String relationshipId, String verb, SaveCallback callback) {
+  linker.addReln(entityId, relationshipId, verb, callback);
+}
+
+/**
+  * Create an attribute list.
+  *
+  * @return new attribute list
+  */
+createAttributeList() {
+	return new ArrayList();
+}
+
+/**
+  * Create an entity attribute to be added to the attribute list.
+  *
+  * @param name the name of the attribute
+  * @param text the text of the entity attribute, could be null
+  * @param vocab the vocab id of the entity attribute (obtained from the database), could be null
+  * @param measure the measure of the entity attribute, could be null
+  * @param certainty the certainty of the entity attribute, could be null
+  * @return an entity attribute
+  */
+createEntityAttribute(String name, String text, String vocab, String measure, String certainty){
+	return createEntityAttribute(name, text, vocab, measure, certainty, false);
+}
+
+/**
+  * Create an entity attribute to be added to the attribute list.
+  *
+  * @param name the name of the attribute
+  * @param text the text of the entity attribute, could be null
+  * @param vocab the vocab id of the entity attribute (obtained from the database), could be null
+  * @param measure the measure of the entity attribute, could be null
+  * @param certainty the certainty of the entity attribute, could be null
+  * @param isDeleted set to true to delete the attribute
+  * @return an entity attribute
+  */
+createEntityAttribute(String name, String text, String vocab, String measure, String certainty, boolean isDeleted) {
+	EntityAttribute attribute = new EntityAttribute();
+	attribute.setName(name);
+	attribute.setText(text);
+	attribute.setVocab(vocab);
+	attribute.setMeasure(measure);
+	attribute.setCertainty(certainty);
+	attribute.setDeleted(isDeleted);
+	return attribute;
+}
+
+/**
+  * Create a relationship attribute to be added to the attribute list.
+  *
+  * @param name the name of the attribute
+  * @param text the text of the relationship attribute, could be null
+  * @param vocab the vocab id of the relationship attribute (obtained from the database), could be null
+  * @param certainty the certainty of the relationship attribute, could be null
+  * @return a relationship attribute
+  */
+createRelationshipAttribute(String name, String text, String vocab, String certainty){
+	return createRelationshipAttribute(name, text, vocab, certainty, false);
+}
+
+/**
+  * Create a relationship attribute to be added to the attribute list.
+  *
+  * @param name the name of the attribute
+  * @param text the text of the relationship attribute, could be null
+  * @param vocab the vocab id of the relationship attribute (obtained from the database), could be null
+  * @param certainty the certainty of the relationship attribute, could be null
+  * @param isDeleted set to true to delete the attribute
+  * @return a relationship attribute
+  */
+createRelationshipAttribute(String name, String text, String vocab, String certainty, boolean isDeleted) {
+	RelationshipAttribute attribute = new RelationshipAttribute();
+	attribute.setName(name);
+	attribute.setText(text);
+	attribute.setVocab(vocab);
+	attribute.setCertainty(certainty);
+	attribute.setDeleted(isDeleted);
+	return attribute;
+}
+
+/**
+  * Populate dropdown field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the dropdown with
+  */
+populateDropDown(String ref, Collection values){
+    linker.populateDropDown(ref, values, false);
+}
+
+/**
+  * Populate dropdown field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the dropdown with
+  * @param hasNull set to true to populate the drop down with null value
+  */
+populateDropDown(String ref, Collection values, boolean hasNull){
+    linker.populateDropDown(ref, values, hasNull);
+}
+
+/**
+  * Populate dropdown field hierarchical vocab terms of the given attribute.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param attributeName the name of the attribute
+  */
+populateHierarchicalDropDown(String ref, String attributeName){
+    linker.populateHierarchicalDropDown(ref, attributeName, false);
+}
+
+/**
+  * Populate dropdown field hierarchical vocab terms of the given attribute.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param attributeName the name of the attribute
+  * @param hasNull set to true to populate the drop down with null value
+  */
+populateHierarchicalDropDown(String ref, String attributeName, boolean hasNull){
+    linker.populateHierarchicalDropDown(ref, attributeName, hasNull);
+}
+
+/**
+  * Populate radio group field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the radio group with
+  */
+populateRadioGroup(String ref, Collection values) {
+	linker.populateList(ref, values);
+}
+
+/**
+  * Populate checkbox group field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the checkbox group with
+  */
+populateCheckBoxGroup(String ref, Collection values) {
+	linker.populateList(ref, values);
+}
+
+/**
+  * Populate list with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the list with
+  */
+populateList(String ref, Collection values){
+	linker.populateList(ref, values);
+}
+
+/**
+  * Populate a scrolling list with a query, that dynamically adds items on scroll
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param query the query to extract data to populate the list
+  * @param limit the limit for the original population and the number of items added
+  * each time the scroll reaches the bottom
+  */
+populateCursorList(String ref, String query, int limit) {
+  linker.populateCursorList(ref, query, limit);
+}
+
+/**
+  * Populate table from a query.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param query the query to populate the table from
+  * @param headers the columns used for the header of the table
+  * @param actionName the label for the action
+  * @param actionIndex the index to create actions on
+  * @param actionCallback the callback to execute when an action is triggered
+  */
+populateTableRaw(String ref, String query, List headers, String actionName, int actionIndex, String actionCallback){
+  linker.populateTableRaw(ref, query, headers, actionName, actionIndex, actionCallback);
+}
+
+/**
+  * Populate table from a query by applying a pivot. The query should returns results as id, name, and value.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param query the query to populate the table from
+  * @param headers the columns used for the header of the table
+  * @param actionName the label for the action
+  * @param actionIndex the index to create actions on
+  * @param actionCallback the callback to execute when an action is triggered
+  */
+populateTablePivot(String ref, String query, List headers, String actionName, int actionIndex, String actionCallback){
+  linker.populateTablePivot(ref, query, headers, actionName, actionIndex, actionCallback);
+}
+
+/**
+  * Refresh table results while maintaining scroll position.
+  */
+refreshTable(String ref){
+  linker.refreshTable(ref);
+}
+
+/**
+  * Styles the table with the supplied css file.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param cssFile the css file to style the table with
+  */
+styleTable(String ref, String cssFile) {
+  linker.styleTable(ref, cssFile);
+}
+
+/**
+  * Scroll table to top.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  */
+scrollTableToTop(String ref){
+  linker.scrollTableToTop(ref);
+}
+
+/**
+  * Scroll table to bottom.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  */
+scrollTableToBottom(String ref){
+  linker.scrollTableToBottom(ref);
+}
+
+/**
+  * Scroll table to top.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  */
+scrollTableToRow(String ref, int row){
+  linker.scrollTableToRow(ref, row);
+}
+
+/**
+  * Used in conjunction with the action callback for tables.
+  *
+  * @return the last table row number.
+  */
+getTableRow(){
+  return _table_row;
+}
+
+/**
+  * Used in conjunction with the action callback for tables.
+  *
+  * @return the last table row value.
+  */
+getTableValue(){
+  return _table_value;
+}
+
+/**
+  * Used in conjunction with the click event on a list. This returns last selected value in the list.
+  *
+  * @return the last selected value in the list
+  */
+String getListItemValue() {
+	return _list_item_value;
+}
+
+/**
+  * Populate picture gallery field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the picture gallery with
+  */
+populatePictureGallery(String ref, Collection values){
+	linker.populatePictureGallery(ref, values);
+}
+
+/**
+  * Populate hierarchical picture gallery field with the vocabulary in the given attribute name.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param attributeName the name of the attribute with the vocabulary
+  */
+populateHierarchicalPictureGallery(String ref, String attributeName){
+	linker.populateHierarchicalPictureGallery(ref, attributeName);
+}
+
+/**
+  * Populate file list field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the file list with
+  */
+populateFileList(String ref, Collection values) {
+  linker.populateFileList(ref, values);
+}
+
+/**
+  * Populate camera picture gallery field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the camera picture gallery with
+  */
+populateCameraPictureGallery(String ref, Collection values){
+	linker.populateCameraPictureGallery(ref, values);
+}
+
+/**
+  * Populate video gallery field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the video gallery with
+  */
+populateVideoGallery(String ref, Collection values){
+	linker.populateVideoGallery(ref, values);
+}
+
+/**
+  * Populate audio list field with the given collection of values.
+  *
+  * If the field reference is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param values the collection of values to populate the audio list with
+  */
+populateAudioList(String ref, Collection values){
+	linker.populateAudioList(ref, values);
+}
+
+/**
+  * Populate webview with the given html source file
+  *
+  * If the file is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param sourceFile the html file to render
+  */
+populateWebView(String ref, String sourceFile) {
+  linker.populateWebView(ref, sourceFile);
+}
+
+/**
+  * Populate webview with the given html
+  *
+  * If the file is not found a logic error dialog will appear.
+  *
+  * @param ref the reference to the field
+  * @param html the html to render
+  */
+populateWebViewHtml(String ref, String html) {
+  linker.populateWebViewHtml(ref, html);
+}
+
+/**
+  * Back navigate webview if possible
+  *
+  * @param ref the reference to the field
+  */
+navigateWebViewBack(String ref) {
+  linker.navigateWebViewBack(ref);
+}
+
+/**
+  * Fetch the archaeological entity record with the specified id.
+  *
+  * @param id the id of the entity
+  * @param callback callback to execute when fetching is finished
+  */
+fetchArchEnt(String id, FetchCallback callback){
+  linker.fetchArchEnt(id, callback);
+}
+
+/**
+  * Fetch the relationship record with the specified id.
+  *
+  * @param id the id of the relationship
+  * @param callback callback to execute when fetching is finished
+  */
+fetchRel(String id, FetchCallback callback){
+  linker.fetchRel(id, callback);
+}
+
+/**
+  * Fetch the result of a query. This will return only a single row.
+  *
+  * @param query the query to be run against the database
+  */
+fetchOne(String query){
+  linker.fetchOne(query, null);
+}
+
+
+/**
+  * Fetch the result of a query. This will return only a single row.
+  *
+  * @param query the query to be run against the database
+  * @param callback callback to execute when fetching is finished
+  */
+fetchOne(String query, FetchCallback callback){
+  linker.fetchOne(query, callback);
+}
+
+/**
+  * Fetch the results of a query. This will return a collection of rows.
+  *
+  * @param query the query to be run against the database
+  */
+fetchAll(String query){
+  linker.fetchAll(query, null);
+}
+
+/**
+  * Fetch the results of a query. This will return a collection of rows.
+  *
+  * @param query the query to be run against the database
+  */
+fetchAll(String query, FetchCallback callback){
+  linker.fetchAll(query, callback);
+}
+
+/**
+  * Fetch a list of entities. Each row in the collection is a list with the first item being the id of the entity and the second the identifier of the entity.
+  *
+  * @param type the type of arch entity to filter
+  */
+fetchEntityList(String type, FetchCallback callback){
+  linker.fetchEntityList(type, callback);
+}
+
+/**
+  * Fetch a list of relationships. Each row in the collection is a list with the first item being the id of the relationship and the second the identifier of the relationship.
+  *
+  * @param type the type of relationship to filter
+  */
+fetchRelationshipList(String type, FetchCallback callback){
+  linker.fetchRelationshipList(type, callback);
+}
+
+//========= Navigation Functionality ==========
+/**
+  * Provide functionality to go back as if the user press the hardware back button.
+  */
+goBack(){
+	linker.goBack();
+}
+
+//========= GPS Functionality ==========
+/**
+  * Set the GPS update interval to determine how often the GPS should update. Default value is 10 seconds.
+  *
+  * @param seconds the length of the interval in seconds
+  */
+setGPSUpdateInterval(int seconds){
+	linker.setGpsUpdateInterval(seconds);
+}
+
+/**
+  * Start using the internal GPS to update the location.
+  */
+startInternalGPS(){
+	linker.startInternalGPS();
+}
+
+/**
+  * @return whether internal GPS is on
+  */
+boolean isInternalGPSOn() {
+  return linker.isInternalGPSOn();
+}
+
+/**
+  * Start using the external GPS to update the location.
+  *
+  * A dialog will be presented to the user to choose which bluetooth device to be used as external GPS.
+  */
+startExternalGPS(){
+	linker.startExternalGPS();
+}
+
+/**
+  * @return whether external GPS is on
+  */
+boolean isExternalGPSOn() {
+  return linker.isExternalGPSOn();
+}
+
+/**
+  * Get the GPS position as longitude and latitude from external GPS or internal GPS.
+  *
+  * @return GPSPosition if starting GPS or null if no GPS started or position found
+  */
+Object getGPSPosition(){
+	return linker.getGPSPosition();
+}
+
+/**
+  * Stops both internal and external gps.
+  */
+stopGPS() {
+  linker.stopGPS();
+}
+
+/**
+  * Get the GPS position as longitude and latitude in the module projection from external GPS or internal GPS.
+  *
+  * @return projected GPSPosition if starting GPS or null if no GPS started or position found
+  */
+Object getGPSPositionProjected() {
+	return linker.getGPSPositionProjected();
+}
+
+/**
+  * Get the GPS accuracy from external GPS or internal GPS.
+  *
+  * @return accuracy of the gps or null
+  */
+Object getGPSEstimatedAccuracy(){
+	return linker.getGPSEstimatedAccuracy();
+}
+
+/**
+  * Get the GPS heading from external GPS or internal GPS.
+  *
+  * @return heading of the gps or null
+  */
+Object getGPSHeading(){
+	return linker.getGPSHeading();
+}
+
+/**
+  * Get the GPS position as longitude and latitude from selected GPS.
+  *
+  * @param gps the type of gps used, one of "internal" or "external"
+  * @return GPSPosition if starting GPS or null if no GPS started or position found
+  */
+Object getGPSPosition(String gps){
+	return linker.getGPSPosition(gps);
+}
+
+/**
+  * Get the GPS accuracy from selected GPS.
+  *
+  * @param gps the type of gps used, one of "internal" or "external"
+  * @return accuracy of the selected gps or null
+  */
+Object getGPSEstimatedAccuracy(String gps){
+	return linker.getGPSEstimatedAccuracy(gps);
+}
+
+/**
+  * Get the GPS heading from selected GPS.
+  *
+  * @param gps the type of gps used, one of "internal" or "external"
+  * @return heading of the selected gps or null
+  */
+Object getGPSHeading(String gps){
+	return linker.getGPSHeading(gps);
+}
+
+/**
+  * Start GPS track log with as either time based or distance based.
+  *
+  * @param type either "distance" or "time"
+  * @param value the value of the tracking, if type is "distance", the value will be in meter, if type is "time", the value will be in seconds
+  * @param callback code to execute when interval limit is reached
+  */
+startTrackingGPS(String type, int value, String callback){
+	linker.startTrackingGPS(type, value, callback);
+}
+
+/**
+  * @return whether GPS tracking is on
+  */
+boolean isTrackingGPS() {
+  return linker.isTrackingGPS();
+}
+
+/**
+  * Stop the GPS track log.
+  */
+stopTrackingGPS(){
+	linker.stopTrackingGPS();
+}
+
+//========= Bluetooth Functionality ==========
+/**
+  * Create bluetooth connection to read input and write output.
+  *
+  * @param callback the handler to call when input is read
+  * @param interval the time interval (seconds) between bluetooth reads. Set to 0 if you want to manually control reads.
+  */
+createBluetoothConnection(String callback, int interval){
+  linker.createBluetoothConnection(callback, interval);
+}
+
+/**
+  * Destroy bluetooth connection.
+  */
+destroyBluetoothConnection(){
+  linker.destroyBluetoothConnection();
+}
+
+/**
+  * @return whether bluetooth is connected
+  */
+boolean isBluetoothConnected() {
+  return linker.isBluetoothConnected();
+}
+
+/**
+  * Read message from bluetooth connection.
+  */
+readBluetoothMessage(){
+  linker.readBluetoothMessage();
+}
+
+/**
+  * Write message to bluetooth connection.
+  */
+writeBluetoothMessage(message){
+  linker.writeBluetoothMessage(message);
+}
+
+/**
+  * Write message to bluetooth connection.
+  */
+clearBluetoothMessages(){
+  linker.clearBluetoothMessages();
+}
+
+/**
+  * Get the bluetooth message.
+  */
+getBluetoothMessage(){
+  return _bluetooth_message;
+}
+
+//========= Map Functionality ==========
+/**
+  * Bind map click and select events to the map with the following reference.
+  *
+  * @param ref the reference to the map view
+  * @param clickCallback the callback that is executed when the map view is clicked
+  * @param selectCallback the callback that is executed when a element is clicked
+  */
+onMapEvent(String ref, String clickCallback, selectCallback) {
+	linker.bindMapEvent(ref, clickCallback, selectCallback);
+}
+
+/**
+  * Used in conjunction with the map click event. This returns the last point clicked on the map.
+  * @return the clicked map point
+  */
+getMapPointClicked() {
+	return _map_point_clicked;
+}
+
+/**
+  * Used in conjunction with the map select event. This returns the last element selected on the map.
+  *
+  * @return the selected geometry
+  */
+getMapGeometrySelected() {
+	return _map_geometry_selected;
+}
+
+/**
+  * Save the map view configuration to the specified file.
+  *
+  * @param ref the reference to the map view
+  * @param file the file to save the json config to, will show error if cannot create
+  * @callback the callback code to execute
+  */
+saveMapViewConfiguration(String ref, String file, String callback) {
+  linker.saveMapViewConfiguration(ref, file, callback);
+}
+
+/**
+  * Setup the map with the given reference with configuration specified in the json file.
+  *
+  * @param ref the reference to the map view
+  * @param configFile the json file with map view configuration, will show error if the file does not exist
+  * @callback the callback code to execute
+  */
+loadMapViewConfiguration(String ref, String configFile, String callback) {
+  linker.loadMapViewConfiguration(ref, configFile, callback);
+}
+
+/**
+  * Add a raster map layer to the map view with the following reference and make it the base layer.
+  *
+  * You can only have a single base layer.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the layer name for the raster map
+  * @param filename the filename of the map view, will show error if the file does not exist
+  */
+showBaseMap(String ref, String layerName, String filename) {
+	linker.showBaseMap(ref, layerName, filename);
+}
+
+/**
+  * Add a raster map layer to the map view with the following reference.
+  *
+  * You can have multiple raster layers.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the layer name for the raster map
+  * @param filename the filename of the map view, will show error if the file does not exist
+  */
+showRasterMap(String ref, String layerName, String filename) {
+	linker.showRasterMap(ref, layerName, filename);
+}
+
+/**
+  * Add a shape map layer to the map view with the following reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the layer name for the shape layer
+  * @param filename the file path of the shape map, will show error if the file does not exist
+  * @param pointStyle the styling to points appearing in the layer
+  * @param lineStyle the styling to lines appearing in the layer
+  * @param polygonStyle the styling to polygons appearing in the layer
+  */
+showShapeLayer(String ref, String layerName, String filename, GeometryStyle pointStyle, GeometryStyle lineStyle, GeometryStyle polygonStyle) {
+	linker.showShapeLayer(ref, layerName, filename, pointStyle, lineStyle, polygonStyle);
+}
+
+/**
+  * Add a vector map layer to the map view with the following reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the layer name for the shape layer
+  * @param filename the file path of the shape map, will show error if the file does not exist
+  * @param tableName the table name to be loaded from the database
+  * @param idColumn the id column from the table to be loaded from the database
+  * @param labelColumn the label column from the table to be loaded from the database to be shown as the label
+  * @param pointStyle the styling to points appearing in the layer
+  * @param lineStyle the styling to lines appearing in the layer
+  * @param polygonStyle the styling to polygons appearing in the layer
+  * @param textStyle the styling to all text labels appearing in the layer
+  */
+showSpatialLayer(String ref, String layerName, String filename, String tableName, String idColumn, String labelColumn, GeometryStyle pointStyle, GeometryStyle lineStyle, GeometryStyle polygonStyle, GeometryTextStyle textStyle) {
+	linker.showSpatialLayer(ref, layerName, filename, tableName, idColumn, labelColumn, pointStyle, lineStyle, polygonStyle, textStyle);
+}
+
+/**
+  * Add a database map layer to the map view with the following reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the layer name for the shape layer
+  * @param isEntity a boolean value to determine whether it is entity or relationship
+  * @param queryName the query name for the executed query
+  * @param querySql the sql to be executed for the layer
+  * @param pointStyle the styling to points appearing in the layer
+  * @param lineStyle the styling to lines appearing in the layer
+  * @param polygonStyle the styling to polygons appearing in the layer
+  * @param textStyle the styling to all text labels appearing in the layer
+  */
+showDatabaseLayer(String ref, String layerName, boolean isEntity, String queryName, String querySql,GeometryStyle pointStyle, GeometryStyle lineStyle, GeometryStyle polygonStyle, GeometryTextStyle textStyle) {
+	linker.showDatabaseLayer(ref, layerName, isEntity, queryName, querySql, pointStyle, lineStyle, polygonStyle, textStyle);
+}
+
+/**
+  * Add a canvas layer to the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the name of the canvas layer
+  */
+createCanvasLayer(String ref, String layerName) {
+	return linker.createCanvasLayer(ref, layerName);
+}
+
+/**
+  * Set the focus point of the map view using longitude and latitude specified in the modules projection.
+  *
+  * @param ref the reference to the map view
+  * @param longitude the longitude of the focus point
+  * @param latitude the latitude of the focus point
+  */
+setMapFocusPoint(String ref, float longitude, float latitude) {
+	linker.setMapFocusPoint(ref, longitude, latitude);
+}
+
+/**
+  * Set the focus point of the map view using longitude and latitude specified in the modules projection.
+  *
+  * @param ref the reference to the map view
+  * @param longitude the longitude of the focus point
+  * @param latitude the latitude of the focus point
+  */
+setMapFocusPoint(String ref, double longitude, double latitude) {
+	setMapFocusPoint(ref, (float) longitude, (float) latitude);
+}
+
+/**
+  * Set the rotation of the map with the given rotation.
+  *
+  * @param ref the reference to the map view
+  * @param rotation the rotation of the map view in degrees
+  */
+setMapRotation(String ref, float rotation) {
+	linker.setMapRotation(ref, rotation);
+}
+
+/**
+  * Set the zoom level of the map with the given level.
+  *
+  * @param ref the reference to the map view
+  * @param zoom the zoom level of the map view
+  */
+setMapZoom(String ref, float zoom) {
+	linker.setMapZoom(ref, zoom);
+}
+
+/**
+  * Set the tilt of the map with the given tilt.
+  *
+  * @param ref the reference to the map view
+  * @param tilt the tilt value default is 90 degrees for 2d view, minimum is 30 degrees
+  */
+setMapTilt(String ref, float tilt) {
+	linker.setMapTilt(ref, tilt);
+}
+
+/**
+  * Sets the currently selected layer for the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerid to be set as selected, if not found, a logic error will appear.
+  */
+setSelectedLayer(String ref, int layerId) {
+  linker.setSelectedLayer(ref, layerId);
+}
+
+/**
+  * Sets the currently selected layer for the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the layer name to be set as selected, if not found, a logic error will appear.
+  */
+setSelectedLayer(String ref, String layerName) {
+  linker.setSelectedLayer(ref, layerName);
+}
+
+/**
+  * Remove a layer from the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerid to be removed, if not found, a logic error will appear.
+  */
+removeLayer(String ref, int layerId) {
+	linker.removeLayer(ref, layerId);
+}
+
+/**
+  * Center the map based on the current GPS position if there is GPS position.
+  *
+  * @param ref the reference to the map view
+  */
+centerOnCurrentPosition(String ref){
+	linker.centerOnCurrentPosition(ref);
+}
+
+/**
+  * Change the visibility of the specified layer in the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerId to set visibility, will show logic error dialog if not found
+  * @param visible the boolean to set whether it is visible or not
+  */
+setLayerVisible(String ref, int layerId, boolean visible) {
+	linker.setLayerVisible(ref, layerId, visible);
+}
+
+/**
+  * Change the showAlways attribute of the specified gdal layer in the map view with the given reference.
+  * If showAlways set to true, the GDAL layer will always be loaded without doing calculation to determine
+  * which tile should be shown at certain zoom level.
+  *
+  * @param ref the reference to the map view
+  * @param layerName the layerName to set showAlways options, will show logic error dialog if not a gdal layer
+  * @param showAlways the boolean to set whether it is doing calculation or not
+  */
+setGdalLayerShowAlways(String ref, String layerName, boolean showAlways){
+	linker.setGdalLayerShowAlways(ref, layerName, showAlways);
+}
+/**
+  * Draw a point on the map view with the given reference by specifying the point and style.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerId to draw the point to, will show logic error dialog if not found
+  * @param point the map view point to be drawn
+  * @param style the style that will be applied to the point
+  */
+drawPoint(String ref, int layerId, MapPos point, GeometryStyle style) {
+	linker.drawPoint(ref, layerId, point, style);
+}
+
+/**
+  * Draw a line on the map view with the given reference by specifying the points and style.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerId to draw the point to, will show logic error dialog if not found
+  * @param points the map view points to be drawn as a line
+  * @param style the style that will be applied to the line
+  */
+drawLine(String ref, int layerId, List points, GeometryStyle style) {
+	linker.drawLine(ref, layerId, points, style);
+}
+
+/**
+  * Draw a polygon on the map view with the given reference by specifying the points and style.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerId to draw the point to, will show logic error dialog if not found
+  * @param points the map view points to be drawn as polygon
+  * @param style the style that will be applied to the polygon
+  */
+drawPolygon(String ref, int layerId, List points, GeometryStyle style) {
+	linker.drawPolygon(ref, layerId, points, style);
+}
+
+/**
+  * Clear a geometry from the map view with the given reference by specifying the geometry id.
+  *
+  * @param ref the reference to the map view
+  * @param geomId the id of the geometry to be cleared, will show logic error dialog if not found
+  */
+clearGeometry(String ref, int geomId) {
+	linker.clearGeometry(ref, geomId);
+}
+
+/**
+  * Clear a list of geometries from the map view with the given reference by specifying the list of geometry.
+  *
+  * @param ref the reference to the map view
+  * @param geomList the list of id of the geometries to be cleared, will show logic error dialog if not found
+  */
+clearGeometryList(String ref, List geomList) {
+	linker.clearGeometryList(ref, geomList);
+}
+
+/**
+  * Create a point from longitude and latitude.
+  *
+  * @param lon the longitude of the point in String format
+  * @param lat the latitude of the point in String format
+  * @return MapPos the new point object for the map view
+  */
+createPoint(String lon, String lat) {
+	return createPoint(Float.parseFloat(lon), Float.parseFloat(lat));
+}
+
+/**
+  * Create a point from longitude and latitude.
+  *
+  * @param lon the longitude of the point in float format
+  * @param lat the latitude of the point in float format
+  * @return MapPos the new point object for the map view
+  */
+createPoint(float lon, float lat) {
+	return new MapPos(lon, lat);
+}
+
+/**
+  * Create a point from longitude and latitude.
+  *
+  * @param lon the longitude of the point in double format
+  * @param lat the latitude of the point in double format
+  * @return MapPos the new point object for the map view
+  */
+createPoint(double lon, double lat) {
+	return createPoint((float) lon, (float) lat);
+}
+
+/**
+  * Get all geometries in a specified layer from the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerId to get the geometries from, will show logic error dialog if not found
+  * @return list of the geometries or null
+  */
+getGeometryList(String ref, int layerId) {
+	return linker.getGeometryList(ref, layerId);
+}
+
+/**
+  * Get a geometry from the map view with the given reference by specifying the geometry id.
+  *
+  * @param ref the reference to the map view
+  * @param geomId the id of the geometry, will show logic error dialog if not found
+  * @return list of the geometries or null
+  */
+getGeometry(String ref, int geomId) {
+	return linker.getGeometry(ref, geomId);
+}
+
+/**
+  * Get the layer name of the associated geometry on a canvas layer.
+  *
+  * @param ref the reference to the map view
+  * @geomId the id of the geometry
+  * @return the layer name of the canvas layer the geometry is on
+  */
+getGeometryLayerName(String ref, int geomId) {
+	return linker.getGeometryLayerName(ref, geomId);
+}
+
+/**
+  * Draw geometry on the map view with the given reference by specifying the geometry and style.
+  *
+  * @param ref the reference to the map view
+  * @param layerId the layerId to draw the geometry to, will show logic error dialog if not found
+  * @param geom the geometry to be drawn
+  * @param style the style that will be applied to the geometry
+  * @return the id of the created geometry
+  */
+drawGeometry(String ref, int layerId, Geometry geom, GeometryStyle style) {
+	if (geom instanceof Point) {
+		return drawPoint(ref, layerId, ((Point) geom).getMapPos(), style);
+	} else if (geom instanceof Line) {
+		return drawLine(ref, layerId, ((Line) geom).getVertexList(), style);
+	} else if (geom instanceof Polygon) {
+		return drawPolygon(ref, layerId, ((Polygon) geom).getVertexList(), style);
+	}
+}
+
+/**
+  * Create a point style with the given minZoom, color, size, and pickSize.
+  *
+  * @param minZoom the minimum level of zoom for the point to show up
+  * @param color the color of the point
+  * @param size the size of the point, range from 0.0 - 1.0
+  * @param pickSize the picking size of the point, used for selecting the point, range from 0.0 - 1.0
+  * @return the new point style
+  */
+createPointStyle(int minZoom, int color, float size, float pickSize) {
+	return linker.createPointStyle(minZoom, color, size, pickSize);
+}
+
+/**
+  * Create a line style with the given minZoom, color, width, pickWidth, and pointStyle.
+  *
+  * @param minZoom the minimum level of zoom for the line to show up
+  * @param color the color of the line
+  * @param width the width of the line, range from 0.0 - 1.0
+  * @param pickWidth the picking width of the line, used for selecting the line, range from 0.0 - 1.0
+  * @param pointStyle the styling of the point for the line
+  * @return the new line style
+  */
+createLineStyle(int minZoom, int color, float width, float pickWidth, GeometryStyle pointStyle) {
+	return linker.createLineStyle(minZoom, color, width, pickWidth, pointStyle);
+}
+
+/**
+  * Create a polygon style with the given minZoom, color, and lineStyle.
+  *
+  * @param minZoom the minimum level of zoom for the polygon to show up
+  * @param color the color of the polygon
+  * @param lineStyle the styling of the line for the polygon
+  * @return the new polygon style
+  */
+createPolygonStyle(int minZoom, int color, GeometryStyle lineStyle) {
+	return linker.createPolygonStyle(minZoom, color, lineStyle);
+}
+
+/**
+  * Create a text style with the given minZoom, color, size, and font.
+  *
+  * @param minZoom the minimum level of zoom for the text label to show up
+  * @param color the color of the text label
+  * @param size the size of the text label
+  * @param font the font of the text label
+  * @return the new text style
+  */
+createTextStyle(int minZoom, int color, int size, android.graphics.Typeface font) {
+	return linker.createTextStyle(minZoom, color, size, font);
+}
+
+/**
+  * This sets the tilt of the map to be locked at 90 degrees to give a 2D view of the map.
+  *
+  * @param ref the reference to the map view
+  * @param lock set to true to lock the map view
+  */
+lockMapView(String ref, boolean lock) {
+	linker.lockMapView(ref, lock);
+}
+
+/**
+  * Add the specified geometry to the list of highlighted geometry on the map with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param geomId the id of the geometry to be highlighted
+  */
+addGeometryHighlight(String ref, int geomId) {
+	linker.addGeometryHighlight(ref, geomId);
+}
+
+/**
+  * Remove the specified geometry from the list of highlighted geometry on the map with the given reference.
+  *
+  * @param ref the reference to the map view
+  * @param geomId the id of the geometry to be removed from highlighted list
+  */
+removeGeometryHighlight(String ref, int geomId) {
+	linker.removeGeometryHighlight(ref, geomId);
+}
+
+/**
+  * Call this method to prepare the geometry in the highlighted list to be transformed to their new position.
+  *
+  * @param ref the reference to the map view
+  */
+prepareHighlightTransform(String ref) {
+	linker.prepareHighlightTransform(ref);
+}
+
+/**
+  * Call this method after calling prepareHighlightTransform once your ready to transform the geometry to their new position.
+  *
+  * @param ref the reference to the map view
+  */
+doHighlightTransform(String ref) {
+	linker.doHighlightTransform(ref);
+}
+
+/**
+  * Clear the highlighted geometry list for the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  */
+clearGeometryHighlights(String ref) {
+	linker.clearGeometryHighlights(ref);
+}
+
+/**
+  * Get the highlighted geometry list for the map view with the given reference.
+  *
+  * @param ref the reference to the map view
+  */
+getGeometryHighlights(String ref) {
+	return linker.getGeometryHighlights(ref);
+}
+
+/**
+  * Add a database layer query to the map with the given reference which will then be used when loading database layers via the layer manager.
+  *
+  * @param ref the reference to the map view
+  * @param name the name of the query added
+  * @param sql the query to be executed
+  */
+addDatabaseLayerQuery(String ref, String name, String sql) {
+	linker.addDatabaseLayerQuery(ref, name, sql);
+}
+
+/**
+  * Add a track log layer query to the map with the given reference which will then be used when loading track log layers via the layer manager.
+  *
+  * @param ref the reference to the map view
+  * @param name the name of the query added
+  * @param sql the query to be executed
+  */
+addTrackLogLayerQuery(String ref, String name, String sql) {
+	linker.addTrackLogLayerQuery(ref, name, sql);
+}
+
+/**
+  * Add a query builder to the map view which will then be used by the database selection tool via the tools bar.
+  *
+  * @param ref the reference to the map view
+  * @param name the name of the query added
+  * @param builder the query builder to be executed when selected
+  */
+addSelectQueryBuilder(String ref, String name, QueryBuilder builder) {
+	linker.addSelectQueryBuilder(ref, name, builder);
+}
+
+/**
+  * Create a query builder for database selection tool by providing the sql query and adding parameters.
+  *
+  * @param sql the query to be executed when selected
+  */
+createQueryBuilder(String sql) {
+	return new QueryBuilder(sql);
+}
+
+/**
+  * Add a legacy query builder to the map view which will then be used by the legacy selection tool via the tools bar.
+  *
+  * @param ref the reference to the map view
+  * @param name the name of the query added
+  * @param dbPath the path of the database file
+  * @param tableName the name of the table for the database executed against
+  * @param builder the query builder to be executed when selected
+  */
+addLegacySelectQueryBuilder(String ref, String name, String dbPath, String tableName, QueryBuilder builder) {
+	linker.addLegacySelectQueryBuilder(ref, name, dbPath, tableName, builder);
+}
+
+/**
+  * Create a legacy query builder for legacy selection tool by providing the sql query and adding parameters.
+  * @param sql the query to be executed when selected
+  */
+createLegacyQueryBuilder(String sql) {
+	return new LegacyQueryBuilder(sql);
+}
+
+/**
+  * Convert a map position from one projection to another projection.
+  *
+  * @param fromSrid the projection to convert
+  * @param toSrid the projection to be converted to
+  * @param p the map position to be converted
+  */
+convertFromProjToProj(String fromSrid, String toSrid, MapPos p) {
+	return linker.convertFromProjToProj(fromSrid, toSrid, p);
+}
+
+/**
+  * Enable or disable map tools for the map view.
+  *
+  * @param ref the reference to the map view
+  * @param enabled true or false to enable or disable map tools
+  */
+setToolsEnabled(String ref, boolean enabled) {
+	linker.setToolsEnabled(ref, enabled);
+}
+
+/**
+  * Add tool specific events (create or load).
+  *
+  * The create event is called when the create point, line or polygon
+  * tools generate their geometry.
+  *
+  * The load event is called when the load data tool is used to select
+  * geometry.
+  *
+  * @param ref the reference to the map view
+  * @param type the event type (create or load)
+  * @callback the callback code to execute
+  */
+onToolEvent(String ref, String type, String callback) {
+	linker.bindToolEvent(ref, type, callback);
+}
+
+/**
+  * This is used in conjunction with the tool create event. This returns the last created geometry id.
+  */
+getMapGeometryCreated() {
+	return _map_geometry_created;
+}
+
+/**
+  * This is used in conjunction with the tool load event. This will return the last selected geometry id.
+  */
+getMapGeometryLoaded() {
+	return _map_geometry_loaded;
+}
+
+/**
+  * This is used in conjunction with the tool load event. This will return the last selected geometry type (either entity or relationship).
+  */
+getMapGeometryLoadedType() {
+	return _map_geometry_loaded_type;
+}
+
+/**
+  * Refresh all the layers of the map.
+  *
+  * @param reference to the map view
+  */
+refreshMap(String ref) {
+	linker.refreshMap(ref);
+}
+
+//========= Sync Functionality ==========
+/**
+  * Push the full database from the app to the server and execute the callback when finished.
+  *
+  * @param callback the callback that will be executed when the operation finished
+  */
+pushDatabaseToServer(String callback) {
+	linker.pushDatabaseToServer(callback);
+}
+
+/**
+  * Pull the full database from the server to the app and execute the callback when finished.
+  *
+  * @param callback the callback that will be executed when the operation finished
+  */
+pullDatabaseFromServer(String callback) {
+	linker.pullDatabaseFromServer(callback);
+}
+
+/**
+  * Enable or disable syncing the database from the app to the server.
+  *
+  * @param value boolean value to set the sync enabled or not
+  */
+setSyncEnabled(boolean value) {
+	linker.setSyncEnabled(value);
+}
+
+/**
+  * @return whether sync is enabled
+  */
+boolean isSyncEnabled() {
+  linker.isSyncEnabled();
+}
+
+/**
+  * Bind to the sync start, success and failure events.
+  *
+  * @param startCallback the callback that will be executed when sync is started
+  * @param successCallback the callback that will be executed when sync is finish
+  * @param failureCallback the callback that will be executed when sync is failing
+  */
+onSyncEvent(String startCallback, String successCallback, String failureCallback) {
+	linker.addSyncListener(startCallback, successCallback, failureCallback);
+}
+
+/**
+  * Set the minimum interval for the sync to happen.
+  *
+  * @param value the minimum interval for the sync to happen in seconds
+  */
+setSyncMinInterval(float value) {
+	linker.setSyncMinInterval(value);
+}
+
+/**
+  * Set the maximum interval for the sync to happen.
+  *
+  * @param value the maximum interval for the sync to happen in seconds
+  */
+setSyncMaxInterval(float value) {
+	linker.setSyncMaxInterval(value);
+}
+
+/**
+  * Set the delay interval to add to the current sync interval when a sync failure happens.
+  *
+  * @param value the delay interval for each sync in seconds.
+  */
+setSyncDelay(float value) {
+	linker.setSyncDelay(value);
+}
+
+/**
+  * Set whether files should also be synced with the database.
+  *
+  * @param value boolean value to set the file sync enabled or not
+  */
+setFileSyncEnabled(boolean enabled) {
+	linker.setFileSyncEnabled(enabled);
+}
+
+/**
+  * @return whether file sync is enabled
+  */
+boolean isFileSyncEnabled() {
+  linker.isFileSyncEnabled();
+}
+
+//========= Static Data Functionality ==========
+/**
+  * Get the static data for current module name.
+  *
+  * @return module name
+  */
+String getModuleName(){
+	return linker.getModuleName();
+}
+
+/**
+  * Get the static data for current module version.
+  *
+  * @return module version
+  */
+String getModuleVersion(){
+  return linker.getModuleVersion();
+}
+
+/**
+  * Get the static data for current module projection.
+  *
+  * @return module projection
+  */
+String getModuleSrid(){
+	return linker.getModuleSrid();
+}
+
+/**
+  * Get the static data for current module id.
+  *
+  * @return module id
+  */
+String getModuleId(){
+	return linker.getModuleId();
+}
+
+/**
+  * Get the static data for current module season.
+  *
+  * @return module season
+  */
+String getModuleSeason(){
+	return linker.getModuleSeason();
+}
+
+/**
+  * Get the static data for current module description.
+  *
+  * @return module description
+  */
+String getProjectDescription(){
+	return linker.getProjectDescription();
+}
+
+/**
+  * Get the static data for current permit number.
+  *
+  * @return permit number
+  */
+String getPermitNo(){
+	return linker.getPermitNo();
+}
+
+/**
+  * Get the static data for current permit holder.
+  *
+  * @return permit holder
+  */
+String getPermitHolder(){
+	return linker.getPermitHolder();
+}
+
+/**
+  * Get the static data for current contact and address.
+  *
+  * @return contact and address
+  */
+String getContactAndAddress(){
+	return linker.getContactAndAddress();
+}
+
+/**
+  * Get the static data for current participants.
+  *
+  * @return participants
+  */
+String getParticipants(){
+	return linker.getParticipants();
+}
+
+/**
+  * Get the static data for permit issued by.
+  *
+  * @return permit issued by
+  */
+public String getPermitIssuedBy() {
+	return linker.getPermitIssuedBy();
+}
+
+/**
+  * Get the static data for permit type.
+  *
+  * @return permit type
+  */
+public String getPermitType() {
+	return linker.getPermitType();
+}
+
+/**
+  * Get the static data for copyright holder.
+  *
+  * @return copyright holder
+  */
+public String getCopyrightHolder() {
+	return linker.getCopyrightHolder();
+}
+
+/**
+  * Get the static data for client/sponsor.
+  *
+  * @return client/sponsor
+  */
+public String getClientSponsor() {
+	return linker.getClientSponsor();
+}
+
+/**
+  * Get the static data for land owner.
+  *
+  * @return land owner
+  */
+public String getLandOwner() {
+	return linker.getLandOwner();
+}
+
+/**
+  * Get the static data for whether containing sensitive data or not.
+  *
+  * @return true or false
+  */
+public String hasSensitiveData() {
+	return linker.hasSensitiveData();
+}
+
+//========= File attachment Functionality ==========
+
+/**
+  * Show the file browser and execute the callback once a file is selected.
+  *
+  * @param callback the callback to be executed once the operation finished
+  */
+showFileBrowser(String callback) {
+	linker.showFileBrowser(callback);
+}
+
+/**
+  * This is used in conjunction with showFileBrowser. This returns the filename of the last selected file.
+  *
+  * @return name of last selected file
+  */
+getLastSelectedFilename() {
+	return _last_selected_filename;
+}
+
+/**
+  * This is used in conjunction with showFileBrowser. This returns the filepath of the last selected file.
+  *
+  * @return path of last selected file
+  */
+getLastSelectedFilepath() {
+	return _last_selected_filepath;
+}
+
+/**
+  * Copy a file into the modules server or app folders. If the sync is set to true then the file
+  * is copied to the app folder. If the sync is set to false then the file is copied to the server folder.
+  *
+  * Files in the app folder are sync to the server and other apps. Files in the server folder are only
+  * synced to the server.
+  *
+  * @param filepath the path of the file to be synced
+  * @param sync the boolean value to tell whether the file should be copied to the app/server folder
+  * @return the full path of the file
+  */
+attachFile(String filePath, boolean sync) {
+	return linker.attachFile(filePath, sync, null, null);
+}
+
+/**
+  * Copy a file into the modules server or app folders. If the sync is set to true then the file
+  * is copied to the app folder. If the sync is set to false then the file is copied to the server folder.
+  *
+  * Files in the app folder are sync to the server and other apps. Files in the server folder are only
+  * synced to the server.
+  *
+  * @param filepath the path of the file to be synced
+  * @param sync the boolean value to tell whether the file should be copied to the app/server folder
+  * @param dir the directory to be added to the app/server folder, can be null
+  * @return the full path of the file
+  */
+attachFile(String filePath, boolean sync, String dir) {
+	return linker.attachFile(filePath, sync, dir, null);
+}
+
+/**
+  * Copy a file into the modules server or app folders. If the sync is set to true then the file
+  * is copied to the app folder. If the sync is set to false then the file is copied to the server folder.
+  *
+  * Files in the app folder are sync to the server and other apps. Files in the server folder are only
+  * synced to the server.
+  *
+  * @param filepath the path of the file to be synced
+  * @param sync the boolean value to tell whether the file should be copied to the app/server folder
+  * @param dir the directory to be added to the app/server folder, can be null
+  * @param callback code to execute when file is finished copying into the directory
+  * @return the full path of the file
+  */
+attachFile(String filePath, boolean sync, String dir, String callback) {
+	return linker.attachFile(filePath, sync, dir, callback);
+}
+
+/**
+  * Copy a file into the modules server or app folders. If the sync is set to true then the file
+  * is copied to the app folder. If the sync is set to false then the file is copied to the server folder.
+  *
+  * Files in the app folder are sync to the server and other apps. Files in the server folder are only
+  * synced to the server.
+  *
+  * @param filepath the path of the file to be synced
+  * @param sync the boolean value to tell whether the file should be copied to the app/server folder
+  * @param dir the directory to be added to the app/server folder, can be null
+  * @param callback code to execute when file is finished copying into the directory
+  * @param attributeName the name of the attribute you are attaching the file to
+  * @return the full path of the file
+  */
+attachFile(String filePath, boolean sync, String dir, String callback, String attributeName) {
+  return linker.attachFile(filePath, sync, dir, callback, attributeName);
+}
+
+/**
+  * Shows a dialog, displaying options to remove synced files to clean up space
+  */
+cleanSyncedFiles() {
+  linker.cleanSyncedFiles();
+}
+
+/**
+  * List all attached files of an archaeological entity by providing the id of the entity.
+  *
+  * @param id the id of the entity
+  */
+viewArchEntAttachedFiles(String id){
+	linker.viewArchEntAttachedFiles(id);
+}
+
+/**
+  * List all attached files of a relationship by providing the id of the relationship.
+  *
+  * @param id the id of the relationship
+  */
+viewRelAttachedFiles(String id){
+	linker.viewRelAttachedFiles(id);
+}
+
+/**
+  * Open the camera and then execute the callback after finish.
+  *
+  * @param callback the callback executed after operation is finish
+  */
+openCamera(String callback){
+	linker.openCamera(callback);
+}
+
+/**
+  * Open the video recorder and then execute the callback after finish.
+  *
+  * @param callback the callback executed after operation is finish
+  */
+openVideo(String callback){
+	linker.openVideo(callback);
+}
+
+/**
+  * Open the audio recorder and then execute the callback after finish.
+  *
+  * @param callback the callback executed after operation is finish
+  */
+recordAudio(String callback){
+	linker.recordAudio(callback);
+}
+
+/**
+  * Open the barcode scanner and then execute the callback after finish.
+  *
+  * @param callback the callback executed after operation is finish
+  */
+scanCode(String callback){
+  linker.scanCode(callback);
+}
+
+/**
+  * Enable hardware device debug mode, which shows a toast of the device name for every input.
+  *
+  * @param enabled the boolean denoting on or off
+  */
+debugHardwareDevices(boolean enabled){
+  linker.debugHardwareDevices(enabled);
+}
+
+/**
+  * Returns a list of the names of all devices currently attached, includes defaults e.g. Virtual, Volume Buttons etc.
+  *
+  * @return list of device names
+  */
+getHardwareDevices(){
+  linker.getHardwareDevices();
+}
+
+/**
+  * Capture key events for the given device name, and then execute the callback once the delimiter is read.
+  *
+  * @param deviceName the name of the device to capture input for
+  * @param delimiter the character which denotes end of input
+  * @param callback the callback executed after delimiter is reached
+  */
+captureHardware(String deviceName, String delimiter, String callback){
+  linker.captureHardware(deviceName, delimiter, callback);
+}
+
+/**
+  * Clears the buffer for the device currently used with captureHardware()
+  */
+clearHardwareDeviceBuffer(){
+  linker.clearHardwareDeviceBuffer();
+}
+
+/**
+  * This is used in conjunction with openCamera. This returns the file path of the last picture taken.
+  *
+  * @return the path of the last taken picture
+  */
+String getLastPictureFilePath(){
+	return linker.getLastPictureFilePath();
+}
+
+/**
+  * This is used in conjunction with openVideo. This returns the file path of the last video taken.
+  *
+  * @return the path of the last recorded video
+  */
+String getLastVideoFilePath(){
+	return linker.getLastVideoFilePath();
+}
+
+/**
+  * This is used in conjunction with recordVideo. This returns the file path of the last audio taken.
+  *
+  * @return the path of the last recorded audio
+  */
+String getLastAudioFilePath(){
+	return linker.getLastAudioFilePath();
+}
+
+/**
+  * This is used in conjunction with scanCode. This returns the contents of the last scan taken.
+  *
+  * @return the contents of the last scan
+  */
+String getLastScanContents(){
+  return linker.getLastScanContents();
+}
+
+/**
+  * This is used in conjunction with captureHarware. This returns the contents of the buffer contents.
+  *
+  * @return the contents of the buffer read from a hardware device
+  */
+String getHardwareBufferContents(){
+  return linker.getHardwareBufferContents();
+}
+
+/**
+  * @return returns true if files are currently being attached
+  */
+isAttachingFiles(){
+	return linker.isAttachingFiles();
+}
+
+/**
+  * @return returns the full path to attached file
+  */
+getAttachedFilePath(String file) {
+	return linker.getAttachedFilePath(file);
+}
+
+/**
+  * @return returns the file path relative to the modules folder of file
+  */
+stripAttachedFilePath(String file) {
+	return linker.stripAttachedFilePath(file);
+}
+
+/**
+  * Add file to checkbox group.
+  *
+  * @param ref reference to the checkbox group
+  * @param file the filepath of the file to add
+  */
+addFile(String ref, String file) {
+	linker.addFile(ref, file);
+}
+
+/**
+  * Add picture to gallery.
+  *
+  * @param ref reference to the gallery
+  * @param file the filepath of the picture to add
+  */
+addPicture(String ref, String file) {
+	linker.addPicture(ref, file);
+}
+
+/**
+  * Add file to checkbox group.
+  *
+  * @param ref reference to the checkbox group
+  * @param file the filepath of the video to add
+  */
+addVideo(String ref, String file) {
+	linker.addVideo(ref, file);
+}
+
+//========= MISC ==========
+
+/**
+  * Executes a given string of code.
+  *
+  * @param code the string of code to execute
+  */
+execute(String code){
+	return linker.execute(code);
+}
+
+/**
+  * Adds an item to the action bar with a reference name
+  *
+  * @param name the reference name for the action bar menu item
+  * @param callback the callback with item action/s, label/s and show requirement
+  */
+addActionBarItem(String name, ActionButtonCallback callback) {
+  linker.addActionBarItem(name, callback);
+}
+
+/**
+  * Remove an action item with the given reference name
+  *
+  * @param name the reference name of the action bar menu item
+  */
+removeActionBarItem(String name) {
+  linker.removeActionBarItem(name);
+}
+
+/**
+  * Refreshes the action bar menu do menu items reflect the current state
+  */
+refreshActionBarMenu() {
+  linker.refreshActionBarMenu();
+}
+
+/**
+  * Adds an action button to the navigation drawer
+  *
+  * @param name the reference name of the action button
+  * @param callback the callback with item action and label
+  */
+addNavigationButton(String name, ActionButtonCallback callback) {
+  linker.addNavigationButton(name, callback, "default");
+}
+
+/**
+  * Adds an action button to the navigation drawer
+  *
+  * @param name the reference name of the action button
+  * @param callback the callback with item action and label
+  * @param type the type of button to add (default, primary, success and danger)
+  */
+addNavigationButton(String name, ActionButtonCallback callback, String type) {
+  linker.addNavigationButton(name, callback, type);
+}
+
+/**
+  * Remove an action button to the navigation drawer
+  *
+  * @param name the reference name of the action button
+  */
+removeNavigationButton(String name) {
+  linker.removeNavigationButton(name);
+}
+
+/**
+  * Returns the currently connected server
+  *
+  * @return IP and port of the connected server, null if no connected server. Note: doesn't check if connection is active
+  */
+String getConnectedServer() {
+  return linker.getConnectedServer();
+}
+
+/**
+  * Helper method to be used with a button click event to attach files to a view
+  *
+  * @param ref the view reference to attach the files to (must be of type file)
+  */
+attachFileTo(String ref) {
+	showFileBrowser("_setFileTo(\""+ref+"\")");
+}
+
+/**
+  */
+_setFileTo(String ref) {
+	String filePath = getLastSelectedFilepath();
+	List selectedFiles = null;
+    if (isNull(getFieldValue(ref))) {
+    	selectedFiles = new ArrayList();
+    	selectedFiles.add(filePath);
+    	addFile(ref, filePath);
+    } else {
+    	selectedFiles = _convertPairsToList(getFieldValue(ref));
+    	if (!selectedFiles.contains(filePath)) {
+    		selectedFiles.add(filePath);
+    		addFile(ref, filePath);
+    	}
+    }
+    setFieldValue(ref, _convertListToPairs(selectedFiles));
+}
+
+/**
+  * Helper method to be used with a button click event to attach pictures to a view
+  *
+  * @param ref the view reference to attach the pictures to (must be of type camera)
+  */
+attachPictureTo(String ref) {
+	openCamera("_setPictureTo(\""+ref+"\")");
+}
+
+/**
+  */
+_setPictureTo(String ref) {
+	String filePath = getLastPictureFilePath();
+	List selectedFiles = null;
+    if (isNull(getFieldValue(ref))) {
+    	selectedFiles = new ArrayList();
+    	selectedFiles.add(filePath);
+    	addPicture(ref, filePath);
+    } else {
+    	selectedFiles = _convertPairsToList(getFieldValue(ref));
+    	if (!selectedFiles.contains(filePath)) {
+    		selectedFiles.add(filePath);
+    		addPicture(ref, filePath);
+    	}
+    }
+    setFieldValue(ref, _convertListToPairs(selectedFiles));
+}
+
+/**
+  * Helper method to be used with a button click event to attach videos to a view
+  *
+  * @param ref the view reference to attach the videos to (must be of type video)
+  */
+attachVideoTo(String ref) {
+	openVideo("_setVideoTo(\""+ref+"\")");
+}
+
+/**
+  */
+_setVideoTo(String ref) {
+	String filePath = getLastVideoFilePath();
+	List selectedFiles = null;
+    if (isNull(getFieldValue(ref))) {
+    	selectedFiles = new ArrayList();
+    	selectedFiles.add(filePath);
+    	addVideo(ref, filePath);
+    } else {
+    	selectedFiles = _convertPairsToList(getFieldValue(ref));
+    	if (!selectedFiles.contains(filePath)) {
+    		selectedFiles.add(filePath);
+    		addVideo(ref, filePath);
+    	}
+    }
+    setFieldValue(ref, _convertListToPairs(selectedFiles));
+}
+
+/**
+  * Helper method to be used with a button click event to attach audios to a view
+  *
+  * @param ref the view reference to attach the audios to (must be of type file)
+  */
+attachAudioTo(String ref) {
+	recordAudio("_setAudioTo(\""+ref+"\")");
+}
+
+/**
+  */
+_setAudioTo(String ref) {
+	String filePath = getLastAudioFilePath();
+	List selectedFiles = null;
+    if (isNull(getFieldValue(ref))) {
+    	selectedFiles = new ArrayList();
+    	selectedFiles.add(filePath);
+    	addFile(ref, filePath);
+    } else {
+    	selectedFiles = _convertPairsToList(getFieldValue(ref));
+    	if (!selectedFiles.contains(filePath)) {
+    		selectedFiles.add(filePath);
+    		addFile(ref, filePath);
+    	}
+    }
+    setFieldValue(ref, _convertListToPairs(selectedFiles));
+}
+
+/**
+  */
+_convertPairsToList(pairs) {
+	if (pairs == null) return new ArrayList();
+	ArrayList list = new ArrayList();
+	for (NameValuePair p : pairs) {
+		list.add(p.getName());
+	}
+	return list;
+}
+
+/**
+  */
+_convertListToPairs(list) {
+	if (list == null) return new ArrayList();
+	ArrayList pairs = new ArrayList();
+	for (String s : list) {
+		pairs.add(new NameValuePair(s, "true"));
+	}
+	return pairs;
+}
+
+/**
+  * Helper method to test if a value is null or empty.
+  * @param value a string value
+  */
+isNull(String value) {
+	return value == null || "".equals(value);
+}
+
+/**
+  * Helper method to test if a value is null or empty.
+  * @param value a list value.
+  */
+isNull(List value) {
+	return value == null || value.isEmpty();
+}

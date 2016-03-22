@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/androidcodescanner/androidcodescanner.iml" filepath="$PROJECT_DIR$/androidcodescanner/androidcodescanner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/androidfilechooser/androidfilechooser.iml" filepath="$PROJECT_DIR$/androidfilechooser/androidfilechooser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/faims-android-app.iml" filepath="$PROJECT_DIR$/faims-android-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/faimsandroidapp/faimsandroidapp.iml" filepath="$PROJECT_DIR$/faimsandroidapp/faimsandroidapp.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,22 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 'Google Inc.:Google APIs:17'
+    buildToolsVersion "19.1.0"
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles 'proguard-android-optimize.txt'
+        }
+    }
+}
+
+dependencies {
+    compile files('libs/core-2.3.0.jar')
+}

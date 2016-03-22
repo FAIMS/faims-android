@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="au.org.intersect.faims.android"
+    android:versionCode="14"
+    android:versionName="2.2" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19"/>
+    
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.BLUETOOTH" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.RECORD_AUDIO" />
+	<uses-permission android:name="android.permission.CAMERA" />
+	
+	<uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"/>
+
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false"/>
+
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" 
+        android:largeHeap="true">
+        
+        <activity
+            android:name="au.org.intersect.faims.android.ui.activity.SplashActivity"
+            android:label="@string/app_name"
+			android:configChanges="orientation|keyboardHidden|screenSize" 
+            android:screenOrientation="sensorPortrait"
+			>
+             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="au.org.intersect.faims.android.ui.activity.MainActivity"
+            android:label="@string/app_name"
+			android:configChanges="orientation|keyboardHidden|screenSize" 
+			/>
+        
+        <activity
+            android:name="au.org.intersect.faims.android.ui.activity.ServerSettingsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+             />
+
+        <activity
+            android:name="au.org.intersect.faims.android.ui.activity.ShowModuleActivity" 
+            android:configChanges="orientation|keyboardHidden|screenSize" 
+            >
+             <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="au.org.intersect.faims.android.ui.activity.MainActivity" />       
+        </activity>
+        
+        <service
+            android:name="au.org.intersect.faims.android.services.DownloadModuleService"
+            ></service>
+        
+        <service
+            android:name="au.org.intersect.faims.android.services.UpdateModuleSettingService"
+            ></service>
+        
+        <service
+            android:name="au.org.intersect.faims.android.services.UpdateModuleDataService"
+            ></service>
+        
+        <service
+            android:name="au.org.intersect.faims.android.services.DownloadDatabaseService"
+            ></service>
+        
+        <service
+            android:name="au.org.intersect.faims.android.services.UploadDatabaseService"
+            ></service>
+        
+        <service
+            android:name="au.org.intersect.faims.android.services.SyncDatabaseService"
+            ></service>
+        
+         <service
+            android:name="au.org.intersect.faims.android.services.SyncFilesService"
+            ></service>
+        
+        <activity android:name="group.pals.android.lib.ui.filechooser.FileChooserActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@android:style/Theme.Dialog"
+            ></activity>
+        
+        <activity
+               android:name="com.google.zxing.client.android.CaptureActivity"
+               android:screenOrientation="landscape"
+               android:configChanges="orientation|keyboardHidden"
+               android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+               android:windowSoftInputMode="stateAlwaysHidden">
+               <intent-filter>
+                  <action android:name="android.intent.action.MAIN"/>
+                  <category android:name="android.intent.category.DEFAULT"/>
+               </intent-filter>
+               <intent-filter>
+                  <action android:name="com.google.zxing.client.android.SCAN"/>
+                  <category android:name="android.intent.category.DEFAULT"/>
+               </intent-filter>
+        </activity>
+        
+        <service android:name="group.pals.android.lib.ui.filechooser.services.LocalFileProvider"
+            ></service>
+    </application>
+
+</manifest>
