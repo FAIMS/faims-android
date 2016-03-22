@@ -6,9 +6,9 @@
     permission.
 -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <string name="afc_lib_name">android-filechooser</string>
+    <string name="afc_lib_name" tools:ignore="MissingTranslation">android-filechooser</string>
     <string name="afc_cmd_advanced_selection_all">All</string>
     <string name="afc_cmd_advanced_selection_invert">Invert selection</string>
     <string name="afc_cmd_advanced_selection_none">None</string>
@@ -48,7 +48,7 @@
     <string name="afc_pmsg_max_file_count_allowed">…has more files, max allowed: %1$,d</string>
     <string name="afc_pmsg_unknown_error">Unknown error: %1$s</string>
     <string name="afc_pmsg_xxx_items">%1$,d items</string>
-    <string name="afc_root">Root</string>
+    <string name="afc_root" tools:ignore="MissingTranslation">Root</string>
     <string name="afc_title_advanced_selection">Select…</string>
     <string name="afc_title_alert">Alert</string>
     <string name="afc_title_choose_directories">Choose folders…</string>

@@ -12,6 +12,7 @@
     android:orientation="vertical" >
 
     <EditText
+        android:inputType="text"
         android:id="@+id/afc_simple_text_input_view_text1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
