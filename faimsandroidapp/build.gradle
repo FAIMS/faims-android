@@ -27,6 +27,7 @@ android {
 }
 
 dependencies {
+    compile project(':androidcodescanner')
     compile files('libs/android-support-v4.jar')
     compile files('libs/antlr-4.4-complete.jar')
     compile files('libs/apache-mime4j-core-0.7.2.jar')
@@ -53,5 +54,4 @@ dependencies {
     androidTestCompile files('libs/gson-2.2.3.jar')
     androidTestCompile files('libs/robotium-solo-5.1.jar')
     compile project(':androidfilechooser')
-    compile project(':androidcodescanner')
 }

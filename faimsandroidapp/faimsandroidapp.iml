@@ -109,7 +109,7 @@
     <orderEntry type="library" exported="" name="slf4j-android-1.6.1-RC1" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.2.3" level="project" />
     <orderEntry type="library" exported="" name="commons-compress-1.6" level="project" />
-    <orderEntry type="module" module-name="androidcodescanner" exported="" />
     <orderEntry type="module" module-name="androidfilechooser" exported="" />
+    <orderEntry type="module" module-name="androidcodescanner" exported="" />
   </component>
 </module>

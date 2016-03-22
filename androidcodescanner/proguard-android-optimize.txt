@@ -30,6 +30,9 @@
 -keep public class com.google.vending.licensing.ILicensingService
 -keep public class com.android.vending.licensing.ILicensingService
 
+# Prevent unused activity from being culled (for FAIMS app to use)
+-keep public class com.google.zxing.client.android.CaptureActivity
+
 # For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
 -keepclasseswithmembernames class * {
     native <methods>;
