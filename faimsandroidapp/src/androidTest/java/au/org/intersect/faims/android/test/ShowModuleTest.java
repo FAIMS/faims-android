@@ -125,20 +125,11 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
 		solo.scrollToBottom();
-//		String TAG = "Sol1";
-//		Log.e(TAG, "0: " + solo.getView(CustomButton.class, 0).getText());
-//		Log.e(TAG, "1: " + solo.getView(CustomButton.class, 1).getText());
-//		Log.e(TAG, "2: " + solo.getView(CustomButton.class, 2).getText());
-//		Log.e(TAG, "3: " + solo.getView(CustomButton.class, 3).getText());
-//		Log.e(TAG, "4: " + solo.getView(CustomButton.class, 4).getText());
-//		Log.e(TAG, "5: " + solo.getView(CustomButton.class, 5).getText());
-//		Log.e(TAG, "6: " + solo.getView(CustomButton.class, 6).getText());
-//		Log.e(TAG, "7: " + solo.getView(CustomButton.class, 7).getText());
-		solo.clickOnView(solo.getView(CustomButton.class, 5));
+		solo.clickOnButton("Save");
 		Thread.sleep(1000);
 		
 		TestModuleUtil.recreateActivity(getInstrumentation(), getActivity());
-		solo.clickOnText("Show Entity ID");
+		solo.clickOnButton("Show Entity ID");
 		
 		assertFalse(solo.getView(CustomEditText.class, 0).getText().toString().isEmpty());
 	}
