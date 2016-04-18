@@ -41,8 +41,8 @@ public class TimezoneCheckUtil implements LocationListener {
         return userActioned;
     }
 
-    public static void resetUserActioned() {
-        userActioned = false;
+    public static synchronized void setUserActioned(Boolean actioned) {
+        userActioned = actioned;
     }
 
     // Compare location-determined TZ to system TZ and display a dialog asking the user to set the
@@ -57,6 +57,7 @@ public class TimezoneCheckUtil implements LocationListener {
         if (!gpsTZ.equals(sysTZ) && !userActioned) {
             final Activity currentActivity = getActivity();
             if (currentActivity != null) {
+                TimezoneCheckUtil.setUserActioned(true); // do this early to prevent multiple dialogs being created, they are modal anyway
                 new AlertDialog.Builder(currentActivity)
                         .setMessage("Timezone from " + location.getProvider() + " ("
                                 + gpsTZ
@@ -68,7 +69,6 @@ public class TimezoneCheckUtil implements LocationListener {
                                 "Yes",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        TimezoneCheckUtil.userActioned = true;
                                         // Display the system Date and Time settings so the user can choose a timezone
                                         currentActivity.startActivity(new Intent(Settings.ACTION_DATE_SETTINGS));
                                         dialog.cancel();
@@ -79,7 +79,6 @@ public class TimezoneCheckUtil implements LocationListener {
                                 "No",
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        TimezoneCheckUtil.userActioned = true;
                                         dialog.cancel();
                                     }
                                 }

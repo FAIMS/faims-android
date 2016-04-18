@@ -68,7 +68,7 @@ public class GPSDataManager implements BluetoothManager.BluetoothListener, Activ
 		
 		public MyLocationListener() {
 			FAIMSApplication.getInstance().injectMembers(this);
-            TimezoneCheckUtil.resetUserActioned(); // re-enable TZ check if the module/user turns on GPS
+            TimezoneCheckUtil.setUserActioned(false); // re-enable TZ check if the module/user turns on GPS
         }
 
 		@Override
