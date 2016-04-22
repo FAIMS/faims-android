@@ -14,6 +14,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import au.org.intersect.faims.android.R;
 import au.org.intersect.faims.android.app.FAIMSApplication;
+import au.org.intersect.faims.android.util.ClockskewCheckUtil;
 import au.org.intersect.faims.android.util.ModuleUtil;
 import android.location.LocationManager;
 import au.org.intersect.faims.android.util.TimezoneCheckUtil;
@@ -29,9 +30,21 @@ public class SplashActivity extends Activity {
 	    FAIMSApplication.getInstance().setApplication(getApplication());
 	    Log.d("FAIMS","Loading...");
 		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		if (null == lm.getProvider("gps")) {
+			Log.d("FAIMS", "No gps found");
+		} else {
+			if (lm.addNmeaListener(new ClockskewCheckUtil())) {
+				Log.d("FAIMS", "NMEA Listener added successfully");
+			} else {
+				Log.d("FAIMS", "NMEA Listener failed");
+			}
+		}
+
         if (!TimezoneCheckUtil.isActioned()) {
             lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 0.0f, new TimezoneCheckUtil(this));
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, new TimezoneCheckUtil(this));
+			if (null != lm.getProvider("gps")) {
+				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, new TimezoneCheckUtil(this));
+			}
         }
 
         WebView attribution = (WebView) findViewById(R.id.splashscreen_attribution);
