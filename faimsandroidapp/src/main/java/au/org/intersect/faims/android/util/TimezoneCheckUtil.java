@@ -28,6 +28,8 @@ public class TimezoneCheckUtil implements LocationListener {
 
     private static Boolean userActioned = false;
 
+    // In the splash screen we start LocationListeners on both the Passive and the GPS providers.
+    // This lets us track both so we can remove them when the user has responded to one or the other
     protected static ArrayList<TimezoneCheckUtil> instances = new ArrayList<TimezoneCheckUtil>();
 
     public TimezoneCheckUtil(Context c) {
@@ -39,7 +41,62 @@ public class TimezoneCheckUtil implements LocationListener {
         return userActioned;
     }
 
-    private Activity getActivity() {
+    public static synchronized void setUserActioned(Boolean actioned) {
+        userActioned = actioned;
+    }
+
+    // Compare location-determined TZ to system TZ and display a dialog asking the user to set the
+    // system TZ correctly
+    public static void checkTimezone(Location location) {
+        String gpsTZ = TimezoneMapper.latLngToTimezoneString(location.getLatitude(), location.getLongitude());
+        String sysTZ = TimeZone.getDefault().getID();
+
+        Log.d("FAIMS", location.getProvider() + ": " + gpsTZ + " (accuracy: " + location.getAccuracy() + ")");
+        Log.d("FAIMS", "SYS: " + sysTZ);
+
+        if (!gpsTZ.equals(sysTZ) && !userActioned) {
+            final Activity currentActivity = getActivity();
+            if (currentActivity != null) {
+                TimezoneCheckUtil.setUserActioned(true); // do this early to prevent multiple dialogs being created, they are modal anyway
+                new AlertDialog.Builder(currentActivity)
+                        .setMessage("Timezone from " + location.getProvider() + " ("
+                                + gpsTZ
+                                + ") does not match your system timezone ("
+                                + sysTZ
+                                + ").  Do you wish to change your system timezone?")
+                        .setCancelable(false)
+                        .setPositiveButton(
+                                "Yes",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // Display the system Date and Time settings so the user can choose a timezone
+                                        currentActivity.startActivity(new Intent(Settings.ACTION_DATE_SETTINGS));
+                                        dialog.cancel();
+                                    }
+                                }
+                        )
+                        .setNegativeButton(
+                                "No",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                }
+                        )
+                        .create()
+                        .show();
+            }
+        } else if (!gpsTZ.equals(sysTZ) && userActioned) {
+            Log.d("FAIMS","User has already addressed the TZ mismatch");
+        } else if (gpsTZ.equals(sysTZ)) {
+            Log.d("FAIMS","TZ matches");
+        }
+    }
+
+    // Borrowed from http://stackoverflow.com/a/28423385
+    // Returns the currently displayed Activity, required for providing the right context
+    // for displaying the AlertDialog when a TZ mismatch is detected
+    private static Activity getActivity() {
         try {
             Class activityThreadClass = Class.forName("android.app.ActivityThread");
             Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(null);
@@ -73,47 +130,8 @@ public class TimezoneCheckUtil implements LocationListener {
 
     @Override
     public void onLocationChanged(final Location location) {
-        String gpsTZ = TimezoneMapper.latLngToTimezoneString(location.getLatitude(), location.getLongitude());
-        String sysTZ = TimeZone.getDefault().getID();
-
         Log.d("FAIMS","LocationListener:onLocationChanged");
-        Log.d("FAIMS", location.getProvider() + ": " + gpsTZ);
-        Log.d("FAIMS", "ACC: " + location.getAccuracy());
-        Log.d("FAIMS", "SYS: " + sysTZ);
-
-        if (!gpsTZ.equals(sysTZ) && !userActioned) {
-            final Activity currentActivity = getActivity();
-            if (currentActivity != null) {
-                new AlertDialog.Builder(currentActivity)
-                        .setMessage("Timezone from " + location.getProvider() + " ("
-                                + gpsTZ
-                                + ") does not match your system timezone ("
-                                + sysTZ
-                                + ").  Do you wish to change your system timezone?")
-                        .setCancelable(false)
-                        .setPositiveButton(
-                                "Yes",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        TimezoneCheckUtil.userActioned = true;
-                                        currentActivity.startActivity(new Intent(Settings.ACTION_DATE_SETTINGS));
-                                        dialog.cancel();
-                                    }
-                                }
-                        )
-                        .setNegativeButton(
-                                "No",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        TimezoneCheckUtil.userActioned = true;
-                                        dialog.cancel();
-                                    }
-                                }
-                        )
-                        .create()
-                        .show();
-            }
-        }
+        checkTimezone(location);
         Log.d("FAIMS", "Removing location listeners");
         for (TimezoneCheckUtil tzcheck : instances) {
             ((LocationManager) context.getSystemService(Context.LOCATION_SERVICE)).removeUpdates(tzcheck);
