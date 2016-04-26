@@ -15,8 +15,10 @@ import android.app.Instrumentation;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import au.org.intersect.faims.android.constants.FaimsSettings;
+import au.org.intersect.faims.android.ui.activity.ShowModuleActivity;
 
 import com.google.gson.JsonObject;
+import com.robotium.solo.Solo;
 
 public class TestModuleUtil {
 	
@@ -83,4 +85,10 @@ public class TestModuleUtil {
 	public static String getNewModuleName(String baseName) {
 		return baseName + "-" + System.currentTimeMillis();
 	}
+
+	public static void initCleanTest(Solo solo) {
+		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
+		solo.waitForDialogToClose();
+	}
+
 }
