@@ -96,7 +96,7 @@ public class TimezoneCheckUtil implements LocationListener {
     // Borrowed from http://stackoverflow.com/a/28423385
     // Returns the currently displayed Activity, required for providing the right context
     // for displaying the AlertDialog when a TZ mismatch is detected
-    private static Activity getActivity() {
+    public static Activity getActivity() {
         try {
             Class activityThreadClass = Class.forName("android.app.ActivityThread");
             Object activityThread = activityThreadClass.getMethod("currentActivityThread").invoke(null);
