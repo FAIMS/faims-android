@@ -493,7 +493,7 @@ public class Tab {
 		
 		LinearLayout viewLayout = new LinearLayout(linearLayout.getContext());
 		viewLayout.setOrientation(LinearLayout.VERTICAL);
-		
+		view.setTag((Object) ref);
     	// setup view buttons
 		if (view instanceof ICustomView) {
 			ICustomView customView = (ICustomView) view;
