@@ -1,3 +1,5 @@
 include ':faimsandroidapp'
 include ':androidfilechooser'
 include ':androidcodescanner'
+
+include ':SplashActivityTest'
