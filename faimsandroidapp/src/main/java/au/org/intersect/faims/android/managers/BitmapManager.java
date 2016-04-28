@@ -30,7 +30,9 @@ public class BitmapManager {
 	public synchronized void destroy() {
 		if (bitmaps != null) {
 			for (Bitmap bitmap : bitmaps) {
-				bitmap.recycle();
+				if (null != bitmap) {
+					bitmap.recycle();
+				}
 			}
 			this.bitmaps = null;
 		}
