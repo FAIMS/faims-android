@@ -40,8 +40,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 	
 	public void testDropdownClickEvent() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Dropdown select event"));
 
@@ -56,8 +55,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testHierarchicalDropdownClickEvent() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Hierarchical dropdown select event"));
 
@@ -71,8 +69,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testPictureGalleryClickEvent() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Gallery select event"));
 
@@ -84,8 +81,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testHierarchicalPictureGalleryClickEvent() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Hierarchical gallery select event"));
 
@@ -97,8 +93,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testCheckboxClickEvent() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
@@ -108,8 +103,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testRadioGroupClickEvent() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
@@ -119,8 +113,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 	
 	public void testRecoverBeanshellLogicState() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 		
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
@@ -135,8 +128,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 	
 	public void testShowTextAlert() throws Exception {
-		solo.assertCurrentActivity("wrong activity", ShowModuleActivity.class);
-		solo.waitForDialogToClose();
+		TestModuleUtil.initCleanTest(solo);
 
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
