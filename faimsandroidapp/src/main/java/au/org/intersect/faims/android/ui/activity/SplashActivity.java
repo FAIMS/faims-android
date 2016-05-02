@@ -2,9 +2,12 @@ package au.org.intersect.faims.android.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.location.GpsStatus;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,7 +15,10 @@ import android.webkit.WebView;
 import android.widget.Button;
 import au.org.intersect.faims.android.R;
 import au.org.intersect.faims.android.app.FAIMSApplication;
+import au.org.intersect.faims.android.util.ClockskewCheckUtil;
 import au.org.intersect.faims.android.util.ModuleUtil;
+import android.location.LocationManager;
+import au.org.intersect.faims.android.util.TimezoneCheckUtil;
 
 public class SplashActivity extends Activity {
 
@@ -23,8 +29,26 @@ public class SplashActivity extends Activity {
 	    setContentView(R.layout.splashscreen);
 	    
 	    FAIMSApplication.getInstance().setApplication(getApplication());
-	    
-	    WebView attribution = (WebView) findViewById(R.id.splashscreen_attribution);
+	    Log.d("FAIMS","Loading...");
+		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		if (null == lm.getProvider("gps")) {
+			Log.d("FAIMS", "No gps found");
+		} else {
+			if (lm.addNmeaListener(new ClockskewCheckUtil())) {
+				Log.d("FAIMS", "NMEA Listener added successfully");
+			} else {
+				Log.d("FAIMS", "NMEA Listener failed");
+			}
+		}
+
+        if (!TimezoneCheckUtil.isActioned()) {
+            lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 1l, 1l, new TimezoneCheckUtil(this));
+			if (null != lm.getProvider("gps")) {
+				lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1l, 1l, new TimezoneCheckUtil(this));
+			}
+        }
+
+        WebView attribution = (WebView) findViewById(R.id.splashscreen_attribution);
 	    attribution.loadUrl("file:///android_asset/attribution.html");
 	    attribution.setLongClickable(false);
 	    attribution.setOnTouchListener(new View.OnTouchListener() {

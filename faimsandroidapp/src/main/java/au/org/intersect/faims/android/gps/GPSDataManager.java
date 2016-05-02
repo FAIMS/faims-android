@@ -17,6 +17,9 @@ import au.org.intersect.faims.android.data.IFAIMSRestorable;
 import au.org.intersect.faims.android.log.FLog;
 import au.org.intersect.faims.android.managers.BluetoothManager;
 import au.org.intersect.faims.android.ui.activity.ShowModuleActivity;
+import au.org.intersect.faims.android.util.ClockskewCheckUtil;
+import au.org.intersect.faims.android.util.TimezoneCheckUtil;
+
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -67,7 +70,9 @@ public class GPSDataManager implements BluetoothManager.BluetoothListener, Activ
 		
 		public MyLocationListener() {
 			FAIMSApplication.getInstance().injectMembers(this);
-		}
+            TimezoneCheckUtil.setUserActioned(false); // re-enable TZ check if the module/user turns on GPS
+			ClockskewCheckUtil.setUserActioned(false);
+        }
 
 		@Override
 		public void onLocationChanged(Location location) {
@@ -77,6 +82,8 @@ public class GPSDataManager implements BluetoothManager.BluetoothListener, Activ
 			if (!gpsDataManager.hasValidInternalGPSSignal()) {
 				gpsDataManager.setHasValidInternalGPSSignal(true);
 			}
+            // Opportunistically check TZ since we've obtained a Location
+            TimezoneCheckUtil.checkTimezone(location);
 		}
 
 		@Override
@@ -149,7 +156,7 @@ public class GPSDataManager implements BluetoothManager.BluetoothListener, Activ
         if (nmeaMessage == null) {
         	return;
         }
-        
+		ClockskewCheckUtil.checkTime(input);
         if (nmeaMessage.startsWith("$GPGGA")) {
             setGGAMessage(nmeaMessage);
             setExternalGPSTimestamp(System.currentTimeMillis());
