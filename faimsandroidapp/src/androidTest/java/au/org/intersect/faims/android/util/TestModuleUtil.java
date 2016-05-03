@@ -24,6 +24,7 @@ import au.org.intersect.faims.android.ui.activity.SplashActivity;
 import com.google.gson.JsonObject;
 import com.robotium.solo.*;
 
+import static android.view.KeyEvent.KEYCODE_MENU;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
@@ -130,8 +131,12 @@ public class TestModuleUtil {
 	public static void roboUseCurrentServer(Solo solo) {
 		//Load the app: Wait for activity: 'au.org.intersect.faims.android.ui.activity.SplashActivity'
 		solo.waitForActivity(SplashActivity.class, 5000);
+
+		assertFalse(hasGPSTimeError(solo));
+		assertFalse(hasGPSTimezoneError(solo));
+
 		//Assert that: 'ImageView' is shown
-		assertTrue("'ImageView' is not shown!", solo.waitForView(solo.getView(android.widget.ImageView.class, 0)));
+ 		assertTrue("'ImageView' is not shown!", solo.waitForView(solo.getView(android.widget.ImageView.class, 0)));
 
 
 //		View splashLoad = solo.getCurrentActivity().findViewById(R.id.splash_load);
@@ -148,25 +153,25 @@ public class TestModuleUtil {
 		}
 	}
 
+	public static boolean hasGPSTimeError(Solo solo) {
+		// Make sure there are no errors about GPS time
+		return (solo.searchText("The time from GPS", true) && solo.searchText("does not match your system time", true));
+	}
+
+	public static boolean hasGPSTimezoneError(Solo solo) {
+		// Make sure there are no errors about GPS time
+		return (solo.searchText("Timezone from", true) && solo.searchText("does not match your system timezone", true));
+	}
+
 	public static void roboContinueLastSession(Solo solo) {
 		//Wait for activity: 'au.org.intersect.faims.android.ui.activity.SplashActivity'
 		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.SplashActivity.class, 2000);
 		solo.clickOnButton(TestModuleUtil.CONTINUE_LAST_SESSION);
 	}
 
-	public static void roboLoadModule(Solo solo, int moduleId) {
-		//Select Module
-		solo.clickOnView(solo.getView(au.org.intersect.faims.android.R.id.list_item_overlay, moduleId));
-		roboLoadModule(solo);
-	}
-
 	public static void roboLoadModule(Solo solo, String moduleName) {
 		//Select Module
 		solo.clickOnText(moduleName);
-		roboLoadModule(solo);
-	}
-
-	private static void roboLoadModule(Solo solo) {
 
 		//Click on YES on Load module confirmation (if it exist)
 		//Wait for dialog
@@ -181,7 +186,18 @@ public class TestModuleUtil {
 		//Wait for activity: 'au.org.intersect.faims.android.ui.activity.ShowModuleActivity'
 		solo.waitForActivity(SplashActivity.class, 15000);
 		assertTrue("au.org.intersect.faims.android.ui.activity.ShowModuleActivity is not found!", solo.waitForActivity(ShowModuleActivity.class));
+
+		// wait for the loading screen to close
+		if (solo.searchText("please wait")) {
+			// Debug may die here because loading takes a while when debugging
+			assertTrue("Wait for loading screen failed", solo.waitForDialogToClose(60000));
+		}
+
 		roboCheckForLogicErrors(solo);
+
+		// We assume the module name is part of the app's title bar
+		assertTrue("Loaded module name " + moduleName + " not found.", solo.searchText(moduleName));
+
 	}
 
 	/*
@@ -190,7 +206,8 @@ public class TestModuleUtil {
 	 */
 	private static void roboCheckForLogicErrors(Solo solo) {
 
-		while (solo.searchText("Logic Error", true)) {
+		int logicError = 0;
+		while (solo.searchText("Logic Error", true) && logicError < 10) {
 			if (solo.searchButton("OK", true)) {
 				if (solo.searchText("Error trying to start internal gps")) {
 					assertTrue("Error trying to start internal gps", true);
@@ -202,7 +219,13 @@ public class TestModuleUtil {
 			} else {
 				assertFalse("Unknown Logic Error", true);
 			}
+			logicError++;
 		}
 
+	}
+
+	public static void roboClickOnKebabItem(Solo solo, String menuItemName) {
+		solo.sendKey(KEYCODE_MENU);
+		solo.clickOnText(menuItemName);
 	}
 }
