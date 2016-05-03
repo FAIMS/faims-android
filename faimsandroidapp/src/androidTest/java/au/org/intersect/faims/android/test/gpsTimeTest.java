@@ -1,7 +1,12 @@
 package au.org.intersect.faims.android.test;
 
+import au.org.intersect.faims.android.app.FAIMSApplication;
 import au.org.intersect.faims.android.ui.activity.SplashActivity;
 import au.org.intersect.faims.android.util.TestModuleUtil;
+import au.org.intersect.faims.android.util.MockLocationProvider;
+
+import android.app.Application;
+import android.location.LocationManager;
 
 import com.robotium.solo.*;
 import android.test.ActivityInstrumentationTestCase2;
@@ -12,7 +17,9 @@ import static android.view.KeyEvent.*;
 
 public class gpsTimeTest extends ActivityInstrumentationTestCase2<SplashActivity> {
   	private Solo solo;
-  	
+  	private MockLocationProvider locationNetwork;
+	private MockLocationProvider locationGPS;
+
   	public gpsTimeTest() {
 		super(SplashActivity.class);
   	}
@@ -21,6 +28,11 @@ public class gpsTimeTest extends ActivityInstrumentationTestCase2<SplashActivity
         super.setUp();
 		solo = new Solo(getInstrumentation());
 		getActivity();
+
+		locationGPS = new MockLocationProvider(LocationManager.GPS_PROVIDER, getActivity().getApplicationContext());
+		locationNetwork = new MockLocationProvider(LocationManager.NETWORK_PROVIDER, getActivity().getApplicationContext());
+		locationGPS.pushLocation(-12.34, 23.45);
+		locationNetwork.pushLocation(-12.34, 23.45);
   	}
   
 	/*
