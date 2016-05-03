@@ -1,11 +1,9 @@
 package au.org.intersect.faims.android.test;
 
-import au.org.intersect.faims.android.app.FAIMSApplication;
 import au.org.intersect.faims.android.ui.activity.SplashActivity;
 import au.org.intersect.faims.android.util.TestModuleUtil;
 import au.org.intersect.faims.android.util.MockLocationProvider;
 
-import android.app.Application;
 import android.location.LocationManager;
 
 import com.robotium.solo.*;
