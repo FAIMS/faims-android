@@ -32,6 +32,17 @@ import static junit.framework.Assert.assertTrue;
 public class TestModuleUtil {
 	public static final String CONTINUE_LAST_SESSION = "Continue Last Session";
 
+	public static final String MODULE_CSIRO_GEOCHEMISTRY_SAMPLING = "Geochemistry Sampling";
+	public static final String MODULE_PAZC = "PAZC";
+	public static final String MODULE_SAVING_AND_LOADING = "Saving and Loading";
+	public static final String MODULE_SOL1_HARDWARE = "Sol1 Hardware";
+
+	public static final String SERVER_NAME_TEST1 = "test1.fedarch.org";
+	public static final String SERVER_PORT_80 = "80";
+
+	public static final String USER_FAIMS_ADMIN = "Faims Admin";
+
+
 	public static void createModuleFrom(String name, String key, String dirname, AssetManager assetManager) {
 		try {
 			String dir = Environment.getExternalStorageDirectory() + FaimsSettings.modulesDir + key;
@@ -167,6 +178,8 @@ public class TestModuleUtil {
 		//Wait for activity: 'au.org.intersect.faims.android.ui.activity.SplashActivity'
 		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.SplashActivity.class, 2000);
 		solo.clickOnButton(TestModuleUtil.CONTINUE_LAST_SESSION);
+		waitForModuleLoad(solo);
+
 	}
 
 	public static void roboLoadModule(Solo solo, String moduleName) {
@@ -187,6 +200,14 @@ public class TestModuleUtil {
 		solo.waitForActivity(SplashActivity.class, 15000);
 		assertTrue("au.org.intersect.faims.android.ui.activity.ShowModuleActivity is not found!", solo.waitForActivity(ShowModuleActivity.class));
 
+		waitForModuleLoad(solo);
+
+		// We assume the module name is part of the app's title bar
+		assertTrue("Loaded module name " + moduleName + " not found.", solo.searchText(moduleName));
+
+	}
+
+	private static void waitForModuleLoad(Solo solo) {
 		// wait for the loading screen to close
 		if (solo.searchText("please wait")) {
 			// Debug may die here because loading takes a while when debugging
@@ -194,10 +215,6 @@ public class TestModuleUtil {
 		}
 
 		roboCheckForLogicErrors(solo);
-
-		// We assume the module name is part of the app's title bar
-		assertTrue("Loaded module name " + moduleName + " not found.", solo.searchText(moduleName));
-
 	}
 
 	/*

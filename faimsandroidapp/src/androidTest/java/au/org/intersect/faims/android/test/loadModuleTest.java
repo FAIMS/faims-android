@@ -26,8 +26,8 @@ public class loadModuleTest extends ActivityInstrumentationTestCase2<SplashActiv
 		Requires: FAIMS server and module PAZC loaded
 	 */
 	public void testRun1() {
-		TestModuleUtil.roboConnectToServer(solo, "test1.fedarch.org", "80");
-		TestModuleUtil.roboLoadModule(solo, "PAZC");
+		TestModuleUtil.roboConnectToServer(solo, TestModuleUtil.SERVER_NAME_TEST1, TestModuleUtil.SERVER_PORT_80);
+		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_PAZC);
 	}
 
 	/*
@@ -36,7 +36,7 @@ public class loadModuleTest extends ActivityInstrumentationTestCase2<SplashActiv
 	 */
 	public void testRun2() {
 		TestModuleUtil.roboUseCurrentServer(solo);
-		TestModuleUtil.roboLoadModule(solo, "CSIRO Geochemistry Sampling");
+		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_CSIRO_GEOCHEMISTRY_SAMPLING);
 	}
 
 	/*

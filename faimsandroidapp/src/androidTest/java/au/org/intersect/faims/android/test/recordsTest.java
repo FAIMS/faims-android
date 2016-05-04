@@ -8,7 +8,7 @@ import android.test.ActivityInstrumentationTestCase2;
 
 
 public class recordsTest extends ActivityInstrumentationTestCase2<SplashActivity> {
-  	private Solo solo;
+	private Solo solo;
   	
   	public recordsTest() {
 		super(SplashActivity.class);
@@ -25,8 +25,8 @@ public class recordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 	 */
 	public void testRun1() {
 		// Load app, set server and module
-		TestModuleUtil.roboConnectToServer(solo, "test1.fedarch.org", "80");
-		TestModuleUtil.roboLoadModule(solo, "Saving and Loading");
+		TestModuleUtil.roboConnectToServer(solo, TestModuleUtil.SERVER_NAME_TEST1, TestModuleUtil.SERVER_PORT_80);
+		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_SAVING_AND_LOADING);
 
 		//Click on Kebab menu (vertical dot dot dot)
 		turnSyncOn();
@@ -115,10 +115,10 @@ public class recordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 
 	private void turnSyncOn() {
 		//Click on Turn Sync on
-		TestModuleUtil.roboClickOnKebabItem(solo, "Sync On");	// TODO: Addressing action bar items by name would be nice
-//		solo.clickOnActionBarItem(au.org.intersect.faims.android.R.id.menu);
-//		solo.clickInList(1, 1);
-		assertTrue(true); //TODO: sync on check pls
+		TestModuleUtil.roboClickOnKebabItem(solo, "Sync On");
+		assertTrue("'Sync enabled' message shown", solo.searchText("Sync enabled"));
+		//TODO: is sync icon on
+
 	}
 
 	private void initToLogin() {
@@ -127,7 +127,7 @@ public class recordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		turnSyncOn();
 
 		//Click on Faims Admin
-		solo.clickOnText("Faims Admin");
+		solo.clickOnText(TestModuleUtil.USER_FAIMS_ADMIN);
 	}
 
 	private void initSaveAndLoadEntity() {
