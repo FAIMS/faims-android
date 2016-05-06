@@ -9,10 +9,10 @@ import au.org.intersect.faims.android.util.TestModuleUtil;
 
 
 
-public class loadModuleTest extends ActivityInstrumentationTestCase2<SplashActivity> {
+public class LoadModuleTest extends ActivityInstrumentationTestCase2<SplashActivity> {
 	private Solo solo;
   	
-  	public loadModuleTest() {
+  	public LoadModuleTest() {
 		super(SplashActivity.class);
   	}
 
