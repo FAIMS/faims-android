@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Random;
 
 import org.apache.commons.compress.utils.IOUtils;
 
@@ -34,7 +35,6 @@ public class TestModuleUtil {
 
 	public static final String MODULE_CSIRO_GEOCHEMISTRY_SAMPLING = "Geochemistry Sampling";
 	public static final String MODULE_PAZC = "PAZC";
-	public static final String MODULE_SAVING_AND_LOADING = "Saving and Loading";
 	public static final String MODULE_SOL1_HARDWARE = "Sol1 Hardware";
 
 	public static final String SERVER_NAME_TEST1 = "test1.fedarch.org";
@@ -178,6 +178,8 @@ public class TestModuleUtil {
 		//Wait for activity: 'au.org.intersect.faims.android.ui.activity.SplashActivity'
 		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.SplashActivity.class, 2000);
 		solo.clickOnButton(TestModuleUtil.CONTINUE_LAST_SESSION);
+		solo.sleep(2000);
+		solo.waitForActivity(SplashActivity.class, 15000);
 		waitForModuleLoad(solo);
 
 	}
@@ -241,8 +243,20 @@ public class TestModuleUtil {
 
 	}
 
-	public static void roboClickOnKebabItem(Solo solo, String menuItemName) {
+	public static void roboClickOnKebabMenu(Solo solo) {
 		solo.sendKey(KEYCODE_MENU);
+	}
+
+	public static void roboClickOnKebabItem(Solo solo, String menuItemName) {
+		roboClickOnKebabMenu(solo);
 		solo.clickOnText(menuItemName);
+	}
+
+	/*
+		Random int between 1000 to 2000
+	 */
+	public static int getRandomRunID() {
+		Random rand = new Random();
+		return rand.nextInt(2000) + 1000;
 	}
 }
