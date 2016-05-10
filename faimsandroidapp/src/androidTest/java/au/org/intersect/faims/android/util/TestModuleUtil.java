@@ -7,6 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 import org.apache.commons.compress.utils.IOUtils;
@@ -16,6 +19,7 @@ import android.app.Instrumentation;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.view.View;
+import android.widget.EditText;
 
 import au.org.intersect.faims.android.R;
 import au.org.intersect.faims.android.constants.FaimsSettings;
@@ -33,7 +37,7 @@ import static junit.framework.Assert.assertTrue;
 public class TestModuleUtil {
 	public static final String CONTINUE_LAST_SESSION = "Continue Last Session";
 
-	public static final String MODULE_CSIRO_GEOCHEMISTRY_SAMPLING = "Geochemistry Sampling";
+	public static final String MODULE_CSIRO_GEOCHEMISTRY_SAMPLING = "CSIRO Geochemistry Sampling";
 	public static final String MODULE_PAZC = "PAZC";
 	public static final String MODULE_SOL1_HARDWARE = "Sol1 Hardware";
 
@@ -150,16 +154,13 @@ public class TestModuleUtil {
  		assertTrue("'ImageView' is not shown!", solo.waitForView(solo.getView(android.widget.ImageView.class, 0)));
 
 
-//		View splashLoad = solo.getCurrentActivity().findViewById(R.id.splash_load);
-//		View splashConnect = solo.getView(au.org.intersect.faims.android.R.id.splash_connect_server);
-
-		if (solo.searchButton("Show Modules", true)) {					//Click on Show Modules
-			solo.clickOnButton("Show Modules");
-//			Wait for activity: 'au.org.intersect.faims.android.ui.activity.MainActivity'
+		View showModules = solo.getView(R.id.splash_load);
+		View enterServerDetails = solo.getView(R.id.splash_connect_server);
+		if (showModules.getVisibility() == View.VISIBLE) {
+			solo.clickOnView(showModules); 			//Click on Show Modules
 			assertTrue("au.org.intersect.faims.android.ui.activity.MainActivity is not found!", solo.waitForActivity(au.org.intersect.faims.android.ui.activity.MainActivity.class));
-		} else if (solo.searchButton("Enter Server Details", true)) {		//Click on Enter Server Details
-			solo.clickOnButton("Enter Server Details");
-			//Wait for activity: 'au.org.intersect.faims.android.ui.activity.ServerSettingsActivity'
+		} else if (enterServerDetails.getVisibility() == View.VISIBLE) {
+			solo.clickOnView(enterServerDetails); 	//Click on Enter Server Details
 			assertTrue("au.org.intersect.faims.android.ui.activity.ServerSettingsActivity is not found!", solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ServerSettingsActivity.class));
 		}
 	}
@@ -187,14 +188,7 @@ public class TestModuleUtil {
 	public static void roboLoadModule(Solo solo, String moduleName) {
 		//Select Module
 		solo.clickOnText(moduleName);
-
-		//Click on YES on Load module confirmation (if it exist)
-		//Wait for dialog
-		solo.waitForDialogToOpen(1500);
-		if (solo.searchText("Download Module", true) && solo.searchButton("YES", true)) {
-			solo.clickOnButton("YES");
-			solo.waitForActivity(SplashActivity.class);
-		}
+		waitForModuleLoadDownload(solo);
 
 		//Click on Load Module
 		solo.clickOnView(solo.getView(au.org.intersect.faims.android.R.id.static_load_module));
@@ -209,11 +203,34 @@ public class TestModuleUtil {
 
 	}
 
+	/*
+		Waits for a downloaded module to load
+	 */
 	private static void waitForModuleLoad(Solo solo) {
-		// wait for the loading screen to close
+		waitForModuleLoad(solo, 120000);
+	}
+
+	/*
+		Waits for a module to download, can take a very long time
+	 */
+	private static void waitForModuleLoadDownload(Solo solo) {
+		//Click on YES on Load module confirmation (if it exist)
+		//Wait for dialog
+		solo.waitForDialogToOpen(1500);
+		if (solo.searchText("Download Module", true) && solo.searchButton("YES", true)) {
+			solo.clickOnButton("YES");
+			solo.waitForActivity(SplashActivity.class);
+		}
+		waitForModuleLoad(solo, 300000);
+	}
+
+	private static void waitForModuleLoad(Solo solo, long timeout) {
+		solo.sleep(2000);
+		solo.waitForActivity(ShowModuleActivity.class);
 		if (solo.searchText("please wait")) {
+			// wait for the loading screen to close
 			// Debug may die here because loading takes a while when debugging
-			assertTrue("Wait for loading screen failed", solo.waitForDialogToClose(60000));
+			assertTrue("Wait for loading screen failed", solo.waitForDialogToClose(timeout));
 		}
 
 		roboCheckForLogicErrors(solo);
@@ -245,12 +262,21 @@ public class TestModuleUtil {
 
 	public static void roboClickOnKebabMenu(Solo solo) {
 		solo.sendKey(KEYCODE_MENU);
+		solo.sleep(500);
 	}
 
 	public static void roboClickOnKebabItem(Solo solo, String menuItemName) {
 		roboClickOnKebabMenu(solo);
 		solo.clickOnText(menuItemName);
+		solo.sleep(500);
 	}
+
+
+	public static void editTextField(Solo solo, EditText field, String text) {
+		solo.clearEditText(field);
+		solo.enterText(field, text);
+	}
+
 
 	/*
 		Random int between 1000 to 2000
@@ -258,5 +284,23 @@ public class TestModuleUtil {
 	public static int getRandomRunID() {
 		Random rand = new Random();
 		return rand.nextInt(2000) + 1000;
+	}
+
+	public static String getStringRunID() {
+		Random r = new Random();
+		char c;
+		String s = "";
+		for (int i = 0; i < 2; i++) {
+			c = (char) (r.nextInt(26) + 'a');
+			s += c;
+		}
+		return s;
+	}
+
+	/*
+		Day of the year + hour and minuite
+	 */
+	public static String getDateRunID() {
+		return new SimpleDateFormat("DDD_HHmm", Locale.US).format(new Date());
 	}
 }
