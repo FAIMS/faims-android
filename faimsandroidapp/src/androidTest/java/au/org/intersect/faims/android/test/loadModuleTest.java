@@ -21,19 +21,28 @@ public class loadModuleTest extends ActivityInstrumentationTestCase2<SplashActiv
 		solo = new Solo(getInstrumentation(), getActivity());
   	}
 
-	/* Start app, set server and module */
+	/*
+		Test: Start app, set server and module
+		Requires: FAIMS server and module PAZC loaded
+	 */
 	public void testRun1() {
-		TestModuleUtil.roboConnectToServer(solo, "test1.fedarch.org", "80");
-		TestModuleUtil.roboLoadModule(solo, "PAZC");
+		TestModuleUtil.roboConnectToServer(solo, TestModuleUtil.SERVER_NAME_TEST1, TestModuleUtil.SERVER_PORT_80);
+		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_PAZC);
 	}
 
-	/* Start app and load named module (uses existing server) */
+	/*
+		Test: Start app and load named module
+	 	Requires: Server previously set and module "CSIRO Geochemistry Sampling" loaded on server
+	 */
 	public void testRun2() {
 		TestModuleUtil.roboUseCurrentServer(solo);
-		TestModuleUtil.roboLoadModule(solo, "CSIRO Geochemistry Sampling");
+		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_CSIRO_GEOCHEMISTRY_SAMPLING);
 	}
 
-	/* Start app and load most recent module (uses existing server) */
+	/*
+		Test: Start app and load most recent module
+		Requires: Existing server and module "CSIRO Geochemistry Sampling" previously selected
+	 */
 	public void testRun3() {
 		TestModuleUtil.roboContinueLastSession(solo);
 	}
