@@ -16,12 +16,12 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 
-public class gpsTest extends ActivityInstrumentationTestCase2<SplashActivity> {
+public class GPSTest extends ActivityInstrumentationTestCase2<SplashActivity> {
   	private Solo solo;
   	private MockLocationProvider locationNetwork;
 	private MockLocationProvider locationGPS;
 
-  	public gpsTest() {
+  	public GPSTest() {
 		super(SplashActivity.class);
   	}
 
