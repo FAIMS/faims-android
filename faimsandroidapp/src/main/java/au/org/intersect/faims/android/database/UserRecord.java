@@ -1,12 +1,15 @@
 package au.org.intersect.faims.android.database;
 
+import android.util.Base64;
 import android.util.Log;
 
 import java.io.File;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import au.org.intersect.faims.android.data.User;
 import au.org.intersect.faims.android.log.FLog;
+import jsqlite.Exception;
 import jsqlite.Stmt;
 
 /**
@@ -18,11 +21,18 @@ public class UserRecord extends Database {
         super(dbFile);
     }
 
-    public boolean saveUser(User user) throws Exception {
-//        FLog.d("firstName:" + user.getFirstName());
-//        FLog.d("lastName:" + user.getLastName());
-//        FLog.d("email:" + user.getEmail());
-//        FLog.d("password:" + user.getPassword());
+    public boolean saveUser(User user) throws java.lang.Exception {
+
+        try {
+            String userLookup = "";
+            userLookup = databaseManager.fetchRecord().fetchOne("SELECT userId from user where fname = '" + user.getFirstName() +
+                    "' and lname = '" + user.getLastName() + "' ;").get(0);
+            if (null != userLookup || !userLookup.isEmpty()) {
+                return false;
+            }
+        } catch (java.lang.Exception e) {
+//            return false;
+        }
 
         String query = DatabaseQueries.INSERT_INTO_USERS;
 
@@ -35,7 +45,7 @@ public class UserRecord extends Database {
             st.bind(1, user.getFirstName());
             st.bind(2, user.getLastName());
             st.bind(3, user.getEmail());
-            st.bind(4, new String(MessageDigest.getInstance("SHA1").digest(user.getPassword().getBytes())));
+            st.bind(4, new String(Base64.encode(MessageDigest.getInstance("SHA1").digest(user.getPassword().getBytes()), Base64.NO_WRAP)));
             st.step();
             st.close();
             st = null;
@@ -49,11 +59,17 @@ public class UserRecord extends Database {
     }
 
     public boolean verifyUser(String userId, String password) throws Exception {
-        String userPassword = databaseManager.fetchRecord().fetchOne("SELECT password from user where userid =" + userId +";").get(0);
-        if ((new String(MessageDigest.getInstance("SHA1").digest(password.getBytes()))).equals(userPassword)) {
-            return true;
-        } else {
-            return false;
+        try {
+            String userPassword = databaseManager.fetchRecord().fetchOne("SELECT password from user where userid =" + userId + ";").get(0);
+            String verifyPassword = new String(Base64.encode(MessageDigest.getInstance("SHA1").digest(password.getBytes()), Base64.NO_WRAP));
+            if (verifyPassword.equals(userPassword)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (java.lang.Exception e) {
+            Exception ex = new Exception("Unable to check password");
+            throw ex;
         }
     }
 }

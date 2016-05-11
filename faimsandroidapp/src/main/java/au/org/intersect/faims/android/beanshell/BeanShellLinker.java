@@ -3004,8 +3004,11 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 	public void createUser(String fname, String lname, String email, String password, String callback ) {
 		User user = new User(null, fname, lname, email, password);
 		try {
-			databaseManager.userRecord().saveUser(user);
-			this.interpreter.eval(callback);
+			if (databaseManager.userRecord().saveUser(user)) {
+				this.interpreter.eval(callback);
+			} else {
+				Toast.makeText(activityRef.get(), "Unable to create user", Toast.LENGTH_SHORT).show();
+			}
 		} catch (Exception e) {
 			reportError(e);
 		}
