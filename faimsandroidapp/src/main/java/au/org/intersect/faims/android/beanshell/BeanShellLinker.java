@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
@@ -30,14 +31,19 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.util.Patterns;
 import android.view.InputDevice;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -55,7 +61,9 @@ import au.org.intersect.faims.android.data.Attribute;
 import au.org.intersect.faims.android.data.EntityAttribute;
 import au.org.intersect.faims.android.data.FileInfo;
 import au.org.intersect.faims.android.data.FormInputDef;
+import au.org.intersect.faims.android.data.ICreateUser;
 import au.org.intersect.faims.android.data.IFAIMSRestorable;
+import au.org.intersect.faims.android.data.IVerifyUser;
 import au.org.intersect.faims.android.data.Module;
 import au.org.intersect.faims.android.data.NameValuePair;
 import au.org.intersect.faims.android.data.Relationship;
@@ -63,6 +71,7 @@ import au.org.intersect.faims.android.data.RelationshipAttribute;
 import au.org.intersect.faims.android.data.User;
 import au.org.intersect.faims.android.data.VocabularyTerm;
 import au.org.intersect.faims.android.database.DatabaseManager;
+import au.org.intersect.faims.android.database.UserRecord;
 import au.org.intersect.faims.android.exceptions.MapException;
 import au.org.intersect.faims.android.gps.GPSDataManager;
 import au.org.intersect.faims.android.gps.GPSLocation;
@@ -79,9 +88,11 @@ import au.org.intersect.faims.android.tasks.CancelableTask;
 import au.org.intersect.faims.android.ui.activity.ShowModuleActivity;
 import au.org.intersect.faims.android.ui.activity.ShowModuleActivity.SyncStatus;
 import au.org.intersect.faims.android.ui.dialog.BusyDialog;
+import au.org.intersect.faims.android.ui.dialog.CreateUserDialog;
 import au.org.intersect.faims.android.ui.dialog.DateDialog;
 import au.org.intersect.faims.android.ui.dialog.TextDialog;
 import au.org.intersect.faims.android.ui.dialog.TimeDialog;
+import au.org.intersect.faims.android.ui.dialog.VerifyUserDialog;
 import au.org.intersect.faims.android.ui.drawer.NavigationDrawer;
 import au.org.intersect.faims.android.ui.map.CustomMapView;
 import au.org.intersect.faims.android.ui.map.LegacyQueryBuilder;
@@ -121,7 +132,7 @@ import com.nutiteq.geometry.Geometry;
 import com.nutiteq.geometry.Point;
 
 @Singleton
-public class BeanShellLinker implements IFAIMSRestorable {
+public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUser {
 	
 	@Inject
 	DatabaseManager databaseManager;
@@ -2966,8 +2977,49 @@ public class BeanShellLinker implements IFAIMSRestorable {
 		this.activityRef.get().setSyncDelay(value);
 	}
 
+	public void showVerifyUserDialog(String callback) {
+		VerifyUserDialog verifyUserDialog = new VerifyUserDialog();
+		Bundle args = new Bundle();
+		args.putString("callback", callback);
+		verifyUserDialog.setArguments(args);
+		verifyUserDialog.show(activityRef.get().getFragmentManager(),"VerifyUser");
+	}
+
 	public void setUser(User user) {
 		databaseManager.setUserId(user.getUserId());
+	}
+
+	public void verifyUser(String password, String callback) {
+		try {
+			if (databaseManager.userRecord().verifyUser(databaseManager.getUserId(), password)) {
+				this.interpreter.eval(callback);
+			} else {
+				Toast.makeText(activityRef.get(), "Password incorrect", Toast.LENGTH_SHORT).show();
+			}
+		} catch (Exception e) {
+			reportError(e);
+		}
+	}
+
+	public void createUser(String fname, String lname, String email, String password, String callback ) {
+		User user = new User(null, fname, lname, email, password);
+		try {
+			databaseManager.userRecord().saveUser(user);
+			this.interpreter.eval(callback);
+		} catch (Exception e) {
+			reportError(e);
+		}
+
+	}
+
+	public void showCreateUserDialog(String callback) {
+
+		CreateUserDialog createUserDialog = new CreateUserDialog();
+		Bundle args = new Bundle();
+		args.putString("callback",callback);
+		createUserDialog.setArguments(args);
+		createUserDialog.show(activityRef.get().getFragmentManager(),"CreateUser");
+
 	}
 
 	public void showFileBrowser(String callback) {

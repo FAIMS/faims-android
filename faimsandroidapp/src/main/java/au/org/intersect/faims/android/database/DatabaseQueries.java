@@ -191,6 +191,7 @@ public final class DatabaseQueries {
 				"create table export.aentreln as select * from aentreln;" + 
 				"create table export.relationship as select * from relationship;" +
 				"create table export.relnvalue as select * from relnvalue;" +
+				"create table export.user as select * from user;" +
 				"detach database export;";
 	}
 
@@ -201,6 +202,7 @@ public final class DatabaseQueries {
 				"create table export.aentreln as select * from aentreln where versionnum is null and aentrelntimestamp >= '" + fromTimestamp + "';" +
 				"create table export.relationship as select * from relationship where versionnum is null and relntimestamp >= '" + fromTimestamp + "';" +
 				"create table export.relnvalue as select * from relnvalue where versionnum is null and relnvaluetimestamp >= '" + fromTimestamp + "';" +
+				"create table export.user as select * from user;" +
 				"detach database export;";
 	}
 
@@ -237,8 +239,8 @@ public final class DatabaseQueries {
 				"  select vocabid, attributeid, vocabname, vocabdescription, VocabCountOrder, VocabDeleted, parentvocabid, SemanticMapURL, PictureURL\n" + 
 				"  from import.vocabulary;\n" + 
 				"insert or replace into user (\n" + 
-				"         userid, fname, lname, email, UserDeleted) \n" + 
-				"  select userid, fname, lname, email, UserDeleted\n" + 
+				"         userid, fname, lname, email, UserDeleted, Password) \n" +
+				"  select userid, fname, lname, email, UserDeleted, Password\n" +
 				"  from import.user;\n" + 
 				"insert or replace into File (Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize)\n" +
 				"  select Filename, MD5Checksum, Size, Type, import.file.State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize\n" +
@@ -341,4 +343,8 @@ public final class DatabaseQueries {
 	public static String HAS_FILE_CHANGES = "select count(*) from file where state = 'attached';";
 	
 	public static String HAS_THUMBNAIL = "select count(*) from attributekey where attributeisfile = 1 and attributeusethumbnail = 1 and attributename = ?";
+
+	public static final String INSERT_INTO_USERS =
+			"INSERT INTO User (FName, LName, Email, Password) VALUES (?, ?, ?, ?);";
+
 }

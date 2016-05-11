@@ -22,7 +22,8 @@ public class DatabaseManager {
 	private SpatialRecord spatialRecord;
 	private SharedRecord sharedRecord;
 	private FileRecord fileRecord;
-	
+	private UserRecord userRecord;
+
 	public void init(File dbFile) {
 		this.listeners = new ArrayList<DatabaseChangeListener>();
 		this.dbFile = dbFile;
@@ -35,6 +36,7 @@ public class DatabaseManager {
 		this.attributeRecord = new AttributeRecord(dbFile);
 		this.spatialRecord = new SpatialRecord(dbFile);
 		this.fileRecord = new FileRecord(dbFile);
+		this.userRecord = new UserRecord(dbFile);
 	}
 
 	public void destroy() {
@@ -49,6 +51,7 @@ public class DatabaseManager {
 		this.attributeRecord = null;
 		this.spatialRecord = null;
 		this.fileRecord = null;
+		this.userRecord = null;
 		this.userId = null;
 	}
 
@@ -108,5 +111,9 @@ public class DatabaseManager {
 	
 	public FileRecord fileRecord() {
 		return this.fileRecord;
+	}
+
+	public UserRecord userRecord() {
+		return this.userRecord;
 	}
 }

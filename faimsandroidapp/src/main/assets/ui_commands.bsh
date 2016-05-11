@@ -602,9 +602,31 @@ onFocus(String ref, String focusCallback, String blurCallback) {
   * Set the current user of the application. Is a requirement for insert records into the database.
   *
   * @param user the user of the application
+  *
+  * TODO: modify setUser to prompt for password in modules where signup is enabled
   */
 setUser(User user){
 	linker.setUser(user);
+}
+
+/**
+  * Create a new user, if it doesn't already exist in the database
+  *
+  * @param fname First name of the new user
+  * @param lname Last name of the new user
+  * @param email Email address of the new user
+  * @param password Password for the new user
+  */
+createUser(String fname, String lname, String email, String password, String callback){
+	linker.createUser(fname, lname, email, password, callback);
+}
+
+showCreateUserDialog(String callback) {
+    linker.showCreateUserDialog(callback);
+}
+
+showVerifyUserDialog(String callback) {
+    linker.showVerifyUserDialog(callback);
 }
 
 //========= Archaeological Entity / Relationship Functionality ==========

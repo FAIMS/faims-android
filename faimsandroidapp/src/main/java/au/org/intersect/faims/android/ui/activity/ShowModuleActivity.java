@@ -143,7 +143,7 @@ public class ShowModuleActivity extends FragmentActivity implements
 	GPSDataManager gpsDataManager;
 
 	@Inject
-	BeanShellLinker beanShellLinker;
+	public BeanShellLinker beanShellLinker;
 
 	@Inject
 	UIRenderer uiRenderer;

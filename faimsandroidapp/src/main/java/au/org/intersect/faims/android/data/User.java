@@ -15,12 +15,18 @@ public class User implements Serializable {
 	private String firstName;
 	private String lastName;
 	private String email;
-	
+	private String password;
+
 	public User(String userId, String firstName, String lastName, String email){
 		this.userId = userId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
+	}
+
+	public User(String userId, String firstName, String lastName, String email, String password){
+		this(userId, firstName, lastName, email);
+		this.password = password;
 	}
 
 	public String getUserId() {
@@ -38,7 +44,10 @@ public class User implements Serializable {
 	public String getEmail() {
 		return email;
 	}
-	
+
+	public String getPassword() {
+		return password;
+	}
 	public static User loadUserFromJSON(JSONObject json) {
 		User user = null;
 		if (json.length() == 0) {

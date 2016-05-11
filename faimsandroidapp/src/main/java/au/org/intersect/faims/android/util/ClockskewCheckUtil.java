@@ -45,9 +45,9 @@ public class ClockskewCheckUtil implements GpsStatus.NmeaListener {
                 String gpsTime = nmea.split(",")[1].split("\\.")[0];
                 if (!gpsTime.isEmpty()) {
                     Integer skew = Math.abs(Integer.parseInt(gpsTime) - Integer.parseInt(sysTime));
-                    Log.d("FAIMS", "GPS Time: " + gpsTime + " (" + nmea.substring(0, 6) + ")");
-                    Log.d("FAIMS", "SYS Time: " + sysTime);
-                    Log.d("FAIMS", "Skew: " + skew);
+//                    Log.d("FAIMS", "GPS Time: " + gpsTime + " (" + nmea.substring(0, 6) + ")");
+//                    Log.d("FAIMS", "SYS Time: " + sysTime);
+//                    Log.d("FAIMS", "Skew: " + skew);
                     if (skew > 120 && !userActioned) {
                         final Activity currentActivity = TimezoneCheckUtil.getActivity();
                         if (currentActivity != null) {
