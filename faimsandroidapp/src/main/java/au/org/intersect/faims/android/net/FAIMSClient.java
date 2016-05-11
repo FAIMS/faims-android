@@ -13,7 +13,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
@@ -182,11 +185,11 @@ public class FAIMSClient {
 		synchronized(FAIMSClient.class) {
 			try {
 				initClient();
-				
-				MultipartEntity entity = new MultipartEntity();
-				entity.addPart("file", new FileBody(uploadFile, "binary/octet-stream"));
-				entity.addPart("request_file", new StringBody(uploadPath.getPath()));
-				entity.addPart("md5", new StringBody(FileUtil.generateMD5Hash(uploadFile)));			
+				MultipartEntityBuilder entity = MultipartEntityBuilder.create();
+				entity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+				entity.addBinaryBody("file", uploadFile);
+				entity.addPart("request_file", new StringBody(uploadPath.getPath(), ContentType.TEXT_PLAIN));
+				entity.addPart("md5", new StringBody(FileUtil.generateMD5Hash(uploadFile), ContentType.TEXT_PLAIN));
 				if (extraParts != null) {
 					for (Entry<String, ContentBody> entry : extraParts.entrySet()) {
 						entity.addPart(entry.getKey(), entry.getValue());
@@ -199,7 +202,7 @@ public class FAIMSClient {
 				}
 				
 				HttpPost post = createPostRequest(getUri(requestUri));
-				post.setEntity(entity);				
+				post.setEntity(entity.build());
 				HttpResponse response = httpClient.execute(post);			
 				if (isInterrupted) {
 					FLog.d("upload file interrupted");				
