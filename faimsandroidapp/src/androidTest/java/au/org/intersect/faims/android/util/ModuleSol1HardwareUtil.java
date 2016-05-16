@@ -126,6 +126,7 @@ public class ModuleSol1HardwareUtil {
          */
 
         solo.clickOnText("Hardware");
+        solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ShowModuleActivity.class);
     }
 
     /*

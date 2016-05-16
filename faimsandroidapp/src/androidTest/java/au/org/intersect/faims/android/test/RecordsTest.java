@@ -187,8 +187,10 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		solo.sleep(1000);
 		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ShowModuleActivity.class, 30000);
 
+		//TODO: Need a 'wait for text' function here
 		// Load the exact record
 		solo.clickOnText(runIDInstance.getRunID() + "'s save count:" + count + ".");
+		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ShowModuleActivity.class);
 		ModuleSol1HardwareUtil.clickTab_Hardware(solo);
 	}
 
