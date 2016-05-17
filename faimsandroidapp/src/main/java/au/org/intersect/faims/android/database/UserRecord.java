@@ -21,42 +21,19 @@ public class UserRecord extends Database {
         super(dbFile);
     }
 
-    public boolean saveUser(User user) throws java.lang.Exception {
-
-        try {
-            String userLookup = "";
-            userLookup = databaseManager.fetchRecord().fetchOne("SELECT userId from user where fname = '" + user.getFirstName() +
-                    "' and lname = '" + user.getLastName() + "' ;").get(0);
-            if (null != userLookup || !userLookup.isEmpty()) {
-                return false;
-            }
-        } catch (java.lang.Exception e) {
-//            return false;
-        }
-
-        String query = DatabaseQueries.INSERT_INTO_USERS;
-
-        jsqlite.Database db = null;
-        Stmt st = null;
-        try {
-            db = openDB(jsqlite.Constants.SQLITE_OPEN_READWRITE);
-            beginTransaction(db);
-            st = db.prepare(query);
-            st.bind(1, user.getFirstName());
-            st.bind(2, user.getLastName());
-            st.bind(3, user.getEmail());
-            st.bind(4, new String(Base64.encode(MessageDigest.getInstance("SHA1").digest(user.getPassword().getBytes()), Base64.NO_WRAP)));
-            st.step();
-            st.close();
-            st = null;
-            commitTransaction(db);
-            notifyListeners();
-            return true;
-        } finally {
-            closeStmt(st);
-            closeDB(db);
-        }
-    }
+//    public boolean saveUser(User user) throws java.lang.Exception {
+//
+//        try {
+//            String userLookup = "";
+//            userLookup = databaseManager.fetchRecord().fetchOne("SELECT userId from user where email = '" + user.getEmail() + "' ;").get(0);
+//            if (null != userLookup || !userLookup.isEmpty()) {
+//                return false;
+//            }
+//        } catch (java.lang.Exception e) {
+////            return false;
+//        }
+//
+//    }
 
     public boolean verifyUser(String userId, String password) throws Exception {
         try {

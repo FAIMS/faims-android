@@ -23,11 +23,15 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.net.http.AndroidHttpClient;
 import android.util.Base64;
+import android.util.Log;
+
+import au.org.intersect.faims.android.data.User;
 import au.org.intersect.faims.android.log.FLog;
 import au.org.intersect.faims.android.util.FileUtil;
 import au.org.intersect.faims.android.util.JsonUtil;
@@ -228,7 +232,51 @@ public class FAIMSClient {
 			}
 		}		
 	}
-	
+
+	public Result createUser(String requestUri, User user) {
+		synchronized(FAIMSClient.class) {
+			try {
+				initClient();
+				MultipartEntityBuilder entity = MultipartEntityBuilder.create();
+				entity.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+				entity.addPart("new_user_fname", new StringBody(user.getFirstName(), ContentType.TEXT_PLAIN));
+				entity.addPart("new_user_lname", new StringBody(user.getLastName(), ContentType.TEXT_PLAIN));
+				entity.addPart("new_user_email", new StringBody(user.getEmail(), ContentType.TEXT_PLAIN));
+				entity.addPart("new_user_password", new StringBody(user.getPassword(), ContentType.TEXT_PLAIN));
+
+				if (isInterrupted) {
+					FLog.d("create user interrupted");
+					return Result.INTERRUPTED;
+				}
+
+				HttpPost post = createPostRequest(getUri(requestUri));
+				post.setEntity(entity.build());
+				HttpResponse response = httpClient.execute(post);
+				if (isInterrupted) {
+					FLog.d("create user interrupted");
+					return Result.INTERRUPTED;
+				}
+
+				int statusCode = response.getStatusLine().getStatusCode();
+				if (statusCode != HttpStatus.SC_OK) {
+					FLog.d("create user failed");
+					return new Result(FAIMSClientResultCode.FAILURE, null, JsonUtil.deserializeJsonObject(response.getEntity().getContent()));
+				}
+
+				return Result.SUCCESS;
+			} catch (Exception e) {
+				if (isInterrupted) {
+					FLog.d("create user interrupted");
+					return Result.INTERRUPTED;
+				}
+				FLog.e("error creating user", e);
+				return Result.FAILURE;
+			} finally {
+				cleanupClient();
+			}
+		}
+	}
+
 	private HttpPost createPostRequest(String uri) {
 		HttpPost post = new HttpPost(uri);
 		post.setHeader("Authorization", getCredentials());
