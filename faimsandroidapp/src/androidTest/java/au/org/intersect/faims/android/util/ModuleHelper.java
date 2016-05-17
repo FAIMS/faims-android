@@ -17,7 +17,7 @@ public abstract class ModuleHelper {
                 can I address this using solo.getView((Object) "Control/Main/Record_Asset")? no, though the ref tags exist
          */
 
-        clickOpenDialogButton(solo, name, 8000);
+        clickOpenDialogButton(solo, name, 2000);
     }
 
     public static void clickOpenDialogButton(Solo solo, String name, long timeout) {
@@ -40,7 +40,7 @@ public abstract class ModuleHelper {
                 can I address this using solo.getView((Object) "Control/Main/Record_Asset")? no, though the ref tags exist
          */
 
-        clickCloseDialogButton(solo, name, 8000);
+        clickCloseDialogButton(solo, name, 300);
     }
 
     public static void clickCloseDialogButton(Solo solo, String name, long timeout) {
@@ -52,7 +52,7 @@ public abstract class ModuleHelper {
          */
 
         solo.clickOnButton(name);
-        solo.waitForDialogToClose(8000);
+        solo.waitForDialogToClose(timeout);
     }
 
     public static void clickButton(Solo solo, String name) {

@@ -183,9 +183,6 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		EditText search = ModuleSol1HardwareUtil.getEditText_ControlSearchSearch_Term(solo);
 		TestModuleUtil.editTextField(solo, search, "count:" + count + ".");
 		ModuleSol1HardwareUtil.clickButton_Search(solo);
-		// TODO: There is a spinner when searching, not sure how we tap in to that
-		solo.sleep(1000);
-		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ShowModuleActivity.class, 30000);
 
 		//TODO: Need a 'wait for text' function here
 		// Load the exact record
@@ -279,6 +276,7 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		//Click on Faims Admin
 		solo.clickOnText(TestModuleUtil.USER_FAIMS_ADMIN);
 		ModuleSol1HardwareUtil.clickButton_Login(solo);
+		assertTrue("Login Failed: Failed to find Record Asset button", solo.searchButton("Record Asset", true));
 
 	}
 
