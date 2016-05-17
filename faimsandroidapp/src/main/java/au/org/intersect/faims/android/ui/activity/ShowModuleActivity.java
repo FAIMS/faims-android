@@ -1,5 +1,10 @@
 package au.org.intersect.faims.android.ui.activity;
 
+import au.org.intersect.faims.android.data.User;
+import au.org.intersect.faims.android.net.FAIMSClient;
+import au.org.intersect.faims.android.net.FAIMSClientResultCode;
+import au.org.intersect.faims.android.net.Result;
+import au.org.intersect.faims.android.tasks.UserSignupTask;
 import group.pals.android.lib.ui.filechooser.FileChooserActivity;
 import group.pals.android.lib.ui.filechooser.io.localfile.LocalFile;
 import group.pals.android.lib.ui.filechooser.prefs.DisplayPrefs;
@@ -96,6 +101,9 @@ import au.org.intersect.faims.android.util.ModuleUtil;
 
 import com.google.inject.Inject;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class ShowModuleActivity extends FragmentActivity implements
 		IFAIMSRestorable {
 
@@ -162,7 +170,10 @@ public class ShowModuleActivity extends FragmentActivity implements
 	
 	@Inject
 	CSSManager cssManager;
-	
+
+	@Inject
+	FAIMSClient faimsClient;
+
 	private WifiBroadcastReceiver broadcastReceiver;
 
 	private BusyDialog busyDialog;
@@ -829,6 +840,42 @@ public class ShowModuleActivity extends FragmentActivity implements
 		}
 	}
 
+	public void createNewUser(final User user, final String callback) {
+		Module module = ModuleUtil.getModule(moduleKey);
+		if (serverDiscovery.isServerHostValid()) {
+			showBusyUploadDatabaseDialog();
+
+			new UserSignupTask(faimsClient, new ITaskListener() {
+				@Override
+				public void handleTaskCompleted(Object resobj) {
+					Result result = (Result) resobj;
+					ShowModuleActivity.this.busyDialog.dismiss();
+					if (result.resultCode == FAIMSClientResultCode.SUCCESS) {
+						ShowModuleActivity.this.addSyncListener(new SyncListener() {
+							@Override
+							public void handleStart() {
+
+							}
+
+							@Override
+							public void handleSuccess() {
+								ShowModuleActivity.this.beanShellLinker.execute(callback);
+//								ShowModuleActivity.this.listeners.remove(this);
+							}
+
+							@Override
+							public void handleFailure() {
+
+							}
+						});
+					} else {
+						showCreateUserErrorDialog(result);
+					}
+				}
+			}, user, module).execute();
+		}
+	}
+
 	public void uploadDatabaseToServer(final String callback) {
 
 		if (serverDiscovery.isServerHostValid()) {
@@ -1015,6 +1062,30 @@ public class ShowModuleActivity extends FragmentActivity implements
 		confirmDialog.show();
 	}
 
+	public void showCreateUserErrorDialog(Result result) {
+		JSONObject json;
+		try {
+			json = (JSONObject) result.data;
+		} catch (Exception e) {
+			json = new JSONObject();
+		}
+		if (null != json) {
+			try {
+				confirmDialog = new ConfirmDialog(ShowModuleActivity.this,
+						json.getString("message"),
+						json.getString("error"),
+						new IDialogListener() {
+							@Override
+							public void handleDialogResponse(DialogResultCode resultCode) {
+								//
+							}
+						});
+				confirmDialog.show();
+			} catch (Exception e) {
+
+			}
+		}
+	}
 	public void showDownloadDatabaseErrorDialog(final String callback) {
 		confirmDialog = new ConfirmDialog(ShowModuleActivity.this,
 				getString(R.string.download_database_error_title),
