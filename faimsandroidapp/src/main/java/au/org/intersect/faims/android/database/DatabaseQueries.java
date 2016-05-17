@@ -344,7 +344,7 @@ public final class DatabaseQueries {
 	
 	public static String HAS_THUMBNAIL = "select count(*) from attributekey where attributeisfile = 1 and attributeusethumbnail = 1 and attributename = ?";
 
-	public static final String INSERT_INTO_USERS =
-			"INSERT INTO User (FName, LName, Email, Password) VALUES (?, ?, ?, ?);";
+//	public static final String INSERT_INTO_USERS =
+//			"INSERT INTO User (FName, LName, Email, Password) VALUES (?, ?, ?, ?);";
 
 }

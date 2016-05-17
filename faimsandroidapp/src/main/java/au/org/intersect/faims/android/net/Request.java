@@ -1,6 +1,7 @@
 package au.org.intersect.faims.android.net;
 
 import au.org.intersect.faims.android.data.Module;
+import au.org.intersect.faims.android.data.User;
 
 public class Request {
 	
@@ -60,5 +61,9 @@ public class Request {
 	
 	public static String SERVER_FILE_UPLOAD_REQUEST(Module module) {
 		return "/android/module/" + module.key + "/server_file_upload?";
+	}
+
+	public static String USER_SIGNUP_REQUEST(Module module) {
+		return "/android/module/" + module.key + "/signup";
 	}
 }

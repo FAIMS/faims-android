@@ -79,7 +79,7 @@ public class CreateUserDialog extends DialogFragment implements DialogInterface.
 //                Log.d("CREATE", lname.getText().toString());
 //                Log.d("CREATE", email.getText().toString());
 //                Log.d("CREATE", password.getText().toString());
-                Log.d("CREATE", password_confirmation.getText().toString());
+//                Log.d("CREATE", password_confirmation.getText().toString());
                 if (!fname.getText().toString().trim().equals("")) {
                     if (!lname.getText().toString().trim().equals("")) {
                         if (Patterns.EMAIL_ADDRESS.matcher(email.getText().toString()).matches()) {
