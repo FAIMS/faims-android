@@ -206,8 +206,9 @@ public final class DatabaseQueries {
 				"detach database export;";
 	}
 
-	public static final String MERGE_DATABASE_FROM(String path){
-		return "attach database '" + path + "' as import;" +
+	public static final String MERGE_DATABASE_FROM(String path, Boolean hasPassword){
+		String result =
+		"attach database '" + path + "' as import;" +
 				"insert or replace into archentity (\n" + 
 				"         uuid, aenttimestamp, userid, doi, aenttypeid, deleted, versionnum, isdirty, isdirtyreason, isforked, parenttimestamp, geospatialcolumntype, geospatialcolumn) \n" + 
 				"  select uuid, aenttimestamp, userid, doi, aenttypeid, deleted, versionnum, isdirty, isdirtyreason, isforked, parenttimestamp, geospatialcolumntype, geospatialcolumn \n" + 
@@ -237,16 +238,28 @@ public final class DatabaseQueries {
 				"insert or replace into vocabulary (\n" + 
 				"         vocabid, attributeid, vocabname, vocabdescription, VocabCountOrder, VocabDeleted, parentvocabid, SemanticMapURL, PictureURL) \n" + 
 				"  select vocabid, attributeid, vocabname, vocabdescription, VocabCountOrder, VocabDeleted, parentvocabid, SemanticMapURL, PictureURL\n" + 
-				"  from import.vocabulary;\n" + 
-				"insert or replace into user (\n" + 
-				"         userid, fname, lname, email, UserDeleted, Password) \n" +
-				"  select userid, fname, lname, email, UserDeleted, Password\n" +
-				"  from import.user;\n" + 
-				"insert or replace into File (Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize)\n" +
+				"  from import.vocabulary;\n";
+				if (hasPassword) {
+					result += "insert or replace into user (\n" +
+							"         userid, fname, lname, email, UserDeleted, Password) \n" +
+							"  select userid, fname, lname, email, UserDeleted, Password\n" +
+							"  from import.user;\n";
+				} else {
+					result += "insert or replace into user (\n" +
+							"         userid, fname, lname, email, UserDeleted) \n" +
+							"  select userid, fname, lname, email, UserDeleted\n" +
+							"  from import.user;\n";
+				}
+
+				result += "insert or replace into File (Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize)\n" +
 				"  select Filename, MD5Checksum, Size, Type, import.file.State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize\n" +
 				"  from import.file left outer join (select filename, state from file) local using (filename) where local.State != 'downloaded' or local.state is null;" + 
 				"detach database import;";
+		return result;
 	}
+
+	public static String TEST_FOR_PASSWORD_COLUMN =
+			"SELECT sql like '%Password%' FROM sqlite_master WHERE tbl_name='User';";
 
 	public static String RUN_DISTANCE_ENTITY = 
 		"select uuid, aenttimestamp\n" + 

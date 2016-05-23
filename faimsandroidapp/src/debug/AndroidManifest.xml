@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="au.org.intersect.faims.android">
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
+
+    <!--<application>-->
+    <!--<uses-library android:name="android.test.runner" />-->
+    <!--</application>-->
+
+    <!--<instrumentation android:name="android.test.InstrumentationTestRunner"-->
+    <!--android:targetPackage="au.org.intersect.faims.android"-->
+    <!--android:handleProfiling="false"-->
+    <!--android:functionalTest="false"-->
+    <!--android:label="Tests for au.org.intersect.faims.android"/>-->
+</manifest>
