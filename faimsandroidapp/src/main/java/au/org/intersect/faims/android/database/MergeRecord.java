@@ -68,13 +68,27 @@ public class MergeRecord extends Database {
 			closeStmt(st);
 		}
 	}
-	
+
+	private boolean hasPasswordColumn(jsqlite.Database db) throws Exception {
+		Stmt st = null;
+		try {
+			st = db.prepare(DatabaseQueries.TEST_FOR_PASSWORD_COLUMN);
+			st.step();
+			int hasPassword = Integer.parseInt(st.column(0).toString());
+			if (hasPassword == 1) {
+				return true;
+			}
+			return false;
+		} finally {
+			closeStmt(st);
+		}
+	}
 	public void mergeDatabaseFrom(File file) throws Exception {
 		FLog.d("merging database");
 		jsqlite.Database db = null;
 		try {
 			db = openDB(jsqlite.Constants.SQLITE_OPEN_READWRITE);
-			String query = DatabaseQueries.MERGE_DATABASE_FROM(file.getAbsolutePath());
+			String query = DatabaseQueries.MERGE_DATABASE_FROM(file.getAbsolutePath(),hasPasswordColumn(db));
 			db.exec(query, createCallback());
 		} finally {
 			closeDB(db);
