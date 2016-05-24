@@ -1,6 +1,7 @@
 package au.org.intersect.faims.android.test;
 
 import au.org.intersect.faims.android.ui.activity.SplashActivity;
+import au.org.intersect.faims.android.ui.map.tools.DatabaseSelectionTool;
 import au.org.intersect.faims.android.util.TestModuleUtil;
 import au.org.intersect.faims.android.util.ModuleSol1HardwareUtil;
 import au.org.intersect.faims.android.util.TestRunID;
@@ -9,6 +10,8 @@ import com.robotium.solo.*;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.widget.EditText;
+
+import java.util.Date;
 
 
 public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity> {
@@ -101,11 +104,18 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		turnSyncOff();
 
 		int recordsToGenerate = 50;
+		Log.d("Start Run:", runIDInstance.getRunID() + " with " + recordsToGenerate + " records");
 		for (int count = 1; count < recordsToGenerate; count++) {
 			// Lets make this range populate from 10 to 60 to be unique in this run
 			saveRecord(count + 10);
 			autosaveAndGoBack();
+			int sleep = 0;
+			while ( !solo.searchText("Record Asset", true) && sleep < 50 ) {
+				solo.sleep(100);
+				sleep++;
+			}
 		}
+		Log.d("End Run:", runIDInstance.getRunID() + " with " + recordsToGenerate + " records");
 
 		turnSyncOn();
 		solo.sleep(10000);
@@ -168,32 +178,32 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 
 	private void loadRecord(int count) {
 
-		Log.d("Debug Load", "Run ID = " + runIDInstance.getRunID() + ", count = " + count);
+		String record = runIDInstance.getRunID() + "'s save count:" + count + ".";
+		Log.d("Debug Load", "Record = " + record);
 
 		// Goto the records tab
 		ModuleSol1HardwareUtil.clickTab_Records(solo);
 		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ShowModuleActivity.class);
 		int i = 1;
-		while (solo.searchText("Options not loaded") && i < 120) {
-			solo.sleep(500);
+		while (solo.searchText("Options not loaded") && i < 500) {
+			solo.sleep(200);
 			i++;
 		}
 
 		// Search for a field value to find something close
 		EditText search = ModuleSol1HardwareUtil.getEditText_ControlSearchSearch_Term(solo);
 		TestModuleUtil.editTextField(solo, search, "count:" + count + ".");
-		ModuleSol1HardwareUtil.clickButton_Search(solo);
+		ModuleSol1HardwareUtil.clickButton_Search(solo, record);
 
-		//TODO: Need a 'wait for text' function here
 		// Load the exact record
-		solo.clickOnText(runIDInstance.getRunID() + "'s save count:" + count + ".");
+		solo.clickOnText(record);
 		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ShowModuleActivity.class);
 		ModuleSol1HardwareUtil.clickTab_Hardware(solo);
 	}
 
 	private void autosaveAndGoBack() {
 		// Let autosave have a chance to do it's thing
-		solo.sleep(3000);	// TODO: we should be checking for sync state
+		solo.sleep(300);	// TODO: we should be checking for sync state
 		solo.goBack();
 		assertTrue(true);
 	}

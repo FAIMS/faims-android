@@ -76,11 +76,15 @@ public class ModuleSol1HardwareUtil extends ModuleHelper {
         Type: Button
         ref: Control/Main/Record_Asset
      */
-    public static void clickButton_Search(Solo solo) {
+    public static void clickButton_Search(Solo solo, String searchText) {
         clickButton(solo, "Search");
-        // TODO: There is a spinner when searching, not sure how we tap in to that
-        solo.sleep(1000);
-        solo.waitForActivity(au.org.intersect.faims.android.ui.activity.ShowModuleActivity.class, 30000);
+        // There is a spinner here, not sure how to tap into it, just wait a really long time or for a result
+        int i = 1;
+        while ( !solo.searchText(searchText) && i < 500 ) {
+            solo.sleep(200);
+            i++;
+        }
+
     }
 
     // Tab
