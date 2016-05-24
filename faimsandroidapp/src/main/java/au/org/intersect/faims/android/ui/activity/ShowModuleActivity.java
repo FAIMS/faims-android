@@ -1084,6 +1084,17 @@ public class ShowModuleActivity extends FragmentActivity implements
 			} catch (Exception e) {
 
 			}
+		} else {
+			confirmDialog = new ConfirmDialog(ShowModuleActivity.this,
+					"Unable to contact server",
+					"Please check your network connection and try again. Contact an administrator if the problem persists.",
+					new IDialogListener() {
+						@Override
+						public void handleDialogResponse(DialogResultCode resultCode) {
+							//
+						}
+					});
+			confirmDialog.show();
 		}
 	}
 	public void showDownloadDatabaseErrorDialog(final String callback) {
