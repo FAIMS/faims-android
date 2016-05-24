@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import au.org.intersect.faims.android.tasks.DatabaseRecordCountTask;
 import au.org.intersect.faims.android.ui.dialog.IModuleActionsResult;
 import au.org.intersect.faims.android.ui.dialog.ModuleActionsDialog;
 import roboguice.activity.RoboActivity;
@@ -28,6 +29,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -229,6 +231,53 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	}
 
 	public void moduleActionsForce(String selectedItem) {
+		List<Module> modules = ModuleUtil.getModules();
+		Module module = null;
+		for(Module m : modules) {
+			if (m.name.equals(selectedItem)) {
+				module = m;
+			}
+		}
+		new DatabaseRecordCountTask(faimsClient, new ITaskListener() {
+			@Override
+			public void handleTaskCompleted(Object result) {
+				showForceConfirmationDialog(result);
+			}
+		}, module).execute();
+	}
+
+	protected void showForceConfirmationDialog(Object resobj) {
+		Result result = (Result) resobj;
+		int entities = 0;
+		int relationships = 0;
+		JSONObject json;
+		try {
+			json = (JSONObject) result.data;
+		} catch (Exception e) {
+			json = new JSONObject();
+		}
+		if (null != json) {
+			try {
+				entities = json.getInt("entities");
+				relationships = json.getInt("relationships");
+			} catch (Exception e) {
+				// error parsing json from server
+			}
+		} else {
+			// error parsing json from server
+		}
+		choiceDialog = new ChoiceDialog(MainActivity.this,
+				"Confirm forcing sync to server?",
+				//TODO count client side entities and relationships
+				Integer.toString(entities) + " entities, " + Integer.toString(relationships) + " relationships found on server.",
+				new IDialogListener() {
+					@Override
+					public void handleDialogResponse(DialogResultCode resultCode) {
+						//TODO: business logic for forcing sync here
+						Log.d("FORCE", "Result Code: " + resultCode.toString());
+					}
+				});
+		choiceDialog.show();
 
 	}
 
@@ -238,64 +287,6 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		moduleActionsArgs.putString("selectedItem", selectedItem);
 		moduleActionsDialog.setArguments(moduleActionsArgs);
 		moduleActionsDialog.show(this.getFragmentManager(),"moduleActionsDialog");
-//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setTitle(R.string.confirm_download_or_update_module_title);
-//		builder.setMessage(getString(R.string.confirm_download_or_update_module_message) + " " + selectedItem + "?");
-//
-//		builder.setPositiveButton("Cancel", new OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//
-//			}
-//		});
-//
-//		builder.setNeutralButton("Restore", new OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				choiceDialog = new ChoiceDialog(MainActivity.this,
-//						getString(R.string.confirm_restore_module_title),
-//						getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
-//						new IDialogListener() {
-//
-//							@Override
-//							public void handleDialogResponse(
-//									DialogResultCode resultCode) {
-//								if (resultCode == DialogResultCode.SELECT_YES) {
-//									choiceDialog = new ChoiceDialog(MainActivity.this,
-//											getString(R.string.confirm_download_warning_module_title),
-//											getString(R.string.confirm_download_warning_module_message),
-//											new IDialogListener() {
-//
-//												@Override
-//												public void handleDialogResponse(
-//														DialogResultCode resultCode) {
-//													if (resultCode == DialogResultCode.SELECT_YES) {
-//														downloadModule(true);
-//													}
-//												}
-//									},
-//									getString(R.string.confirm_restore_no),
-//									getString(R.string.confirm_restore_yes));
-//									choiceDialog.show();
-//								}
-//							}
-//
-//				});
-//				choiceDialog.show();
-//			}
-//		});
-//
-//		builder.setNegativeButton("Update", new OnClickListener() {
-//
-//			@Override
-//			public void onClick(DialogInterface dialog, int which) {
-//				showUpdateModuleDialog(selectedItem);
-//			}
-//		});
-//
-//		builder.create().show();
 	}
     
     protected void showUpdateModuleDialog(final String selectedItem) {
