@@ -9,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import au.org.intersect.faims.android.ui.dialog.IModuleActionsResult;
+import au.org.intersect.faims.android.ui.dialog.ModuleActionsDialog;
 import roboguice.activity.RoboActivity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -71,7 +73,7 @@ import au.org.intersect.faims.android.util.ModuleUtil;
 
 import com.google.inject.Inject;
 
-public class MainActivity extends RoboActivity {
+public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	
 	enum Type {
 		DOWNLOAD,
@@ -190,66 +192,110 @@ public class MainActivity extends RoboActivity {
 	    	showUpdateOrDownloadModuleDialog(moduleName);
     	}
 	}
-    
+
+	public void moduleActionsUpdate(String selectedItem) {
+		showUpdateModuleDialog(selectedItem);
+	}
+
+	public void moduleActionsRestore(String selectedItem) {
+		choiceDialog = new ChoiceDialog(MainActivity.this,
+			getString(R.string.confirm_restore_module_title),
+			getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
+			new IDialogListener() {
+				@Override
+				public void handleDialogResponse(
+					DialogResultCode resultCode) {
+						if (resultCode == DialogResultCode.SELECT_YES) {
+							choiceDialog = new ChoiceDialog(MainActivity.this,
+								getString(R.string.confirm_download_warning_module_title),
+								getString(R.string.confirm_download_warning_module_message),
+								new IDialogListener() {
+									@Override
+									public void handleDialogResponse(
+										DialogResultCode resultCode) {
+											if (resultCode == DialogResultCode.SELECT_YES) {
+												downloadModule(true);
+											}
+										}
+								},
+								getString(R.string.confirm_restore_no),
+								getString(R.string.confirm_restore_yes));
+							choiceDialog.show();
+						}
+					}
+
+			});
+		choiceDialog.show();
+	}
+
+	public void moduleActionsForce(String selectedItem) {
+
+	}
+
     protected void showUpdateOrDownloadModuleDialog(final String selectedItem) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.confirm_download_or_update_module_title);
-		builder.setMessage(getString(R.string.confirm_download_or_update_module_message) + " " + selectedItem + "?");
-
-		builder.setPositiveButton("Cancel", new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				
-			}
-		});
-		
-		builder.setNeutralButton("Restore", new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				choiceDialog = new ChoiceDialog(MainActivity.this, 
-						getString(R.string.confirm_restore_module_title),
-						getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
-						new IDialogListener() {
-
-							@Override
-							public void handleDialogResponse(
-									DialogResultCode resultCode) {
-								if (resultCode == DialogResultCode.SELECT_YES) {
-									choiceDialog = new ChoiceDialog(MainActivity.this, 
-											getString(R.string.confirm_download_warning_module_title),
-											getString(R.string.confirm_download_warning_module_message),
-											new IDialogListener() {
-	
-												@Override
-												public void handleDialogResponse(
-														DialogResultCode resultCode) {
-													if (resultCode == DialogResultCode.SELECT_YES) {
-														downloadModule(true);
-													}
-												}	
-									},
-									getString(R.string.confirm_restore_no),
-									getString(R.string.confirm_restore_yes));
-									choiceDialog.show();
-								}
-							}
-					
-				});
-				choiceDialog.show();
-			}
-		});
-		
-		builder.setNegativeButton("Update", new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				showUpdateModuleDialog(selectedItem);
-			}
-		});
-		
-		builder.create().show();
+		ModuleActionsDialog moduleActionsDialog = new ModuleActionsDialog();
+		Bundle moduleActionsArgs = new Bundle();
+		moduleActionsArgs.putString("selectedItem", selectedItem);
+		moduleActionsDialog.setArguments(moduleActionsArgs);
+		moduleActionsDialog.show(this.getFragmentManager(),"moduleActionsDialog");
+//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//		builder.setTitle(R.string.confirm_download_or_update_module_title);
+//		builder.setMessage(getString(R.string.confirm_download_or_update_module_message) + " " + selectedItem + "?");
+//
+//		builder.setPositiveButton("Cancel", new OnClickListener() {
+//
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//
+//			}
+//		});
+//
+//		builder.setNeutralButton("Restore", new OnClickListener() {
+//
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				choiceDialog = new ChoiceDialog(MainActivity.this,
+//						getString(R.string.confirm_restore_module_title),
+//						getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
+//						new IDialogListener() {
+//
+//							@Override
+//							public void handleDialogResponse(
+//									DialogResultCode resultCode) {
+//								if (resultCode == DialogResultCode.SELECT_YES) {
+//									choiceDialog = new ChoiceDialog(MainActivity.this,
+//											getString(R.string.confirm_download_warning_module_title),
+//											getString(R.string.confirm_download_warning_module_message),
+//											new IDialogListener() {
+//
+//												@Override
+//												public void handleDialogResponse(
+//														DialogResultCode resultCode) {
+//													if (resultCode == DialogResultCode.SELECT_YES) {
+//														downloadModule(true);
+//													}
+//												}
+//									},
+//									getString(R.string.confirm_restore_no),
+//									getString(R.string.confirm_restore_yes));
+//									choiceDialog.show();
+//								}
+//							}
+//
+//				});
+//				choiceDialog.show();
+//			}
+//		});
+//
+//		builder.setNegativeButton("Update", new OnClickListener() {
+//
+//			@Override
+//			public void onClick(DialogInterface dialog, int which) {
+//				showUpdateModuleDialog(selectedItem);
+//			}
+//		});
+//
+//		builder.create().show();
 	}
     
     protected void showUpdateModuleDialog(final String selectedItem) {
@@ -285,7 +331,7 @@ public class MainActivity extends RoboActivity {
     protected void removeModule() {
     	FileUtil.delete(selectedDownloadModule.getDirectoryPath());
     }
-    
+
     protected void downloadModule(final boolean overwrite) {
     	if (serverDiscovery.isServerHostValid()) {
     		showBusyDialog(Type.DOWNLOAD);
