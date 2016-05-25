@@ -87,6 +87,9 @@
     <string name="update_settings_busy_message">Updating module settings please wait..</string>
     <string name="update_data_busy_message">Updating module maps please wait..</string>
 
+    <string name="create_user_title">Creating User</string>
+    <string name="create_user_message">please wait...</string>
+
     <string name="upload_database_title">Uploading Database</string>
     <string name="upload_database_message">please wait..</string>
 
