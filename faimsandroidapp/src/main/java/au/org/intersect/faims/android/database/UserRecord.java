@@ -35,6 +35,20 @@ public class UserRecord extends Database {
 //
 //    }
 
+    public boolean userExists(User user) throws Exception {
+        try {
+            String userId = databaseManager.fetchRecord().fetchOne("SELECT count(*) from user where email ='" + user.getEmail() + "';").get(0);
+            if (userId.equals("1")) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (java.lang.Exception e) {
+            Exception ex = new Exception("Unable to check password");
+            throw ex;
+        }
+    }
+
     public boolean verifyUser(String userId, String password) throws Exception {
         try {
             String userPassword = databaseManager.fetchRecord().fetchOne("SELECT password from user where userid =" + userId + ";").get(0);
