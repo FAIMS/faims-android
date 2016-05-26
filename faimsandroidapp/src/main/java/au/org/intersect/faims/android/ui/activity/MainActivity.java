@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import au.org.intersect.faims.android.database.Database;
 import au.org.intersect.faims.android.tasks.DatabaseRecordCountTask;
 import au.org.intersect.faims.android.ui.dialog.IModuleActionsResult;
 import au.org.intersect.faims.android.ui.dialog.ModuleActionsDialog;
@@ -248,8 +249,11 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 
 	protected void showForceConfirmationDialog(Object resobj) {
 		Result result = (Result) resobj;
-		int entities = 0;
-		int relationships = 0;
+		int serverEntities = 0;
+		int serverRelationships = 0;
+		int localEntities = 0;
+		int localRelationships = 0;
+
 		JSONObject json;
 		try {
 			json = (JSONObject) result.data;
@@ -258,18 +262,22 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		}
 		if (null != json) {
 			try {
-				entities = json.getInt("entities");
-				relationships = json.getInt("relationships");
+				serverEntities = json.getInt("entities");
+				serverRelationships = json.getInt("relationships");
+				localRelationships = json.getInt("localRelationships");
+				localEntities = json.getInt("localEntities");
 			} catch (Exception e) {
 				// error parsing json from server
 			}
 		} else {
 			// error parsing json from server
 		}
+
 		choiceDialog = new ChoiceDialog(MainActivity.this,
 				"Confirm forcing sync to server?",
 				//TODO count client side entities and relationships
-				Integer.toString(entities) + " entities, " + Integer.toString(relationships) + " relationships found on server.",
+				Integer.toString(serverEntities) + " entities and " + Integer.toString(serverRelationships) + " relationships found on server, " +
+						Integer.toString(localEntities) + " entities and " + Integer.toString(localRelationships) + " relationships found on device.",
 				new IDialogListener() {
 					@Override
 					public void handleDialogResponse(DialogResultCode resultCode) {

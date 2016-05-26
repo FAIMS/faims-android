@@ -338,7 +338,15 @@ public final class DatabaseQueries {
 	public static String COUNT_AENT_RELN_RECORDS(String timestamp) {
 		return "select count(*) from aentreln where versionnum is null and aentrelntimestamp >= '" + timestamp + "';";
 	}
-	
+
+	public static String TOTAL_AENT_RECORDS() {
+		return "select count(*) from ArchEntity;";
+	}
+
+	public static String TOTAL_LATEST_NONDELETED_RELN_RECORDS() {
+		return "select count(*) from latestNonDeletedRelationship;";
+	}
+
 	public static String INSERT_FILE = "insert or replace into File (Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 	
 	public static String UPDATE_FILE = "update File set State = ? where Filename = ?";
@@ -356,6 +364,7 @@ public final class DatabaseQueries {
 	public static String HAS_FILE_CHANGES = "select count(*) from file where state = 'attached';";
 	
 	public static String HAS_THUMBNAIL = "select count(*) from attributekey where attributeisfile = 1 and attributeusethumbnail = 1 and attributename = ?";
+
 
 //	public static final String INSERT_INTO_USERS =
 //			"INSERT INTO User (FName, LName, Email, Password) VALUES (?, ?, ?, ?);";

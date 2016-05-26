@@ -354,5 +354,26 @@ public class EntityRecord extends SharedRecord {
 			closeDB(db);
 		}
 	}
+	public int totalEntities() throws Exception {
+		jsqlite.Database db = null;
+		Stmt stmt = null;
+		int result = 0;
+		try {
+			db = openDB();
+
+			String query = DatabaseQueries.TOTAL_AENT_RECORDS();
+			stmt = db.prepare(query);
+			if(stmt.step()){
+				result = stmt.column_int(0);
+			}
+			stmt.close();
+			stmt = null;
+
+			return result;
+		} finally {
+			closeStmt(stmt);
+			closeDB(db);
+		}
+	}
 
 }
