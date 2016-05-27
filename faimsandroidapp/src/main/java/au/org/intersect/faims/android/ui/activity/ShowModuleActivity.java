@@ -1349,16 +1349,20 @@ public class ShowModuleActivity extends FragmentActivity implements
 
 	public void callSyncStart() {
 		syncStarted = true;
-		for (SyncListener listener : listeners) {
-			listener.handleStart();
+		if (null != listeners) {
+			for (SyncListener listener : listeners) {
+				listener.handleStart();
+			}
 		}
 		setSyncStatus(SyncStatus.ACTIVE_SYNCING);
 	}
 
 	public void callSyncSuccess() {
 		syncStarted = false;
-		for (SyncListener listener : listeners) {
-			listener.handleSuccess();
+		if (null != listeners) {
+			for (SyncListener listener : listeners) {
+				listener.handleSuccess();
+			}
 		}
 		updateSyncStatus();
 
@@ -1386,8 +1390,10 @@ public class ShowModuleActivity extends FragmentActivity implements
 	
 	public void callSyncFailure() {
 		syncStarted = false;
-		for (SyncListener listener : listeners) {
-			listener.handleFailure();
+		if (null != listeners) {
+			for (SyncListener listener : listeners) {
+				listener.handleFailure();
+			}
 		}
 		setSyncStatus(SyncStatus.ERROR);
 
