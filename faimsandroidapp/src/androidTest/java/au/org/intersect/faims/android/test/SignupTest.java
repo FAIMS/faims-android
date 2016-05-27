@@ -44,12 +44,14 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 
 		//Click on User List Drop Down
 		solo.clickOnView(ModuleSol1HardwareUtil.get_UserUserSelect_User(solo));
+		solo.sleep(1000);
 		//Click on Faims Admin
 		solo.clickOnText("Test Password");
 		ModuleSol1HardwareUtil.clickButton_Login(solo);
 		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), PASSWORD);
 		AppSignupUtil.clickButton_LoginOk(solo);
-		assertTrue(solo.searchButton("Record Asset", true));
+		assertFalse("Password is incorrect", solo.searchText("Password incorrect", true));
+		assertTrue("Didn't load module", solo.searchButton("Record Asset", true));
 	}
 
 	/*
