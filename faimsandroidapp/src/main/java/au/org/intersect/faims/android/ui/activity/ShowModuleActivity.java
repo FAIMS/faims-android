@@ -177,6 +177,7 @@ public class ShowModuleActivity extends FragmentActivity implements
 	private WifiBroadcastReceiver broadcastReceiver;
 
 	private BusyDialog busyDialog;
+	private BusyDialog busyCreateUserDialog;
 	private ChoiceDialog choiceDialog;
 	private ConfirmDialog confirmDialog;
 
@@ -843,7 +844,6 @@ public class ShowModuleActivity extends FragmentActivity implements
 	public void createNewUser(final User user, final String callback) {
 		Module module = ModuleUtil.getModule(moduleKey);
 		if (serverDiscovery.isServerHostValid()) {
-			showBusyUploadDatabaseDialog();
 
 			new UserSignupTask(faimsClient, new ITaskListener() {
 				@Override
@@ -851,6 +851,7 @@ public class ShowModuleActivity extends FragmentActivity implements
 					Result result = (Result) resobj;
 					ShowModuleActivity.this.busyDialog.dismiss();
 					if (result.resultCode == FAIMSClientResultCode.SUCCESS) {
+						showBusyCreateUserDialog();
 						ShowModuleActivity.this.addSyncListener(new SyncListener() {
 							@Override
 							public void handleStart() {
@@ -859,8 +860,15 @@ public class ShowModuleActivity extends FragmentActivity implements
 
 							@Override
 							public void handleSuccess() {
-								ShowModuleActivity.this.beanShellLinker.execute(callback);
-//								ShowModuleActivity.this.listeners.remove(this);
+								try {
+									if (databaseManager.userRecord().userExists(user)) {
+										ShowModuleActivity.this.busyCreateUserDialog.dismiss();
+										ShowModuleActivity.this.beanShellLinker.execute(callback);
+										//								ShowModuleActivity.this.listeners.remove(this);
+									}
+								} catch (Exception e) {
+									showCreateUserErrorDialog(Result.FAILURE);
+								}
 							}
 
 							@Override
@@ -969,6 +977,27 @@ public class ShowModuleActivity extends FragmentActivity implements
 
 				});
 		busyDialog.show();
+	}
+
+	public void showBusyCreateUserDialog() {
+		busyCreateUserDialog = new BusyDialog(ShowModuleActivity.this,
+				getString(R.string.create_user_title),
+				getString(R.string.create_user_message),
+				new IDialogListener() {
+
+					@Override
+					public void handleDialogResponse(DialogResultCode resultCode) {
+						if (resultCode == DialogResultCode.CANCEL) {
+							// stop service
+//							Intent intent = new Intent(ShowModuleActivity.this,
+//									UploadDatabaseService.class);
+//
+//							stopService(intent);
+						}
+					}
+
+				});
+		busyCreateUserDialog.show();
 	}
 
 	public void showBusyUploadDatabaseDialog() {
@@ -1320,16 +1349,20 @@ public class ShowModuleActivity extends FragmentActivity implements
 
 	public void callSyncStart() {
 		syncStarted = true;
-		for (SyncListener listener : listeners) {
-			listener.handleStart();
+		if (null != listeners) {
+			for (SyncListener listener : listeners) {
+				listener.handleStart();
+			}
 		}
 		setSyncStatus(SyncStatus.ACTIVE_SYNCING);
 	}
 
 	public void callSyncSuccess() {
 		syncStarted = false;
-		for (SyncListener listener : listeners) {
-			listener.handleSuccess();
+		if (null != listeners) {
+			for (SyncListener listener : listeners) {
+				listener.handleSuccess();
+			}
 		}
 		updateSyncStatus();
 
@@ -1357,8 +1390,10 @@ public class ShowModuleActivity extends FragmentActivity implements
 	
 	public void callSyncFailure() {
 		syncStarted = false;
-		for (SyncListener listener : listeners) {
-			listener.handleFailure();
+		if (null != listeners) {
+			for (SyncListener listener : listeners) {
+				listener.handleFailure();
+			}
 		}
 		setSyncStatus(SyncStatus.ERROR);
 
