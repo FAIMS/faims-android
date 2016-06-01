@@ -707,7 +707,8 @@ public class CustomMapView extends MapView implements IView {
 	}
 
 	public static void registerLicense(Context context) {
-		final String LICENSE = "XTUMwQ0ZIRklrbEZ2T0dIdkZ3QkRieVBtcWJqdjZ1RUtBaFVBa1RreXdabUIraER4UjFmZ01aUk5oay83a2hzPQoKcGFja2FnZU5hbWU9YXUub3JnLmludGVyc2VjdC5mYWltcy5hbmRyb2lkCndhdGVybWFyaz1jdXN0b20KCg==";
+		//final String LICENSE = "XTUMwQ0ZIRklrbEZ2T0dIdkZ3QkRieVBtcWJqdjZ1RUtBaFVBa1RreXdabUIraER4UjFmZ01aUk5oay83a2hzPQoKcGFja2FnZU5hbWU9YXUub3JnLmludGVyc2VjdC5mYWltcy5hbmRyb2lkCndhdGVybWFyaz1jdXN0b20KCg==";
+		final String LICENSE = "XTUN3Q0ZCejRqamM4TEZtcDlaK0d1UnprR0pPcTMyS0RBaFF0NWw4UVBQcUU0N0owRk9heDNta3NxdlYvNmc9PQoKcHJvZHVjdHM9c2RrMgpwYWNrYWdlTmFtZT1hdS5lZHUuZmFpbXMubXEuZmllbGRyZXNlYXJjaDIKd2F0ZXJtYXJrPWN1c3RvbQpvbmxpbmVMaWNlbnNlPTEK";
 		CustomMapView.registerLicense(LICENSE, context);
 		Bitmap logo = BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.ic_launcher);
