@@ -136,7 +136,7 @@ public class HierarchicalSpinner extends CustomSpinner {
 		
 		this.terms = terms;
 		
-		mapVocabToParent();	
+		mapVocabToParent();
 		this.parentTerms = new Stack<VocabularyTerm>();
 		this.hierarchicalSelectListener = new OnItemSelectedListener() {
 
@@ -192,7 +192,12 @@ public class HierarchicalSpinner extends CustomSpinner {
 			currentItems = new ArrayList<VocabularyTerm>();
 			for (VocabularyTerm term : parentTerms) {
 				currentTerms.add(term);
-				currentItems.add(new VocabularyTerm("", "Back to: " + term.getName(), null, null));
+				int idx = parentTerms.indexOf(term);
+				if (idx > 0) {
+					currentItems.add(new VocabularyTerm("", "Back to: " + parentTerms.get(idx - 1).getName(), null, null));
+				} else {
+					currentItems.add(new VocabularyTerm("", "Back to top", null, null));
+				}
 			}
 			currentTerms.addAll(selectedTerm.terms);
 			currentItems.addAll(selectedTerm.terms);
