@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
 import android.widget.Button;
+
+import au.org.intersect.faims.android.BuildConfig;
 import au.org.intersect.faims.android.R;
 import au.org.intersect.faims.android.app.FAIMSApplication;
 import au.org.intersect.faims.android.util.ClockskewCheckUtil;
@@ -52,7 +54,9 @@ public class SplashActivity extends Activity {
 	    attribution.loadUrl("file:///android_asset/attribution.html");
 	    attribution.setLongClickable(false);
 	    attribution.setOnTouchListener(new View.OnTouchListener() {
-
+			// TODO
+			// modify attribution.html to include links for both intersect attribution policy and sol1's homepage,
+			// handle clicks on each link here to open new browser window to appropriate urls
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if(event.getAction() == MotionEvent.ACTION_UP) {
@@ -62,7 +66,8 @@ public class SplashActivity extends Activity {
 				return true;
 			}
 		});
-	
+		Log.d("BConfig","server: " + BuildConfig.COMMUNITY_SERVER);
+		Log.d("BConfig","server: " + BuildConfig.COMMUNITY_MODULE);
 	    updateButtons();
 	}
 	
@@ -90,7 +95,10 @@ public class SplashActivity extends Activity {
 		connectDemo.setVisibility(View.GONE);
 		connectServer.setVisibility(View.GONE);
 		loadModule.setVisibility(View.GONE);
-		
+//		if ((ModuleUtil.getModules() == null || ModuleUtil.getModules().isEmpty()) && null != BuildConfig.COMMUNITY_MODULE && null != BuildConfig.COMMUNITY_SERVER) {
+//			// download the module
+//
+//		} else
 		if (ModuleUtil.getModules() == null || ModuleUtil.getModules().isEmpty()) {
 			connectDemo.setVisibility(View.VISIBLE);
 			connectDemo.setOnClickListener(new OnClickListener() {
@@ -125,7 +133,13 @@ public class SplashActivity extends Activity {
 		Button continueSession = (Button) findViewById(R.id.splash_continue);
 		final String key = FAIMSApplication.getInstance().getSessionModuleKey();
 		final String arch16n = FAIMSApplication.getInstance().getSessionModuleArch16n();
-	    if (key != null && ModuleUtil.getModule(key) != null) {
+		if ((key != null && ModuleUtil.getModule(key) != null) && null != BuildConfig.COMMUNITY_MODULE) {
+			Intent showModuleIntent = new Intent(this, ShowModuleActivity.class);
+			showModuleIntent.putExtra("key", key);
+			showModuleIntent.putExtra("arch16n", arch16n);
+			startActivityForResult(showModuleIntent, 1);
+		} else
+		if (key != null && ModuleUtil.getModule(key) != null) {
 		    continueSession.setOnClickListener(new OnClickListener() {
 				
 				@Override

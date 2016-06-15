@@ -4,6 +4,19 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+def modulePropertiesFile = rootProject.file("module.properties")
+def moduleProperties = new Properties()
+if (modulePropertiesFile.isFile()) {
+    moduleProperties.load(new FileInputStream(modulePropertiesFile))
+} else {
+    moduleProperties.setProperty("server", "null")
+    moduleProperties.setProperty("port", "null")
+    moduleProperties.setProperty("key", "null")
+    moduleProperties.setProperty("appname", "\"FAIMS\"")
+    moduleProperties.setProperty("appid", "au.edu.faims.mq.fieldresearch2")
+
+}
+
 android {
     signingConfigs {
         faims25 {
@@ -16,7 +29,7 @@ android {
     compileSdkVersion 17
     buildToolsVersion "23.0.2"
     defaultConfig {
-        applicationId 'au.edu.faims.mq.fieldresearch2'
+        applicationId moduleProperties['appid']
         minSdkVersion 15
         targetSdkVersion 19
 
@@ -25,11 +38,21 @@ android {
     }
     buildTypes {
         release {
+            buildConfigField "String", "COMMUNITY_SERVER", moduleProperties['server']
+            buildConfigField "String", "COMMUNITY_PORT", moduleProperties['port']
+            buildConfigField "String", "COMMUNITY_MODULE", moduleProperties['key']
+            buildConfigField "String", "COMMUNITY_APPNAME", moduleProperties['appname']
+            resValue "string", "app_name", moduleProperties['appname']
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.faims25
         }
         debug {
+            buildConfigField "String", "COMMUNITY_SERVER", moduleProperties['server']
+            buildConfigField "String", "COMMUNITY_PORT", moduleProperties['port']
+            buildConfigField "String", "COMMUNITY_MODULE", moduleProperties['key']
+            buildConfigField "String", "COMMUNITY_APPNAME", moduleProperties['appname']
+            resValue "string", "app_name", moduleProperties['appname']
             signingConfig signingConfigs.faims25
         }
     }
