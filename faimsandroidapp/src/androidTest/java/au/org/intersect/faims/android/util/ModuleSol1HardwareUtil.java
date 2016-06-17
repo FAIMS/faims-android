@@ -8,7 +8,7 @@ import com.robotium.solo.Solo;
 /**
  * Created by Matthew on 5/05/2016.
  */
-public class ModuleSol1HardwareUtil {
+public class ModuleSol1HardwareUtil extends ModuleHelper {
 
     // Drop Downs
     /*
@@ -50,8 +50,7 @@ public class ModuleSol1HardwareUtil {
         ref: User/User/Login
      */
     public static void clickButton_Login(Solo solo) {
-        // TODO: Would we want to do anything other than click on a button?
-        solo.clickOnButton("Login");
+        clickButton(solo, "Login");
     }
 
     /*
@@ -60,13 +59,7 @@ public class ModuleSol1HardwareUtil {
         ref: Control/Main/Record_Asset
      */
     public static void clickButton_Record_Asset(Solo solo) {
-        // TODO: Would we want to do anything other than click on a button?
-        /*
-            TODO: This one gets the label from the language properties file
-                can I read this from the view? it exists in mText but I can't read it
-                can I address this using solo.getView((Object) "Control/Main/Record_Asset")? no, though the ref tags exist
-         */
-        solo.clickOnButton("Record Asset");
+        clickButton(solo, "Record Asset");
     }
 
     /*
@@ -75,13 +68,7 @@ public class ModuleSol1HardwareUtil {
         ref: Control/Main/Record_Asset
      */
     public static void clickButton_Serial_Trigger(Solo solo) {
-        // TODO: Would we want to do anything other than click on a button?
-        /*
-            TODO: This one gets the label from the language properties file
-                can I read this from the view? it exists in mText but I can't read it
-                can I address this using solo.getView((Object) "Control/Main/Record_Asset")? no, though the ref tags exist
-         */
-        solo.clickOnButton("Serial Trigger");
+        clickButton(solo, "Serial Trigger");
     }
 
     /*
@@ -89,14 +76,15 @@ public class ModuleSol1HardwareUtil {
         Type: Button
         ref: Control/Main/Record_Asset
      */
-    public static void clickButton_Search(Solo solo) {
-        // TODO: Would we want to do anything other than click on a button?
-        /*
-            TODO: This one gets the label from the language properties file
-                can I read this from the view? it exists in mText but I can't read it
-                can I address this using solo.getView((Object) "Control/Main/Record_Asset")? no, though the ref tags exist
-         */
-        solo.clickOnButton("Search");
+    public static void clickButton_Search(Solo solo, String searchText) {
+        clickButton(solo, "Search");
+        // There is a spinner here, not sure how to tap into it, just wait a really long time or for a result
+        int i = 1;
+        while ( !solo.searchText(searchText) && i < 500 ) {
+            solo.sleep(200);
+            i++;
+        }
+
     }
 
     // Tab
@@ -106,12 +94,7 @@ public class ModuleSol1HardwareUtil {
         ref: Asset/Customer
      */
     public static void clickTab_Customer(Solo solo) {
-        /*
-            TODO: This one doesn't have an ref value, need to be added
-            TODO: Click on view would be better
-         */
-
-        solo.clickOnText("Customer");
+        clickTab(solo, "Customer");
     }
 
     /*
@@ -120,12 +103,7 @@ public class ModuleSol1HardwareUtil {
         ref: Asset/Hardware
      */
     public static void clickTab_Hardware(Solo solo) {
-        /*
-            TODO: This one doesn't have an ref value, need to be added
-            TODO: Click on view would be better
-         */
-
-        solo.clickOnText("Hardware");
+        clickTab(solo, "Hardware");
     }
 
     /*
@@ -134,11 +112,6 @@ public class ModuleSol1HardwareUtil {
         ref: Control/Main
      */
     public static void clickTab_Main(Solo solo) {
-        /*
-            TODO: This one doesn't have an ref value, need to be added
-            TODO: Click on view would be better
-         */
-
         solo.clickOnText("Main");
     }
 
@@ -148,11 +121,6 @@ public class ModuleSol1HardwareUtil {
         ref: Control/Records
      */
     public static void clickTab_Records(Solo solo) {
-        /*
-            TODO: This one doesn't have an ref value, need to be added
-            TODO: Click on view would be better
-         */
-
         solo.clickOnText("Records");
     }
 

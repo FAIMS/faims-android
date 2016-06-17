@@ -275,6 +275,7 @@ public class TestModuleUtil {
 	public static void editTextField(Solo solo, EditText field, String text) {
 		solo.clearEditText(field);
 		solo.enterText(field, text);
+		solo.sleep(200);
 	}
 
 
