@@ -6,15 +6,16 @@ import android.util.Log;
 import com.robotium.solo.Solo;
 
 import au.org.intersect.faims.android.ui.activity.SplashActivity;
+import au.org.intersect.faims.android.util.AppModuleUtil;
 import au.org.intersect.faims.android.util.AppSignupUtil;
 import au.org.intersect.faims.android.util.ModuleSol1HardwareUtil;
-import au.org.intersect.faims.android.util.TestModuleUtil;
 import au.org.intersect.faims.android.util.TestRunID;
 
 
 public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity> {
 	public static final String PASSWORD = "aB!45678901234567890";	// 20 chars, uppper, lower, num and symbol
 	public static final String BAD_PASSWORD = "wabbit";
+
 	private Solo solo;
 	private TestRunID runIDInstance = TestRunID.getInstance();
 
@@ -25,7 +26,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
   	public void setUp() throws Exception {
         super.setUp();
 		if (runIDInstance.getRunID().equals("")) {
-			runIDInstance.setRunID(TestModuleUtil.getDateRunID() + "." + TestModuleUtil.getStringRunID());
+			runIDInstance.setRunID(AppModuleUtil.getDateRunID() + "." + AppModuleUtil.getStringRunID());
 		}
 		Log.d("RunID", runIDInstance.getRunID());
 		solo = new Solo(getInstrumentation());
@@ -37,10 +38,10 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 		Requires: FAIMS server with Sol1 Hardware module with sign up enabled
 	 */
 	public void testRun1() {
-		TestModuleUtil.roboConnectToServer(solo, TestModuleUtil.SERVER_NAME_TEST1, TestModuleUtil.SERVER_PORT_80);
-		TestModuleUtil.roboLoadModule(solo, "Sol1 Hardware with Sign Up");
-//		TestModuleUtil.roboConnectToServer(solo, TestModuleUtil.SERVER_NAME_TEST1, TestModuleUtil.SERVER_PORT_80);
-//		TestModuleUtil.roboLoadModule(solo, "Sol1 Hardware Sign In");
+		AppModuleUtil.roboConnectToServer(solo, AppModuleUtil.SERVER_NAME_TEST1, AppModuleUtil.SERVER_PORT_80);
+		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_SIGN_UP);
+//		AppModuleUtil.roboConnectToServer(solo, AppModuleUtil.SERVER_NAME_TEST1, AppModuleUtil.SERVER_PORT_80);
+//		AppModuleUtil.roboLoadModule(solo, "Sol1 Hardware Sign In");
 
 		//Click on User List Drop Down
 		solo.clickOnView(ModuleSol1HardwareUtil.get_UserUserSelect_User(solo));
@@ -48,7 +49,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 		//Click on Faims Admin
 		solo.clickOnText("Test Password");
 		ModuleSol1HardwareUtil.clickButton_Login(solo);
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), PASSWORD);
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), PASSWORD);
 		AppSignupUtil.clickButton_LoginOk(solo);
 		assertFalse("Password is incorrect", solo.searchText("Password incorrect", true));
 		assertTrue("Didn't load module", solo.searchButton("Record Asset", true));
@@ -60,7 +61,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 	 */
 	public void testRun2() {
 		// Load app, start last session
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 
 		AppSignupUtil.clickButton_Signup(solo);
 		setSignupValues(runIDInstance.getRunID(), "test2", runIDInstance.getRunID() + "_test2@example.com", PASSWORD, PASSWORD);
@@ -78,14 +79,14 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 	 */
 	public void testRun3() {
 		// Load app, start last session
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 
 		//Click on User List Drop Down
 		solo.clickOnView(ModuleSol1HardwareUtil.get_UserUserSelect_User(solo));
 		solo.clickOnText(runIDInstance.getRunID() + " test2");
 
 		ModuleSol1HardwareUtil.clickButton_Login(solo);
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), PASSWORD);
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), PASSWORD);
 		AppSignupUtil.clickButton_LoginOk(solo);
 		assertTrue(solo.searchButton("Record Asset", true));
 	}
@@ -96,14 +97,14 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 	 */
 	public void testRun4() {
 		// Load app, start last session
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 		//Click on User List Drop Down
 		solo.clickOnView(ModuleSol1HardwareUtil.get_UserUserSelect_User(solo));
 		solo.clickOnText(runIDInstance.getRunID() + " test2");
 		solo.sleep(500);
 
 		ModuleSol1HardwareUtil.clickButton_Login(solo);
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), "wabbit");
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), "wabbit");
 		AppSignupUtil.clickButton_LoginOk(solo);
 		assertTrue(solo.searchText("Password incorrect"));
 	}
@@ -114,7 +115,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 	 */
 	public void testRun5() {
 		// Load app, start last session
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 		String testID = runIDInstance.getRunID() + " test5";
 
 		AppSignupUtil.clickButton_Signup(solo);
@@ -156,7 +157,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 	 */
 	public void testRun6() {
 		// Load app, start last session
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 		String testID = runIDInstance.getRunID() + " test6";
 
 		AppSignupUtil.clickButton_Signup(solo);
@@ -181,7 +182,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 	 */
 	public void testRun7() {
 		// Load app, start last session
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 
 		// Turn wifi off for this test
 		solo.setWiFiData(false);
@@ -202,11 +203,11 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 
 	// Convince for filling in the form
 	private void setSignupValues(String firstname, String lastname, String email, String password, String passwordConfirmation) {
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_FirstName(solo), firstname);
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LastName(solo), lastname);
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_Email(solo), email);
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_Password(solo), password);
-		TestModuleUtil.editTextField(solo, AppSignupUtil.getEditText_PasswordConfirmation(solo), passwordConfirmation);
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_FirstName(solo), firstname);
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LastName(solo), lastname);
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_Email(solo), email);
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_Password(solo), password);
+		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_PasswordConfirmation(solo), passwordConfirmation);
 	}
 
 	@Override

@@ -3,16 +3,14 @@ package au.org.intersect.faims.android.test;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
 import android.widget.CheckedTextView;
 import au.org.intersect.faims.android.ui.activity.ShowModuleActivity;
-import au.org.intersect.faims.android.ui.view.CustomButton;
 import au.org.intersect.faims.android.ui.view.CustomCheckBox;
 import au.org.intersect.faims.android.ui.view.CustomEditText;
 import au.org.intersect.faims.android.ui.view.CustomImageView;
 import au.org.intersect.faims.android.ui.view.CustomRadioButton;
 import au.org.intersect.faims.android.ui.view.HierarchicalSpinner;
-import au.org.intersect.faims.android.util.TestModuleUtil;
+import au.org.intersect.faims.android.util.AppModuleUtil;
 
 import com.robotium.solo.Solo;
 
@@ -29,9 +27,9 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 		
 		//TODO: Extract module generation into global setup task
 		AssetManager assetManager = getInstrumentation().getContext().getAssets();
-		String name = TestModuleUtil.getNewModuleName("Sync Example");
+		String name = AppModuleUtil.getNewModuleName("Sync Example");
 		String moduleKey = "sync";
-		TestModuleUtil.createModuleFrom(name, moduleKey, "Sync Example", assetManager);
+		AppModuleUtil.createModuleFrom(name, moduleKey, "Sync Example", assetManager);
 		
 		Intent i = new Intent();
 		i.putExtra("key", moduleKey);
@@ -40,7 +38,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 	
 	public void testDropdownClickEvent() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Dropdown select event"));
 
@@ -55,7 +53,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testHierarchicalDropdownClickEvent() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Hierarchical dropdown select event"));
 
@@ -69,7 +67,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testPictureGalleryClickEvent() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Gallery select event"));
 
@@ -81,7 +79,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testHierarchicalPictureGalleryClickEvent() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 		// Check click event doesn't fire on tab load
 		assertFalse(solo.searchText("Hierarchical gallery select event"));
 
@@ -93,7 +91,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testCheckboxClickEvent() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
@@ -103,7 +101,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 
 	public void testRadioGroupClickEvent() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
@@ -113,7 +111,7 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 	}
 	
 	public void testRecoverBeanshellLogicState() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 		
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
@@ -121,14 +119,14 @@ public class ShowModuleTest extends ActivityInstrumentationTestCase2<ShowModuleA
 		solo.clickOnButton("Save");
 		Thread.sleep(1000);
 		
-		TestModuleUtil.recreateActivity(getInstrumentation(), getActivity());
+		AppModuleUtil.recreateActivity(getInstrumentation(), getActivity());
 		solo.clickOnButton("Show Entity ID");
 		
 		assertFalse(solo.getView(CustomEditText.class, 0).getText().toString().isEmpty());
 	}
 	
 	public void testShowTextAlert() throws Exception {
-		TestModuleUtil.initCleanTest(solo);
+		AppModuleUtil.initCleanTest(solo);
 
 		solo.clickOnText("Faims Admin");
 		solo.clickOnText("Create Entity");
