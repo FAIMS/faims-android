@@ -22,12 +22,12 @@ public class WidgetTest extends ActivityInstrumentationTestCase2<SplashActivity>
   	}
 
 	/*
-		Test: Init test for module
+		Test: Heirarchical spinner dropdown Test
 		Requires: FAIMS server and module Widget Test loaded
 	 */
 	public void testRun1() {
 		AppModuleUtil.roboConnectToServer(solo, AppModuleUtil.SERVER_NAME_TEST1, AppModuleUtil.SERVER_PORT_80);
-		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_TEST);
+		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_WIDGET_TEST);
 		solo.clickOnText("Faims Admin");
 //		TODO: Select Bone here
 		solo.clickOnView(solo.getView((Object) "control/control/entityTypes"));
@@ -49,15 +49,6 @@ public class WidgetTest extends ActivityInstrumentationTestCase2<SplashActivity>
 		ModuleWidgetTestUtil.clickOnItem(solo, ModuleWidgetTestUtil.INSIT_SURF);
 		assertTrue(ModuleWidgetTestUtil.doesItemExist(solo, ModuleWidgetTestUtil.BONE_ONLY + " > " + ModuleWidgetTestUtil.SURFBO + " > " + ModuleWidgetTestUtil.INSIT_SURF));
 
-	}
-
-	/*
-		Test: Start app and load named module
-	 	Requires: Server previously set and module "CSIRO Geochemistry Sampling" loaded on server
-	 */
-	public void testRun2() {
-		AppModuleUtil.roboUseCurrentServer(solo);
-		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_CSIRO_GEOCHEMISTRY_SAMPLING);
 	}
 
 	@Override

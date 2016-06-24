@@ -43,7 +43,7 @@ public class AppModuleUtil {
 	public static final String MODULE_CSIRO_GEOCHEMISTRY_SAMPLING = "CSIRO Geochemistry Sampling";
 	public static final String MODULE_PAZC = "PAZC";
 	public static final String MODULE_SIGN_UP = "Sign Up";
-	public static final String MODULE_TEST = "Test";
+	public static final String MODULE_WIDGET_TEST = "Widget Test";
 	public static final String MODULE_SOL1_HARDWARE = "Sol1 Hardware";
 
 	public static final String USER_FAIMS_ADMIN = "Faims Admin";
