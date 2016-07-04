@@ -311,7 +311,7 @@ public class SplashActivity extends RoboActivity {
 		final String key = FAIMSApplication.getInstance().getSessionModuleKey();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		String arch = "faims.properties";
-		if (null != key && ModuleUtil.getModule(key).getArch16nFiles().size() > 0) {
+		if (null != key && null != ModuleUtil.getModule(key) && ModuleUtil.getModule(key).getArch16nFiles().size() > 0) {
 			arch = prefs.getString("module-arch16n", FileUtil.sortArch16nFiles(ModuleUtil.getModule(key).getArch16nFiles()).get(0));
 		}
 		final String arch16n = arch;
