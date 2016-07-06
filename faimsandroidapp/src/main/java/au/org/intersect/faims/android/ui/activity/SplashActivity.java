@@ -37,6 +37,7 @@ import au.org.intersect.faims.android.services.UpdateModuleSettingService;
 import au.org.intersect.faims.android.tasks.ITaskListener;
 import au.org.intersect.faims.android.tasks.LocateServerTask;
 import au.org.intersect.faims.android.ui.dialog.BusyDialog;
+import au.org.intersect.faims.android.ui.dialog.ChoiceDialog;
 import au.org.intersect.faims.android.ui.dialog.DialogResultCode;
 import au.org.intersect.faims.android.ui.dialog.IDialogListener;
 import au.org.intersect.faims.android.util.ClockskewCheckUtil;
@@ -45,6 +46,8 @@ import au.org.intersect.faims.android.util.ModuleUtil;
 import android.location.LocationManager;
 
 import com.google.inject.Inject;
+
+import org.antlr.v4.codegen.model.Choice;
 
 import java.lang.ref.WeakReference;
 
@@ -60,6 +63,7 @@ public class SplashActivity extends RoboActivity {
 	}
 
 	protected BusyDialog busyDialog;
+	protected ChoiceDialog choiceDialog;
 
 	protected final SplashActivity.DownloadUpdateModuleHandler downloadHandler = new SplashActivity.DownloadUpdateModuleHandler(SplashActivity.this, Type.DOWNLOAD);
 
@@ -150,7 +154,7 @@ public class SplashActivity extends RoboActivity {
 //		} else if (result.errorCode == FAIMSClientErrorCode.DOWNLOAD_CORRUPTED_ERROR) {
 //			showDownloadCorruptedDialog(type);
 //		} else if (result.errorCode == FAIMSClientErrorCode.SERVER_ERROR) {
-//			showServerErrorDialog(type);
+			showErrorDialog(type);
 //		} else {
 //			showInterruptedDialog(type);
 //		}
@@ -179,13 +183,31 @@ public class SplashActivity extends RoboActivity {
 			if (result.resultCode == FAIMSClientResultCode.SUCCESS) {
 				// Show module static panel
 				activity.openModule(BuildConfig.COMMUNITY_MODULE);
-			} else if (result.resultCode == FAIMSClientResultCode.FAILURE ||
-					result.resultCode == FAIMSClientResultCode.INTERRUPTED) {
+			} else if (result.resultCode == FAIMSClientResultCode.FAILURE || result.resultCode == FAIMSClientResultCode.INTERRUPTED) {
 				activity.showFailureDialog(result, type);
 			}
 		}
 
 	};
+
+	private void showErrorDialog(final Type type) {
+		choiceDialog = new ChoiceDialog(SplashActivity.this,
+				"Error connecting to server",
+				"Please ensure that you are connected to the internet.  Do you wish to retry?",
+				new IDialogListener() {
+
+					@Override
+					public void handleDialogResponse(DialogResultCode resultCode) {
+						if (resultCode == DialogResultCode.SELECT_YES) {
+							downloadModule();
+						} else {
+							SplashActivity.this.finish();
+						}
+					}
+
+				});
+		choiceDialog.show();
+	}
 
 	private void showBusyDialog(final Type type) {
 		busyDialog = new BusyDialog(SplashActivity.this,
