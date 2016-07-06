@@ -140,18 +140,7 @@ public class SplashActivity extends RoboActivity {
 	}
 
 	private void showFailureDialog(Result result, Type type) {
-		//TODO
-//		if (result.errorCode == FAIMSClientErrorCode.BUSY_ERROR) {
-//			showBusyErrorDialog(type);
-//		} else if (result.errorCode == FAIMSClientErrorCode.STORAGE_LIMIT_ERROR) {
-//			showStorageErrorDialog(type);
-//		} else if (result.errorCode == FAIMSClientErrorCode.DOWNLOAD_CORRUPTED_ERROR) {
-//			showDownloadCorruptedDialog(type);
-//		} else if (result.errorCode == FAIMSClientErrorCode.SERVER_ERROR) {
 			showErrorDialog(type);
-//		} else {
-//			showInterruptedDialog(type);
-//		}
 	}
 
 	public static class DownloadUpdateModuleHandler extends Handler {
