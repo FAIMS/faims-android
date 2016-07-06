@@ -1,12 +1,9 @@
 package au.org.intersect.faims.android.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.GpsStatus;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,7 +24,6 @@ import au.org.intersect.faims.android.app.FAIMSApplication;
 import au.org.intersect.faims.android.data.Module;
 import au.org.intersect.faims.android.log.FLog;
 import au.org.intersect.faims.android.net.FAIMSClient;
-import au.org.intersect.faims.android.net.FAIMSClientErrorCode;
 import au.org.intersect.faims.android.net.FAIMSClientResultCode;
 import au.org.intersect.faims.android.net.Result;
 import au.org.intersect.faims.android.net.ServerDiscovery;
@@ -46,8 +42,6 @@ import au.org.intersect.faims.android.util.ModuleUtil;
 import android.location.LocationManager;
 
 import com.google.inject.Inject;
-
-import org.antlr.v4.codegen.model.Choice;
 
 import java.lang.ref.WeakReference;
 
