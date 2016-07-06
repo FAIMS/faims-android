@@ -4,6 +4,42 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+def modulePropertiesFile = rootProject.file("module.properties")
+def moduleProperties = new Properties()
+if (modulePropertiesFile.isFile()) {
+    moduleProperties.load(new FileInputStream(modulePropertiesFile))
+} else {
+    moduleProperties.setProperty("server", "null")
+    moduleProperties.setProperty("port", "null")
+    moduleProperties.setProperty("key", "null")
+    moduleProperties.setProperty("appname", "\"FAIMS\"")
+    moduleProperties.setProperty("appid", "au.edu.faims.mq.fieldresearch2")
+
+}
+
+def publish = project.tasks.create("publishAll")
+android.applicationVariants.all { variant ->
+    if (variant.buildType.name.equals("release") || variant.buildType.name.equals("debug")) {
+        File outDir = file("${rootDir}/apks")
+        File apkFile = variant.outputs[0].outputFile
+        File mapFile = variant.mappingFile
+
+        def task = project.tasks.create("publish${variant.name.capitalize()}Apk", Copy)
+        task.from apkFile, mapFile
+        task.into outDir
+//        task.rename "mapping.txt", "${apkFile.name.substring(0, apkFile.name.length() - 3)}mapping.txt"
+        task.doLast{
+            println ">>>publish ${variant.name} success!" +
+                    "\ndir: ${outDir}" +
+                    "\napk: ${apkFile.name}"
+        }
+
+        task.dependsOn variant.assemble
+        publish.dependsOn task
+    }
+}
+
+
 android {
     signingConfigs {
         faims25 {
@@ -16,20 +52,30 @@ android {
     compileSdkVersion 17
     buildToolsVersion "23.0.2"
     defaultConfig {
-        applicationId 'au.edu.faims.mq.fieldresearch2'
+        applicationId moduleProperties['appid']
         minSdkVersion 15
         targetSdkVersion 19
-
+        setProperty("archivesBaseName", "faims-$applicationId")
         testApplicationId 'au.edu.faims.mq.fieldresearch2.test'
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
     buildTypes {
         release {
+            buildConfigField "String", "COMMUNITY_SERVER", moduleProperties['server']
+            buildConfigField "String", "COMMUNITY_PORT", moduleProperties['port']
+            buildConfigField "String", "COMMUNITY_MODULE", moduleProperties['key']
+            buildConfigField "String", "COMMUNITY_APPNAME", moduleProperties['appname']
+            resValue "string", "app_name", moduleProperties['appname']
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
             signingConfig signingConfigs.faims25
         }
         debug {
+            buildConfigField "String", "COMMUNITY_SERVER", moduleProperties['server']
+            buildConfigField "String", "COMMUNITY_PORT", moduleProperties['port']
+            buildConfigField "String", "COMMUNITY_MODULE", moduleProperties['key']
+            buildConfigField "String", "COMMUNITY_APPNAME", moduleProperties['appname']
+            resValue "string", "app_name", moduleProperties['appname']
             signingConfig signingConfigs.faims25
         }
     }

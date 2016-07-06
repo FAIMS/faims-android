@@ -1,5 +1,6 @@
 package au.org.intersect.faims.android.ui.activity;
 
+import au.org.intersect.faims.android.BuildConfig;
 import au.org.intersect.faims.android.data.User;
 import au.org.intersect.faims.android.net.FAIMSClient;
 import au.org.intersect.faims.android.net.FAIMSClientResultCode;
@@ -20,6 +21,7 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
@@ -1606,22 +1608,41 @@ public class ShowModuleActivity extends FragmentActivity implements
 			builder.show();
 		} else {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Exit Module");
-			builder.setMessage("Do you want to exit module?");
-			builder.setPositiveButton("Yes", new OnClickListener() {
+			if (null != BuildConfig.COMMUNITY_MODULE) {
+				builder.setTitle("Exit " + BuildConfig.COMMUNITY_APPNAME);
+				builder.setMessage("Do you want to exit " + BuildConfig.COMMUNITY_APPNAME + "?");
+				builder.setPositiveButton("Yes", new OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					finish();
-				}
-			});
-			builder.setNegativeButton("No", new OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finishAffinity();
+					}
+				});
+				builder.setNegativeButton("No", new OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// Do nothing
-				}
-			});
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// Do nothing
+					}
+				});
+			} else {
+				builder.setTitle("Exit Module");
+				builder.setMessage("Do you want to exit module?");
+				builder.setPositiveButton("Yes", new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						finish();
+					}
+				});
+				builder.setNegativeButton("No", new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// Do nothing
+					}
+				});
+			}
 			builder.show();
 		}
 	}
