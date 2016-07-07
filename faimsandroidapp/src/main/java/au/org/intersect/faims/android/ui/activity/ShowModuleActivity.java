@@ -1277,7 +1277,9 @@ public class ShowModuleActivity extends FragmentActivity implements
 	}
 	
 	public void releaseSyncLock() {
-		syncLock.release();
+		if (null != syncLock) {
+			syncLock.release();
+		}
 	}
 
 	private void syncLocateServer() {
@@ -1615,7 +1617,12 @@ public class ShowModuleActivity extends FragmentActivity implements
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						finishAffinity();
+						// Not supported in API < 16
+						//finishAffinity();
+//						Intent intent = new Intent(getApplicationContext(), SplashActivity.class);
+//						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//						startActivity(intent);
+						finish();
 					}
 				});
 				builder.setNegativeButton("No", new OnClickListener() {
