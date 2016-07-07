@@ -188,7 +188,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 		solo.setWiFiData(false);
 
 		AppSignupUtil.clickButton_Signup(solo);
-		setSignupValues(runIDInstance.getRunID(), "test6", runIDInstance.getRunID() + "_test2@example.com", PASSWORD, PASSWORD);
+		setSignupValues(runIDInstance.getRunID(), "test7", runIDInstance.getRunID() + "_test2@example.com", PASSWORD, PASSWORD);
 		AppSignupUtil.clickButton_SignupOk(solo);
 
 		assertTrue("Sign up validation on offline server failed", solo.searchText("Please check your network connection and try again. Contact an administrator if the problem persists.",true));
