@@ -4,6 +4,9 @@
 /.idea/libraries
 .DS_Store
 /build
+/apks
 *.iml
 .idea
+*.log
 keystore.properties
+module.properties

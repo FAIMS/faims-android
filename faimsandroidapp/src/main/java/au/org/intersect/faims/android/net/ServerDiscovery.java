@@ -21,6 +21,9 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
+
+import au.org.intersect.faims.android.BuildConfig;
 import au.org.intersect.faims.android.R;
 import au.org.intersect.faims.android.app.FAIMSApplication;
 import au.org.intersect.faims.android.log.FLog;
@@ -99,6 +102,12 @@ public class ServerDiscovery {
 	}
 	
 	public synchronized void startDiscovery(ServerDiscoveryListener listener) {
+		if (null != BuildConfig.COMMUNITY_SERVER) {
+			serverIP = BuildConfig.COMMUNITY_SERVER;
+		}
+		if (null != BuildConfig.COMMUNITY_PORT) {
+			serverPort = BuildConfig.COMMUNITY_PORT;
+		}
 		if (isServerHostValid()) {
 			FLog.w("server is already valid");
 			listener.handleDiscoveryResponse(true);
