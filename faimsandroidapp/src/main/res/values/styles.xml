@@ -16,6 +16,7 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:actionOverflowButtonStyle">@style/ActionButtonOverflow</item>
         <item name="android:actionBarWidgetTheme">@style/Theme.stylingactionbar.widget</item>
@@ -28,7 +29,7 @@
     
 	<style name="ActionBar" parent="@android:style/Widget.ActionBar">
 	    <item name="android:background">@layout/action_bar</item>
-	</style>
+    </style>
 	
 	<style name="Theme.stylingactionbar.widget" parent="@android:style/Theme.Holo">
 	    <item name="android:popupMenuStyle">@style/PopupMenu</item>
@@ -42,7 +43,13 @@
 	    <item name="android:divider">#DDDDDD</item>
 	    <item name="android:dividerHeight">1dp</item>  
 	</style>
-	
+
+    <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
+        <item name="android:minWidth">0dip</item>
+        <item name="android:paddingLeft">0dip</item>
+        <item name="android:paddingRight">0dip</item>
+    </style>
+
 	<style name="ActionButtonOverflow" parent="android:style/Widget.ActionButton.Overflow">
 	    <item name="android:src">@drawable/overflow_menu</item>
 	</style>

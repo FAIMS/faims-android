@@ -16,10 +16,10 @@
 	        android:orientation="horizontal"
 	        android:background="#F0F0F0"
 	        android:layout_width="fill_parent"
-	        android:layout_height="30dp">
-	        
+	        android:layout_height="0dp">
+
 	        <include layout="@layout/status_bar"/>
-	        
+
 	    </LinearLayout>
 	    
 	    <View

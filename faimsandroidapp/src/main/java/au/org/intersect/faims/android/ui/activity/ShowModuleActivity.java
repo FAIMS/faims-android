@@ -732,12 +732,15 @@ public class ShowModuleActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
+
+
 		try {
 			runOnUiThread(new Runnable() {
 	
 				@Override
 				public void run() {
-					menuManager.updateActionBar(menu);			
+					menuManager.updateActionBar(menu);
+					menuManager.updateActionBarStatus(menu);
 					menuManager.updateStatusBar((LinearLayout) findViewById(R.id.status_bar));
 				}
 			});
