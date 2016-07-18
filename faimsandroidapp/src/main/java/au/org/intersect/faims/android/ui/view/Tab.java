@@ -183,6 +183,7 @@ public class Tab {
         linearLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setBackgroundColor(Color.WHITE);
+		//TODO remove padding for map views
         int padding = (int) ScaleUtil.getDip(activityRef.get(), PADDING);
         linearLayout.setPadding(padding, padding, padding, padding);
 		

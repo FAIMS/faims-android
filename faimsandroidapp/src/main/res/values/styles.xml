@@ -16,6 +16,7 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="android:actionBarSize">42dip</item>
         <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:actionOverflowButtonStyle">@style/ActionButtonOverflow</item>
@@ -45,9 +46,18 @@
 	</style>
 
     <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
-        <item name="android:minWidth">0dip</item>
-        <item name="android:paddingLeft">0dip</item>
+        <item name="android:minWidth">10dip</item>
+        <item name="android:maxWidth">120dip</item>
+        <item name="android:minHeight">10dip</item>
+        <item name="android:maxHeight">28dip</item>
+        <item name="android:height">28dip</item>
+        <!--<item name="android:paddingLeft">0dip</item>-->
         <item name="android:paddingRight">0dip</item>
+        <item name="android:textColor">#222222</item>
+        <item name="android:color">#222222</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
 	<style name="ActionButtonOverflow" parent="android:style/Widget.ActionButton.Overflow">
@@ -57,22 +67,42 @@
     <!-- Status bar icon styles -->
     <style name="statusBarIcon">
         <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_width">28dip</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginRight">0dp</item>
+        <item name="android:width">28dip</item>
+    </style>
+
+    <style name="statusBarText">
+        <item name="android:layout_gravity">center_vertical</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">2dp</item>
-        <item name="android:layout_marginBottom">2dp</item>
-        <item name="android:layout_marginLeft">2dp</item>
-        <item name="android:layout_marginRight">2dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginRight">0dp</item>
+        <item name="android:width">120dp</item>
+        <item name="android:minWidth">120dp</item>
+        <item name="android:textColor">#222222</item>
+        <item name="android:color">#222222</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingLeft">10dip</item>
+        <item name="android:textStyle">normal</item>
     </style>
-    
+
     <style name="statusBarIconLarge">
         <item name="android:layout_gravity">center_vertical</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">2dp</item>
-        <item name="android:layout_marginBottom">2dp</item>
-        <item name="android:layout_marginLeft">5dp</item>
-        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginRight">0dp</item>
+        <item name="android:width">28dip</item>
     </style>
 
 </resources>

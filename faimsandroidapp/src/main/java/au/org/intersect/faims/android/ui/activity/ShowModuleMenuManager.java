@@ -277,14 +277,14 @@ public class ShowModuleMenuManager {
 		String distanceInfo = pathIndex < 0 ? "" : " to point (" + pathIndex
 				+ "/" + pathLength + ")";
 		if (pathDistance > 1000) {
-			distance_text.setTitle(MeasurementUtil.displayAsKiloMeters(
+			distance_text.setTitleCondensed(MeasurementUtil.displayAsKiloMeters(
 					pathDistance / 1000, "###,###,###,###.0") + distanceInfo);
 		} else {
-			distance_text.setTitle(MeasurementUtil.displayAsMeters(
+			distance_text.setTitleCondensed(MeasurementUtil.displayAsMeters(
 					pathDistance, "###,###,###,###") + distanceInfo);
 		}
 
-		direction_text.setTitle(MeasurementUtil.displayAsDegrees(pathBearing, "###"));
+		direction_text.setTitleCondensed(MeasurementUtil.displayAsDegrees(pathBearing, "###"));
 
 		if (pathHeading != null) {
 			if (tempBitmap != null) {
