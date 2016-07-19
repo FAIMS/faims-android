@@ -20,6 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.DialogInterface;
@@ -275,7 +276,11 @@ public class ShowModuleActivity extends FragmentActivity implements
 		
 		menuManager = new ShowModuleMenuManager(ShowModuleActivity.this);
 		navigationDrawer.init(this);
-
+		ActionBar ab = getActionBar();
+		if (null != ab) {
+			ab.setDisplayShowHomeEnabled(true);
+			ab.setIcon(R.drawable.hamburger_menu);
+		}
 		String css = module.getCSS();
 		cssManager.init(css, this);
 		
