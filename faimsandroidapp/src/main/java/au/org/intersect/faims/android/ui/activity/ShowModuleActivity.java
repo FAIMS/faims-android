@@ -20,6 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.DialogInterface;
@@ -50,7 +51,9 @@ import android.text.style.ForegroundColorSpan;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.View;
 import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import au.org.intersect.faims.android.R;
@@ -275,7 +278,20 @@ public class ShowModuleActivity extends FragmentActivity implements
 		
 		menuManager = new ShowModuleMenuManager(ShowModuleActivity.this);
 		navigationDrawer.init(this);
+		ActionBar ab = getActionBar();
+		if (null != ab) {
+			ab.setDisplayShowHomeEnabled(true);
+			ab.setIcon(R.drawable.hamburger_menu);
 
+			ImageView abi = (ImageView) findViewById(Resources.getSystem().getIdentifier("home","id","android"));
+			abi.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					navigationDrawer.toggle();
+				}
+			});
+
+		}
 		String css = module.getCSS();
 		cssManager.init(css, this);
 		
@@ -732,12 +748,15 @@ public class ShowModuleActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
+
+
 		try {
 			runOnUiThread(new Runnable() {
 	
 				@Override
 				public void run() {
-					menuManager.updateActionBar(menu);			
+					menuManager.updateActionBar(menu);
+					menuManager.updateActionBarStatus(menu);
 					menuManager.updateStatusBar((LinearLayout) findViewById(R.id.status_bar));
 				}
 			});
@@ -746,7 +765,7 @@ public class ShowModuleActivity extends FragmentActivity implements
 		}
 		return true;
 	}
-	
+
 	@Override
 	// Overrides action bar overflow menu to show icons
 	public boolean onMenuOpened(int featureId, Menu menu)
@@ -1668,15 +1687,15 @@ public class ShowModuleActivity extends FragmentActivity implements
 		Spannable text = new SpannableString(breadcrumbs.toString());
 		if (tabgroups.size() > 0)
 		{
-			text.setSpan(new ForegroundColorSpan(R.color.heading_grey),
+			text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.heading_grey)),
 					0, module.name.length()+2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			text.setSpan(R.color.breadcrumb_contents, module.name.length()+2,
 					breadcrumbs.toString().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		} else {
-			text.setSpan(new ForegroundColorSpan(R.color.heading_grey),
+			text.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.heading_grey)),
 					0, module.name.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		}
-		
+
 		int actionBarTitle = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
 	    TextView title = (TextView) findViewById(actionBarTitle);
 	    if (title != null) {

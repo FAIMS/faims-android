@@ -35,20 +35,20 @@
 				    android:layout_width="match_parent"
 				    android:layout_height="wrap_content"
 				    android:drawablePadding="10dp"
-				    android:paddingLeft="11dp"
-				    android:paddingTop="11dp"
-				    android:paddingRight="11dp"
-				    android:paddingBottom="6dp"
-				    android:textSize="22sp" >
+				    android:paddingLeft="5dp"
+				    android:paddingTop="5dp"
+				    android:paddingRight="5dp"
+				    android:paddingBottom="3dp"
+				    android:textSize="16sp" >
 				</TextView>
 			    <TextView 
 				    android:id="@+id/module_description"
 				    android:layout_width="match_parent"
 				    android:layout_height="wrap_content"
 				    android:drawablePadding="10dp"
-				    android:paddingLeft="11dp"
-				    android:paddingRight="11dp"
-				    android:paddingBottom="11dp"
+				    android:paddingLeft="5dp"
+				    android:paddingRight="5dp"
+				    android:paddingBottom="5dp"
 				    android:textColor="#777777" >
 				</TextView>
 	        </LinearLayout>
