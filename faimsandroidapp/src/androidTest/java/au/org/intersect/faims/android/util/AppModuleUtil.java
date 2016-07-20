@@ -249,7 +249,7 @@ public class AppModuleUtil {
 		Check for logic error after module load
 		continue of error is known and valid
 	 */
-	private static void roboCheckForLogicErrors(Solo solo) {
+	public static void roboCheckForLogicErrors(Solo solo) {
 
 		int logicError = 0;
 		while (solo.searchText("Logic Error", true) && logicError < 10) {
@@ -269,7 +269,7 @@ public class AppModuleUtil {
 
 	}
 
-	private static void roboCheckInitGridMessage(Solo solo) {
+	public static void roboCheckInitGridMessage(Solo solo) {
 		int count = 1;
 		while ( count < 20 ) {
 			count++;
