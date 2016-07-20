@@ -82,6 +82,7 @@ public class ShowModuleMenuManager {
 	
 	public void updateActionBar(Menu menu) {
 		menu.clear();
+		activityRef.get().getMenuInflater().inflate(R.menu.activity_show_module, menu);
 		for(Map.Entry<String, ActionButtonCallback> entry : menuItems.entrySet()) {
 			ActionButtonCallback actionItem = entry.getValue();
 			if (actionItem instanceof ToggleActionButtonCallback) {
@@ -143,115 +144,147 @@ public class ShowModuleMenuManager {
 			activityRef.get().beanShellLinker.reportError("error trying to call action bar menu onerror callback", ce);
 		}
 	}
-	
-	public void updateStatusBar(LinearLayout statusBar) {
+	public void updateActionBarStatus(Menu menu) {
+		// sync status
+		menu.findItem(R.id.action_sync).setVisible(false);
+		menu.findItem(R.id.action_sync_active).setVisible(false);
+		menu.findItem(R.id.action_sync_error).setVisible(false);
+		menu.findItem(R.id.action_sync_has_changes).setVisible(false);
+		menu.findItem(R.id.action_sync_inactive).setVisible(false);
+
+		//TODO fix animation
+//		ImageView syncIcon = (ImageView) statusBar.findViewById(R.id.action_sync_active);
+//		syncIcon.clearAnimation();
+
+		switch (activityRef.get().getSyncStatus()) {
+			case ACTIVE_SYNCING:
+				menu.findItem(R.id.action_sync_active).setVisible(true);
+//				syncIcon.setVisibility(View.VISIBLE);
+//				syncIcon.startAnimation(rotation);
+				break;
+			case ERROR:
+				menu.findItem(R.id.action_sync_error).setVisible(true);
+				break;
+			case ACTIVE_NO_CHANGES:
+				menu.findItem(R.id.action_sync).setVisible(true);
+				break;
+			case ACTIVE_HAS_CHANGES:
+				menu.findItem(R.id.action_sync_has_changes).setVisible(true);
+				break;
+			default:
+				menu.findItem(R.id.action_sync_inactive).setVisible(true);
+				break;
+		}
+
+		// tracker status
+		menu.findItem(R.id.action_tracker_active_no_gps).setVisible(false);
+		menu.findItem(R.id.action_tracker_active_has_gps).setVisible(false);
+		menu.findItem(R.id.action_tracker_inactive).setVisible(false);
+		if (gpsDataManager.isTrackingStarted()) {
+			if (gpsDataManager.hasValidExternalGPSSignal()
+					|| gpsDataManager.hasValidInternalGPSSignal()) {
+				menu.findItem(R.id.action_tracker_active_has_gps).setVisible(true);
+			} else {
+				menu.findItem(R.id.action_tracker_active_no_gps).setVisible(true);
+			}
+		} else {
+			menu.findItem(R.id.action_tracker_inactive).setVisible(true);
+		}
+
 		// gps status
-		statusBar.findViewById(R.id.action_gps_inactive).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_gps_active_has_signal).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_gps_active_no_signal).setVisibility(View.GONE);
+		menu.findItem(R.id.action_gps_inactive).setVisible(false);
+		menu.findItem(R.id.action_gps_active_has_signal).setVisible(false);
+		menu.findItem(R.id.action_gps_active_no_signal).setVisible(false);
 		if (gpsDataManager.isExternalGPSStarted()
 				|| gpsDataManager.isInternalGPSStarted()) {
 			if (gpsDataManager.hasValidExternalGPSSignal()
 					|| gpsDataManager.hasValidInternalGPSSignal()) {
-				statusBar.findViewById(R.id.action_gps_active_has_signal).setVisibility(View.VISIBLE);
+				menu.findItem(R.id.action_gps_active_has_signal).setVisible(true);
 			} else {
-				statusBar.findViewById(R.id.action_gps_active_no_signal).setVisibility(View.VISIBLE);
+				menu.findItem(R.id.action_gps_active_no_signal).setVisible(true);
 			}
 		} else {
-			statusBar.findViewById(R.id.action_gps_inactive).setVisibility(View.VISIBLE);
+			menu.findItem(R.id.action_gps_inactive).setVisible(true);
 		}
-		
-		// tracker status
-		statusBar.findViewById(R.id.action_tracker_active_no_gps).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_tracker_active_has_gps).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_tracker_inactive).setVisibility(View.GONE);
-		if (gpsDataManager.isTrackingStarted()) {
-			if (gpsDataManager.hasValidExternalGPSSignal()
-					|| gpsDataManager.hasValidInternalGPSSignal()) {
-				statusBar.findViewById(R.id.action_tracker_active_has_gps).setVisibility(View.VISIBLE);
-			} else {
-				statusBar.findViewById(R.id.action_tracker_active_no_gps).setVisibility(View.VISIBLE);
-			}
-		} else {
-			statusBar.findViewById(R.id.action_tracker_inactive).setVisibility(View.VISIBLE);
-		}
-		
-		// sync status
-		statusBar.findViewById(R.id.action_sync).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_sync_active).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_sync_error).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_sync_has_changes).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_sync_inactive).setVisibility(View.GONE);
 
-		ImageView syncIcon = (ImageView) statusBar.findViewById(R.id.action_sync_active);
-		syncIcon.clearAnimation();
-
-		switch (activityRef.get().getSyncStatus()) {
-		case ACTIVE_SYNCING:
-			syncIcon.setVisibility(View.VISIBLE);
-			syncIcon.startAnimation(rotation);
-			break;
-		case ERROR:
-			statusBar.findViewById(R.id.action_sync_error).setVisibility(View.VISIBLE);
-			break;
-		case ACTIVE_NO_CHANGES:
-			statusBar.findViewById(R.id.action_sync).setVisibility(View.VISIBLE);
-			break;
-		case ACTIVE_HAS_CHANGES:
-			statusBar.findViewById(R.id.action_sync_has_changes).setVisibility(View.VISIBLE);
-			break;
-		default:
-			statusBar.findViewById(R.id.action_sync_inactive).setVisibility(View.VISIBLE);
-			break;
-		}
-		
 		// bluetooth status
-		statusBar.findViewById(R.id.action_bluetooth_active).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_bluetooth_connected).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_bluetooth_disconnected).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_bluetooth_error).setVisibility(View.GONE);
-		
+		menu.findItem(R.id.action_bluetooth_active).setVisible(false);
+		menu.findItem(R.id.action_bluetooth_connected).setVisible(false);
+		menu.findItem(R.id.action_bluetooth_disconnected).setVisible(false);
+		menu.findItem(R.id.action_bluetooth_error).setVisible(false);
+
 		switch (bluetoothManager.getBluetoothStatus()) {
-		case ACTIVE:
-			statusBar.findViewById(R.id.action_bluetooth_active).setVisibility(View.VISIBLE);
-			break;
-		case CONNECTED:
-			statusBar.findViewById(R.id.action_bluetooth_connected).setVisibility(View.VISIBLE);
-			break;
-		case ERROR:
-			statusBar.findViewById(R.id.action_bluetooth_error).setVisibility(View.VISIBLE);
-			break;
-		default:
-			statusBar.findViewById(R.id.action_bluetooth_disconnected).setVisibility(View.VISIBLE);
-			break;
+			case ACTIVE:
+				menu.findItem(R.id.action_bluetooth_active).setVisible(true);
+				break;
+			case CONNECTED:
+				menu.findItem(R.id.action_bluetooth_connected).setVisible(true);
+				break;
+			case ERROR:
+				menu.findItem(R.id.action_bluetooth_error).setVisible(true);
+				break;
+			default:
+				menu.findItem(R.id.action_bluetooth_disconnected).setVisible(true);
+				break;
 		}
-		
+
+		// autosave status
+		menu.findItem(R.id.action_autosave).setVisible(false);
+		menu.findItem(R.id.action_autosave_inactive).setVisible(false);
+		menu.findItem(R.id.action_autosave_ready).setVisible(false);
+		menu.findItem(R.id.action_autosave_saving).setVisible(false);
+		menu.findItem(R.id.action_autosave_error).setVisible(false);
+
+		//TODO fix animation
+//		ImageView autosaveIcon = (ImageView) menu.findItem(R.id.action_autosave_saving_item).getActionView();
+//		autosaveIcon.clearAnimation();
+
+		switch (autoSaveManager.getStatus()) {
+			case SAVING:
+				menu.findItem(R.id.action_autosave_saving).setVisible(true);
+//				autosaveIcon.setVisibility(View.VISIBLE);
+//				autosaveIcon.startAnimation(rotation);
+				break;
+			case READY:
+				menu.findItem(R.id.action_autosave_ready).setVisible(true);
+				break;
+			case ACTIVE:
+				menu.findItem(R.id.action_autosave).setVisible(true);
+				break;
+			case ERROR:
+				menu.findItem(R.id.action_autosave_error).setVisible(true);
+				break;
+			default:
+				menu.findItem(R.id.action_autosave_inactive).setVisible(true);
+				break;
+		}
+
 		// follow status
-		TextView distance_text = (TextView) statusBar.findViewById(R.id.distance_text);
-		TextView direction_text = (TextView) statusBar.findViewById(R.id.direction_text);
-		ImageView direction_indicator = (ImageView) statusBar.findViewById(R.id.direction_indicator);
-		
-		distance_text.setVisibility(View.GONE);
-		direction_text.setVisibility(View.GONE);
-		direction_indicator.setVisibility(View.GONE);
-		
+		MenuItem distance_text = menu.findItem(R.id.distance_text);
+		MenuItem direction_text = menu.findItem(R.id.direction_text);
+		MenuItem direction_indicator = menu.findItem(R.id.direction_indicator);
+
+		distance_text.setVisible(false);
+		direction_text.setVisible(false);
+		direction_indicator.setVisible(false);
+
 		if (pathIndicatorVisible)  {
-			distance_text.setVisibility(View.VISIBLE);
-			direction_text.setVisibility(View.VISIBLE);
-			direction_indicator.setVisibility(View.VISIBLE);
+			distance_text.setVisible(true);
+			direction_text.setVisible(true);
+			direction_indicator.setVisible(true);
 		}
-		
+
 		String distanceInfo = pathIndex < 0 ? "" : " to point (" + pathIndex
 				+ "/" + pathLength + ")";
 		if (pathDistance > 1000) {
-			distance_text.setText(MeasurementUtil.displayAsKiloMeters(
+			distance_text.setTitleCondensed(MeasurementUtil.displayAsKiloMeters(
 					pathDistance / 1000, "###,###,###,###.0") + distanceInfo);
 		} else {
-			distance_text.setText(MeasurementUtil.displayAsMeters(
+			distance_text.setTitleCondensed(MeasurementUtil.displayAsMeters(
 					pathDistance, "###,###,###,###") + distanceInfo);
 		}
 
-		direction_text.setText(MeasurementUtil.displayAsDegrees(pathBearing, "###"));
+		direction_text.setTitleCondensed(MeasurementUtil.displayAsDegrees(pathBearing, "###"));
 
 		if (pathHeading != null) {
 			if (tempBitmap != null) {
@@ -279,46 +312,22 @@ public class ShowModuleMenuManager {
 			this.tempBitmap = BitmapUtil.rotateBitmap(
 					pathValid ? validArrow.getBitmap() : invalidArrow.getBitmap(),
 					pathBearing - pathHeading);
-			direction_indicator.setImageDrawable(new BitmapDrawable(activityRef.get().getResources(),
+			direction_indicator.setIcon(new BitmapDrawable(activityRef.get().getResources(),
 					tempBitmap));
+//			direction_indicator.setImageDrawable(new BitmapDrawable(activityRef.get().getResources(),
+//					tempBitmap));
 		} else {
-			direction_indicator.setVisibility(View.GONE);
+			direction_indicator.setVisible(false);
 		}
-		
-		// autosave status
-		statusBar.findViewById(R.id.action_autosave).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_autosave_inactive).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_autosave_ready).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_autosave_saving).setVisibility(View.GONE);
-		statusBar.findViewById(R.id.action_autosave_error).setVisibility(View.GONE);
 
-		ImageView autosaveIcon = (ImageView) statusBar.findViewById(R.id.action_autosave_saving);
-		autosaveIcon.clearAnimation();
+	}
 
-		switch (autoSaveManager.getStatus()) {
-		case SAVING:
-			autosaveIcon.setVisibility(View.VISIBLE);
-			autosaveIcon.startAnimation(rotation);
-			break;
-		case READY:
-			statusBar.findViewById(R.id.action_autosave_ready).setVisibility(View.VISIBLE);
-			break;
-		case ACTIVE:
-			statusBar.findViewById(R.id.action_autosave).setVisibility(View.VISIBLE);
-			break;
-		case ERROR:
-			statusBar.findViewById(R.id.action_autosave_error).setVisibility(View.VISIBLE);
-			break;
-		default:
-			statusBar.findViewById(R.id.action_autosave_inactive).setVisibility(View.VISIBLE);
-			break;
-		}
-		
+	public void updateStatusBar(LinearLayout statusBar) {
 		LinearLayout iconContainer = ((LinearLayout) statusBar.findViewById(R.id.status_bar_icons));
 		for (int i=0; i < iconContainer.getChildCount(); i++) {
 			View v = iconContainer.getChildAt(i);
 			v.setOnLongClickListener(new OnLongClickListener() {
-				
+
 				@Override
 				public boolean onLongClick(View v) {
 					activityRef.get().beanShellLinker.showToast(v.getContentDescription().toString());
