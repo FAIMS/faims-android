@@ -35,6 +35,8 @@ public class GPSTest extends ActivityInstrumentationTestCase2<SplashActivity> {
 		Test: Does the GPS time error appear if the gps time and system time is mismatched
 		Requires:
 	 */
+
+	/* 	
 	public void testRun1() {
 		solo.waitForActivity(SplashActivity.class, 5000);
 
@@ -54,6 +56,7 @@ public class GPSTest extends ActivityInstrumentationTestCase2<SplashActivity> {
 
 		assertTrue("GPS time error is " + hasGPSError, hasGPSError);
 	}
+ */
 
 	/*
 		Test: Does the GPS timezone error appear if the gps and system timezone is mismatched
