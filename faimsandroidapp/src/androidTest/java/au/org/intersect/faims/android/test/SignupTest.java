@@ -200,6 +200,17 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 		assertFalse("Found user created when app offline", solo.searchText(runIDInstance.getRunID() + " test6"));
 	}
 
+	/*
+    Test: Turn on wifi in case it is left off after test7
+    Requires: FAIMS server with Sol1 Hardware module with sign up enabled
+ */
+	public void testRun8() {
+		// Load app, start last session
+		AppModuleUtil.roboContinueLastSession(solo);
+		solo.setWiFiData(true);
+		assertTrue(true);
+	}
+	
 
 	// Convince for filling in the form
 	private void setSignupValues(String firstname, String lastname, String email, String password, String passwordConfirmation) {

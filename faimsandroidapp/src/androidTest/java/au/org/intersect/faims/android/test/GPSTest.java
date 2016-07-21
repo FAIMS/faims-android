@@ -36,7 +36,7 @@ public class GPSTest extends ActivityInstrumentationTestCase2<SplashActivity> {
 		Requires:
 	 */
 
-	/* 	
+	/*
 	public void testRun1() {
 		solo.waitForActivity(SplashActivity.class, 5000);
 
