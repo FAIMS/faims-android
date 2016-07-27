@@ -60,6 +60,8 @@ public class SplashActivity extends RoboActivity {
 	protected ChoiceDialog choiceDialog;
 
 	protected final SplashActivity.DownloadUpdateModuleHandler downloadHandler = new SplashActivity.DownloadUpdateModuleHandler(SplashActivity.this, Type.DOWNLOAD);
+	protected final SplashActivity.DownloadUpdateModuleHandler updateModuleSettingHandler = new SplashActivity.DownloadUpdateModuleHandler(SplashActivity.this, Type.UPDATE_SETTINGS);
+	protected final SplashActivity.DownloadUpdateModuleHandler updateModuleDataHandler = new SplashActivity.DownloadUpdateModuleHandler(SplashActivity.this, Type.UPDATE_DATA);
 
 	protected Boolean downloading = false;
 	@Inject
@@ -165,7 +167,18 @@ public class SplashActivity extends RoboActivity {
 			Result result = (Result) message.obj;
 			if (result.resultCode == FAIMSClientResultCode.SUCCESS) {
 				// Show module static panel
-				activity.openModule(BuildConfig.COMMUNITY_MODULE);
+				switch (type) {
+					case DOWNLOAD:
+						activity.openModule(BuildConfig.COMMUNITY_MODULE);
+						break;
+					case UPDATE_SETTINGS:
+						activity.updateModuleData();
+						break;
+					case UPDATE_DATA:
+						activity.openModule(BuildConfig.COMMUNITY_MODULE);
+						break;
+				}
+//				activity.openModule(BuildConfig.COMMUNITY_MODULE);
 			} else if (result.resultCode == FAIMSClientResultCode.FAILURE || result.resultCode == FAIMSClientResultCode.INTERRUPTED) {
 				activity.showFailureDialog(result, type);
 			}
@@ -181,10 +194,28 @@ public class SplashActivity extends RoboActivity {
 
 					@Override
 					public void handleDialogResponse(DialogResultCode resultCode) {
-						if (resultCode == DialogResultCode.SELECT_YES) {
-							downloadModule();
-						} else {
-							SplashActivity.this.finish();
+						switch (type) {
+							case DOWNLOAD:
+								if (resultCode == DialogResultCode.SELECT_YES) {
+									downloadModule();
+								} else {
+									SplashActivity.this.finish();
+								}
+								break;
+							case UPDATE_SETTINGS:
+								if (resultCode == DialogResultCode.SELECT_YES) {
+									updateModuleSettings();
+								} else {
+									SplashActivity.this.openModule(BuildConfig.COMMUNITY_MODULE);
+								}
+								break;
+							case UPDATE_DATA:
+								if (resultCode == DialogResultCode.SELECT_YES) {
+									updateModuleData();
+								} else {
+									SplashActivity.this.openModule(BuildConfig.COMMUNITY_MODULE);
+								}
+								break;
 						}
 					}
 
@@ -193,9 +224,24 @@ public class SplashActivity extends RoboActivity {
 	}
 
 	private void showBusyDialog(final Type type) {
+		String message = "";
+		switch (type) {
+			case DOWNLOAD:
+				message = getString(R.string.download_busy_message);
+				break;
+			case UPDATE_SETTINGS:
+				message = getString(R.string.update_settings_busy_message);
+				break;
+			case UPDATE_DATA:
+				message = getString(R.string.update_data_busy_message);
+				break;
+			default:
+				message = getString(R.string.download_busy_message);
+				break;
+		}
 		busyDialog = new BusyDialog(SplashActivity.this,
 				getString(R.string.busy_title),
-				getString(R.string.download_busy_message),
+				message,
 				new IDialogListener() {
 
 					@Override
@@ -211,9 +257,9 @@ public class SplashActivity extends RoboActivity {
 						} else if (type == Type.UPDATE_SETTINGS) {
 							if (resultCode == DialogResultCode.CANCEL) {
 								// stop service
-								Intent intent = new Intent(SplashActivity.this, UpdateModuleSettingService.class);
+//								Intent intent = new Intent(SplashActivity.this, UpdateModuleSettingService.class);
 
-								stopService(intent);
+//								stopService(intent);
 							}
 
 						} else if (type == Type.UPDATE_DATA) {
@@ -228,6 +274,73 @@ public class SplashActivity extends RoboActivity {
 
 				});
 		busyDialog.show();
+	}
+
+	protected void updateModuleSettings() {
+		if (null != serverDiscovery && serverDiscovery.isServerHostValid()) {
+			showBusyDialog(Type.UPDATE_SETTINGS);
+
+			// start service
+			Intent intent = new Intent(SplashActivity.this, UpdateModuleSettingService.class);
+
+			Messenger messenger = new Messenger(updateModuleSettingHandler);
+			intent.putExtra("MESSENGER", messenger);
+			intent.putExtra("module", new Module(BuildConfig.COMMUNITY_APPNAME, BuildConfig.COMMUNITY_MODULE));
+			intent.putExtra("overwrite", false);
+			startService(intent);
+		} else {
+			showBusyDialog(Type.UPDATE_SETTINGS);
+
+			locateTask = new LocateServerTask(serverDiscovery, new ITaskListener() {
+
+				@Override
+				public void handleTaskCompleted(Object result) {
+					SplashActivity.this.busyDialog.dismiss();
+
+					if ((Boolean) result) {
+						updateModuleSettings();
+					} else {
+						//TODO
+//						showLocateServerDownloadArchiveFailureDialog(overwrite);
+					}
+				}
+
+			}).execute();
+		}
+
+	}
+
+	protected void updateModuleData() {
+		if (null != serverDiscovery && serverDiscovery.isServerHostValid()) {
+			showBusyDialog(Type.UPDATE_DATA);
+
+			// start service
+			Intent intent = new Intent(SplashActivity.this, UpdateModuleDataService.class);
+			Messenger messenger = new Messenger(updateModuleDataHandler);
+			intent.putExtra("MESSENGER", messenger);
+			intent.putExtra("module", new Module(BuildConfig.COMMUNITY_APPNAME, BuildConfig.COMMUNITY_MODULE));
+			intent.putExtra("overwrite", false);
+			startService(intent);
+		} else {
+			showBusyDialog(Type.UPDATE_DATA);
+
+			locateTask = new LocateServerTask(serverDiscovery, new ITaskListener() {
+
+				@Override
+				public void handleTaskCompleted(Object result) {
+					SplashActivity.this.busyDialog.dismiss();
+
+					if ((Boolean) result) {
+						updateModuleData();
+					} else {
+						//TODO
+//						showLocateServerDownloadArchiveFailureDialog(overwrite);
+					}
+				}
+
+			}).execute();
+		}
+
 	}
 
 	protected void downloadModule() {
@@ -273,74 +386,102 @@ public class SplashActivity extends RoboActivity {
 		connectDemo.setVisibility(View.GONE);
 		connectServer.setVisibility(View.GONE);
 		loadModule.setVisibility(View.GONE);
-		if (null != BuildConfig.COMMUNITY_MODULE && null == ModuleUtil.getModule(BuildConfig.COMMUNITY_MODULE)) {
-			 //download the module
-			if (!downloading) {
+		if (null != BuildConfig.COMMUNITY_MODULE) {
+			if (null != BuildConfig.COMMUNITY_MODULE && null == ModuleUtil.getModule(BuildConfig.COMMUNITY_MODULE)) {
+				//download the module
+				if (!downloading) {
+					downloading = true;
+					downloadModule();
+				}
+				return;
+			} else
+			if ((null != BuildConfig.COMMUNITY_MODULE) && (null != ModuleUtil.getModule(BuildConfig.COMMUNITY_MODULE)) && !downloading) {
 				downloading = true;
-				downloadModule();
+				updateModuleSettings();
+			} else
+			if (ModuleUtil.getModules() == null || ModuleUtil.getModules().isEmpty()) {
+				connectDemo.setVisibility(View.VISIBLE);
+				connectDemo.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						connectToDemoServer();
+					}
+				});
+				connectServer.setVisibility(View.VISIBLE);
+				connectServer.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						Intent serverSettings = new Intent(SplashActivity.this, ServerSettingsActivity.class);
+						startActivity(serverSettings);
+					}
+				});
+			} else {
+				loadModule.setVisibility(View.VISIBLE);
+				loadModule.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+						SplashActivity.this.startActivity(mainIntent);
+					}
+				});
 			}
-			return;
-		} else
-		if (ModuleUtil.getModules() == null || ModuleUtil.getModules().isEmpty()) {
-			connectDemo.setVisibility(View.VISIBLE);
-			connectDemo.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					connectToDemoServer();
-				}
-			});
-			
-			connectServer.setVisibility(View.VISIBLE);
-			connectServer.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent serverSettings = new Intent(SplashActivity.this, ServerSettingsActivity.class);
-					startActivity(serverSettings);
-				}
-			});
 		} else {
-			loadModule.setVisibility(View.VISIBLE);
-			loadModule.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
-		            SplashActivity.this.startActivity(mainIntent);
-				}
-			});
+			if (ModuleUtil.getModules() == null || ModuleUtil.getModules().isEmpty()) {
+				connectDemo.setVisibility(View.VISIBLE);
+				connectDemo.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						connectToDemoServer();
+					}
+				});
+				connectServer.setVisibility(View.VISIBLE);
+				connectServer.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						Intent serverSettings = new Intent(SplashActivity.this, ServerSettingsActivity.class);
+						startActivity(serverSettings);
+					}
+				});
+			} else {
+				loadModule.setVisibility(View.VISIBLE);
+				loadModule.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+						SplashActivity.this.startActivity(mainIntent);
+					}
+				});
+			}
+
+			Button continueSession = (Button) findViewById(R.id.splash_continue);
+			final String key = FAIMSApplication.getInstance().getSessionModuleKey();
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			String arch = "faims.properties";
+			if (null != key && null != ModuleUtil.getModule(key) && ModuleUtil.getModule(key).getArch16nFiles().size() > 0) {
+				arch = prefs.getString("module-arch16n", FileUtil.sortArch16nFiles(ModuleUtil.getModule(key).getArch16nFiles()).get(0));
+			}
+			final String arch16n = arch;
+			if (key != null && ModuleUtil.getModule(key) != null) {
+				continueSession.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						Intent showModuleIntent = new Intent(SplashActivity.this, ShowModuleActivity.class);
+						showModuleIntent.putExtra("key", key);
+						showModuleIntent.putExtra("arch16n", arch16n);
+						SplashActivity.this.startActivityForResult(showModuleIntent, 1);
+					}
+				});
+			} else {
+				continueSession.setVisibility(View.GONE);
+			}
 		}
-		
-		Button continueSession = (Button) findViewById(R.id.splash_continue);
-		final String key = FAIMSApplication.getInstance().getSessionModuleKey();
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		String arch = "faims.properties";
-		if (null != key && null != ModuleUtil.getModule(key) && ModuleUtil.getModule(key).getArch16nFiles().size() > 0) {
-			arch = prefs.getString("module-arch16n", FileUtil.sortArch16nFiles(ModuleUtil.getModule(key).getArch16nFiles()).get(0));
-		}
-		final String arch16n = arch;
-		if ((key != null && ModuleUtil.getModule(key) != null) && null != BuildConfig.COMMUNITY_MODULE) {
-			Intent showModuleIntent = new Intent(this, ShowModuleActivity.class);
-			showModuleIntent.putExtra("key", key);
-			showModuleIntent.putExtra("arch16n", arch16n);
-			startActivityForResult(showModuleIntent, 1);
-			SplashActivity.this.finish();
-		} else
-		if (key != null && ModuleUtil.getModule(key) != null) {
-		    continueSession.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent showModuleIntent = new Intent(SplashActivity.this, ShowModuleActivity.class);
-					showModuleIntent.putExtra("key", key);
-					showModuleIntent.putExtra("arch16n", arch16n);
-					SplashActivity.this.startActivityForResult(showModuleIntent, 1);
-				}
-			});
-	    } else {
-	    	continueSession.setVisibility(View.GONE);
-	    }
 	}
 
 	private void openModule(String key) {
