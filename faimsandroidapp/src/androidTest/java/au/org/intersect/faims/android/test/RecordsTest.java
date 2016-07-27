@@ -1,8 +1,7 @@
 package au.org.intersect.faims.android.test;
 
 import au.org.intersect.faims.android.ui.activity.SplashActivity;
-import au.org.intersect.faims.android.ui.map.tools.DatabaseSelectionTool;
-import au.org.intersect.faims.android.util.TestModuleUtil;
+import au.org.intersect.faims.android.util.AppModuleUtil;
 import au.org.intersect.faims.android.util.ModuleSol1HardwareUtil;
 import au.org.intersect.faims.android.util.TestRunID;
 
@@ -10,8 +9,6 @@ import com.robotium.solo.*;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.widget.EditText;
-
-import java.util.Date;
 
 
 public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity> {
@@ -25,7 +22,7 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
   	public void setUp() throws Exception {
         super.setUp();
 		if (runIDInstance.getRunID().equals("")) {
-			runIDInstance.setRunID(TestModuleUtil.getDateRunID() + "_" + TestModuleUtil.getStringRunID());
+			runIDInstance.setRunID(AppModuleUtil.getDateRunID() + "_" + AppModuleUtil.getStringRunID());
 		}
 		Log.d("RunID", runIDInstance.getRunID());
 		solo = new Solo(getInstrumentation());
@@ -39,8 +36,8 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 	public void testRun1() {
 
 		// Load app, set server and module
-		TestModuleUtil.roboConnectToServer(solo, TestModuleUtil.SERVER_NAME_TEST1, TestModuleUtil.SERVER_PORT_80);
-		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_SOL1_HARDWARE);
+		AppModuleUtil.roboConnectToServer(solo, AppModuleUtil.SERVER_NAME_TEST1, AppModuleUtil.SERVER_PORT_80);
+		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_SOL1_HARDWARE);
 
 		//Click on Kebab menu (vertical dot dot dot)
 		toggleSyncOn();
@@ -155,19 +152,19 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 
 		// Enter the data
 		EditText manufactureDate = ModuleSol1HardwareUtil.getEditText_AssetHardwareManufacture_Date(solo);
-		TestModuleUtil.editTextField(solo, manufactureDate, "1980");
+		AppModuleUtil.editTextField(solo, manufactureDate, "1980");
 
 		EditText owner = ModuleSol1HardwareUtil.getEditText_AssetHardwareOwner(solo);
-		TestModuleUtil.editTextField(solo, owner, runIDInstance.getRunID());
+		AppModuleUtil.editTextField(solo, owner, runIDInstance.getRunID());
 
 		EditText model = ModuleSol1HardwareUtil.getEditText_AssetHardwareModel(solo);
-		TestModuleUtil.editTextField(solo, model, "count:" + Integer.toString(count) + ".");
+		AppModuleUtil.editTextField(solo, model, "count:" + Integer.toString(count) + ".");
 
 		EditText make = ModuleSol1HardwareUtil.getEditText_AssetHardwareMake(solo);
-		TestModuleUtil.editTextField(solo, make, "save");
+		AppModuleUtil.editTextField(solo, make, "save");
 
 		EditText serial = ModuleSol1HardwareUtil.getEditText_AssetHardwareSerial(solo);
-		TestModuleUtil.editTextField(solo, serial, Integer.toString(count  + 1000));
+		AppModuleUtil.editTextField(solo, serial, Integer.toString(count  + 1000));
 
 	}
 
@@ -192,7 +189,7 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 
 		// Search for a field value to find something close
 		EditText search = ModuleSol1HardwareUtil.getEditText_ControlSearchSearch_Term(solo);
-		TestModuleUtil.editTextField(solo, search, "count:" + count + ".");
+		AppModuleUtil.editTextField(solo, search, "count:" + count + ".");
 		ModuleSol1HardwareUtil.clickButton_Search(solo, record);
 
 		// Load the exact record
@@ -216,21 +213,21 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 	}
 
 	private void toggleSyncOn() {
-		TestModuleUtil.roboClickOnKebabMenu(solo);
+		AppModuleUtil.roboClickOnKebabMenu(solo);
 		if (solo.searchText("Disable Sync")) {
-			TestModuleUtil.roboClickOnKebabMenu(solo);
+			AppModuleUtil.roboClickOnKebabMenu(solo);
 			assertTrue("Sync already enabled", true);
 		} else if (solo.searchText("Enable Sync")) {
-			TestModuleUtil.roboClickOnKebabMenu(solo);
+			AppModuleUtil.roboClickOnKebabMenu(solo);
 			turnSyncOn();
 		}
 	}
 
 	private void turnSyncOn() {
 		//Click on Turn Sync on
-//		TestModuleUtil.roboClickOnKebabMenu(solo);
+//		AppModuleUtil.roboClickOnKebabMenu(solo);
 //		Log.d("Debug Sync on: ", "Enable sync is " + solo.searchText("Enable Sync"));
-		TestModuleUtil.roboClickOnKebabItem(solo, "Enable Sync");
+		AppModuleUtil.roboClickOnKebabItem(solo, "Enable Sync");
 //		assertTrue("'Sync enabled' message shown", solo.searchText("Sync enabled"));
 		assertTrue("Sync On equals: " + isSyncOn(), isSyncOn());
 		//TODO: is sync icon on
@@ -239,7 +236,7 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 
 	private void turnSyncOff() {
 		//Click on Turn Sync on
-		TestModuleUtil.roboClickOnKebabItem(solo, "Disable Sync");
+		AppModuleUtil.roboClickOnKebabItem(solo, "Disable Sync");
 		boolean syncDisabled = solo.searchText("Sync disabled");
 		if (syncDisabled) {
 			Log.d("Debug Sync off", "Disabled sync is " + syncDisabled);
@@ -260,9 +257,9 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		Checks if the sync is on (cause timing of transient messages screws things up)
 	 */
 	private boolean isSyncOn() {
-		TestModuleUtil.roboClickOnKebabMenu(solo);
+		AppModuleUtil.roboClickOnKebabMenu(solo);
 		boolean syncOn = solo.searchText("Disable Sync");
-		TestModuleUtil.roboClickOnKebabMenu(solo);
+		AppModuleUtil.roboClickOnKebabMenu(solo);
 		return syncOn;
 	}
 
@@ -270,21 +267,21 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		Checks if the sync is off (cause timing of transient messages screws things up)
 	 */
 	private boolean isSyncOff() {
-		TestModuleUtil.roboClickOnKebabMenu(solo);
+		AppModuleUtil.roboClickOnKebabMenu(solo);
 		boolean syncOff = solo.searchText("Enable Sync");
-		TestModuleUtil.roboClickOnKebabMenu(solo);
+		AppModuleUtil.roboClickOnKebabMenu(solo);
 		return syncOff;
 	}
 
 	private void initToLogin() {
 		// Load app, start last session
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 		toggleSyncOn();
 
 		//Click on User List Drop Down
 		solo.clickOnView(ModuleSol1HardwareUtil.get_UserUserSelect_User(solo));
 		//Click on Faims Admin
-		solo.clickOnText(TestModuleUtil.USER_FAIMS_ADMIN);
+		solo.clickOnText(AppModuleUtil.USER_FAIMS_ADMIN);
 		ModuleSol1HardwareUtil.clickButton_Login(solo);
 		assertTrue("Login Failed: Failed to find Record Asset button", solo.searchButton("Record Asset", true));
 

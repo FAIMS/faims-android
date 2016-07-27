@@ -3,10 +3,9 @@ package au.org.intersect.faims.android.test;
 import au.org.intersect.faims.android.ui.activity.SplashActivity;
 import com.robotium.solo.*;
 
-import android.os.StrictMode;
 import android.test.ActivityInstrumentationTestCase2;
-import au.org.intersect.faims.android.util.TestModuleUtil;
 
+import au.org.intersect.faims.android.util.AppModuleUtil;
 
 
 public class LoadModuleTest extends ActivityInstrumentationTestCase2<SplashActivity> {
@@ -26,8 +25,8 @@ public class LoadModuleTest extends ActivityInstrumentationTestCase2<SplashActiv
 		Requires: FAIMS server and module PAZC loaded
 	 */
 	public void testRun1() {
-		TestModuleUtil.roboConnectToServer(solo, TestModuleUtil.SERVER_NAME_TEST1, TestModuleUtil.SERVER_PORT_80);
-		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_PAZC);
+		AppModuleUtil.roboConnectToServer(solo, AppModuleUtil.SERVER_NAME_TEST1, AppModuleUtil.SERVER_PORT_80);
+		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_PAZC);
 	}
 
 	/*
@@ -35,8 +34,8 @@ public class LoadModuleTest extends ActivityInstrumentationTestCase2<SplashActiv
 	 	Requires: Server previously set and module "CSIRO Geochemistry Sampling" loaded on server
 	 */
 	public void testRun2() {
-		TestModuleUtil.roboUseCurrentServer(solo);
-		TestModuleUtil.roboLoadModule(solo, TestModuleUtil.MODULE_CSIRO_GEOCHEMISTRY_SAMPLING);
+		AppModuleUtil.roboUseCurrentServer(solo);
+		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_CSIRO_GEOCHEMISTRY_SAMPLING);
 	}
 
 	/*
@@ -44,7 +43,7 @@ public class LoadModuleTest extends ActivityInstrumentationTestCase2<SplashActiv
 		Requires: Existing server and module "CSIRO Geochemistry Sampling" previously selected
 	 */
 	public void testRun3() {
-		TestModuleUtil.roboContinueLastSession(solo);
+		AppModuleUtil.roboContinueLastSession(solo);
 	}
 
 	@Override

@@ -34,15 +34,17 @@ import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 
-public class TestModuleUtil {
+public class AppModuleUtil {
 	public static final String CONTINUE_LAST_SESSION = "Continue Last Session";
-
-	public static final String MODULE_CSIRO_GEOCHEMISTRY_SAMPLING = "CSIRO Geochemistry Sampling";
-	public static final String MODULE_PAZC = "PAZC";
-	public static final String MODULE_SOL1_HARDWARE = "Sol1 Hardware";
 
 	public static final String SERVER_NAME_TEST1 = "test1.fedarch.org";
 	public static final String SERVER_PORT_80 = "80";
+
+	public static final String MODULE_CSIRO_GEOCHEMISTRY_SAMPLING = "CSIRO Geochemistry Sampling";
+	public static final String MODULE_PAZC = "PAZC";
+	public static final String MODULE_SIGN_UP = "Sign Up";
+	public static final String MODULE_WIDGET_TEST = "Widget Test";
+	public static final String MODULE_SOL1_HARDWARE = "Sol1 Hardware";
 
 	public static final String USER_FAIMS_ADMIN = "Faims Admin";
 
@@ -178,7 +180,7 @@ public class TestModuleUtil {
 	public static void roboContinueLastSession(Solo solo) {
 		//Wait for activity: 'au.org.intersect.faims.android.ui.activity.SplashActivity'
 		solo.waitForActivity(au.org.intersect.faims.android.ui.activity.SplashActivity.class, 2000);
-		solo.clickOnButton(TestModuleUtil.CONTINUE_LAST_SESSION);
+		solo.clickOnButton(AppModuleUtil.CONTINUE_LAST_SESSION);
 		solo.sleep(2000);
 		solo.waitForActivity(SplashActivity.class, 15000);
 		waitForModuleLoad(solo);
@@ -221,10 +223,14 @@ public class TestModuleUtil {
 			solo.clickOnButton("YES");
 			solo.waitForActivity(SplashActivity.class);
 		}
-		waitForModuleLoad(solo, 300000);
+		waitForModuleLoad(solo, 300000, false);
 	}
 
 	private static void waitForModuleLoad(Solo solo, long timeout) {
+		waitForModuleLoad(solo, timeout, true);
+	}
+
+	private static void waitForModuleLoad(Solo solo, long timeout, boolean checkForMessages) {
 		solo.sleep(2000);
 		solo.waitForActivity(ShowModuleActivity.class);
 		if (solo.searchText("please wait")) {
@@ -233,14 +239,17 @@ public class TestModuleUtil {
 			assertTrue("Wait for loading screen failed", solo.waitForDialogToClose(timeout));
 		}
 
-		roboCheckForLogicErrors(solo);
+		if (checkForMessages){
+			roboCheckForLogicErrors(solo);
+			roboCheckInitGridMessage(solo);
+		}
 	}
 
 	/*
 		Check for logic error after module load
 		continue of error is known and valid
 	 */
-	private static void roboCheckForLogicErrors(Solo solo) {
+	public static void roboCheckForLogicErrors(Solo solo) {
 
 		int logicError = 0;
 		while (solo.searchText("Logic Error", true) && logicError < 10) {
@@ -259,6 +268,18 @@ public class TestModuleUtil {
 		}
 
 	}
+
+	public static void roboCheckInitGridMessage(Solo solo) {
+		int count = 1;
+		while ( count < 20 ) {
+			count++;
+			if (solo.searchText("You have not yet initialised the grid.") ) {
+				ModuleWidgetTestUtil.clickCloseDialogButton(solo, "OK");
+				count = 20;
+			}
+		}
+	}
+
 
 	public static void roboClickOnKebabMenu(Solo solo) {
 		solo.sendKey(KEYCODE_MENU);
