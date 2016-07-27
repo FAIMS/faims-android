@@ -296,7 +296,9 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 	public AutoSaveManager getAutoSaveManager() {
 		return autoSaveManager;
 	}
-	
+	public void triggerAutoSave() {
+		autoSaveManager.triggerAutoSave();
+	}
 	public ShowModuleActivity getActivity() {
 		return activityRef.get();
 	}

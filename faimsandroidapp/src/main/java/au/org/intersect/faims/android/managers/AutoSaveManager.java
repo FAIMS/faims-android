@@ -213,7 +213,13 @@ public class AutoSaveManager implements IFAIMSRestorable {
 			}
 		}
 	}
-	
+
+	public void triggerAutoSave() {
+		if (enabled) {
+			postSaveCallback(0);
+		}
+	}
+
 	public void save() {
 		if (enabled) {
 			postSaveCallback(SAVE_AFTER_CHANGE_DELAY);
