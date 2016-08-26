@@ -17,6 +17,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.Environment;
 import android.view.View;
 import android.widget.EditText;
@@ -292,6 +293,9 @@ public class AppModuleUtil {
 		solo.sleep(500);
 	}
 
+	public static void roboCLickOnHamburger(Solo solo) {
+		solo.clickOnView(solo.getView(Resources.getSystem().getIdentifier("home","id","android")));
+	}
 
 	public static void editTextField(Solo solo, EditText field, String text) {
 		solo.clearEditText(field);

@@ -51,6 +51,19 @@ public class WidgetTest extends ActivityInstrumentationTestCase2<SplashActivity>
 
 	}
 
+	/*
+		Test: Hamburger menu Test
+		Requires: FAIMS server and module Widget Test loaded
+	 */
+	public void testRun2() {
+		AppModuleUtil.roboContinueLastSession(solo);
+		solo.clickOnText("Faims Admin");
+		AppModuleUtil.roboCLickOnHamburger(solo);
+		assertTrue(solo.searchText("Main Menu", true));
+		solo.clickOnText("User List");
+		assertTrue(solo.searchText("Faims Admin", true));
+	}
+
 	@Override
 	public void tearDown() throws Exception {
 		solo.finishOpenedActivities();
