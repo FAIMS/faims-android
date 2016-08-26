@@ -187,6 +187,15 @@ duplicateTabGroup(String ref, List geometry, List attributes, List excludeAttrib
 }
 
 /**
+  * Manually trigger immediate autosave
+  *
+  * @param <none>
+  */
+triggerAutoSave() {
+  linker.triggerAutoSave();
+}
+
+/**
   * Disable autosave for tabgroup
   *
   * @param ref the reference  of the tab group

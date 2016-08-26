@@ -24,28 +24,42 @@ public class LoadCommunityModuleTest extends ActivityInstrumentationTestCase2<Sp
 
 	/*
 		Test: Start app, set server and module
-		Requires: FAIMS server and module PAZC loaded
+		Requires: Community module and server
 	 */
 	public void testRun1() {
-		initCommunityModule(false);
+		solo.setWiFiData(true);
+		initCommunityModule();
+		loadCommunityModule(false);
 	}
 
 	/*
-		Test: Start app and load named module
-	 	Requires: Server previously set and module "CSIRO Geochemistry Sampling" loaded on server
+		Test: Start app and load community module with wifi off
+	 	Requires: Community module and server
 	 */
-//	public void testRun2() {
-//		AppModuleUtil.roboUseCurrentServer(solo);
-//		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_CSIRO_GEOCHEMISTRY_SAMPLING);
-//	}
+	public void testRun2() {
+		solo.setWiFiData(false);
+		initCommunityModule();
+		int count = 0;
+		while ( !solo.searchText("Please ensure that you are connected to the internet.  Do you wish to retry?") && count < 10) {
+			solo.sleep(500);
+			count++;
+		}
+		assertTrue("Missing 'Error connecting to server' message", solo.searchText("Please ensure that you are connected to the internet.  Do you wish to retry?"));
+		solo.clickOnButton("NO");
+		loadCommunityModule(false);
+		solo.setWiFiData(true);
+	}
 
-	private void initCommunityModule(Boolean doGridCheck) {
+	private void initCommunityModule() {
+		solo.sleep(2000);
 		//Load the app: Wait for activity: 'au.org.intersect.faims.android.ui.activity.SplashActivity'
 		solo.waitForActivity(SplashActivity.class, 5000);
 
 		assertFalse(AppModuleUtil.hasGPSTimeError(solo));
 		assertFalse(AppModuleUtil.hasGPSTimezoneError(solo));
+	}
 
+	private void loadCommunityModule(Boolean doGridCheck) {
 		Log.d("Loading Module", "check");
 		if (solo.searchText("Loading module")) {
 			// wait for the loading screen to close
