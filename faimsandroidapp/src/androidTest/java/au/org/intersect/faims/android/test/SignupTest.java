@@ -15,6 +15,7 @@ import au.org.intersect.faims.android.util.TestRunID;
 public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity> {
 	public static final String PASSWORD = "aB!45678901234567890";	// 20 chars, uppper, lower, num and symbol
 	public static final String BAD_PASSWORD = "wabbit";
+	public static final String TEST_USER = "Test Password";
 
 	private Solo solo;
 	private TestRunID runIDInstance = TestRunID.getInstance();
@@ -47,7 +48,7 @@ public class SignupTest extends ActivityInstrumentationTestCase2<SplashActivity>
 		solo.clickOnView(ModuleSol1HardwareUtil.get_UserUserSelect_User(solo));
 		solo.sleep(1000);
 		//Click on Faims Admin
-		solo.clickOnText("Test Password");
+		solo.clickOnText(TEST_USER);
 		ModuleSol1HardwareUtil.clickButton_Login(solo);
 		AppModuleUtil.editTextField(solo, AppSignupUtil.getEditText_LoginPassword(solo), PASSWORD);
 		AppSignupUtil.clickButton_LoginOk(solo);

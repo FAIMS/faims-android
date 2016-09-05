@@ -290,7 +290,7 @@ public class AppModuleUtil {
 	public static void roboClickOnKebabItem(Solo solo, String menuItemName) {
 		roboClickOnKebabMenu(solo);
 		solo.clickOnText(menuItemName);
-		solo.sleep(500);
+		solo.sleep(2000);	// Extended to 2000 from 500 for stability
 	}
 
 	public static void roboCLickOnHamburger(Solo solo) {
@@ -300,7 +300,7 @@ public class AppModuleUtil {
 	public static void editTextField(Solo solo, EditText field, String text) {
 		solo.clearEditText(field);
 		solo.enterText(field, text);
-		solo.sleep(200);
+		solo.sleep(250);
 	}
 
 
