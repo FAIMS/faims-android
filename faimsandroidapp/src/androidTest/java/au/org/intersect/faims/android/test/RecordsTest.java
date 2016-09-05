@@ -63,7 +63,7 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 	 */
 	public void testRun3() {
 		initToLogin();
-		loadRecord(1);	//TODO: This isn't the same runID, need to preserve it between runs
+		loadRecord(1);
 		checkSavedSerial("1001");
 	}
 
@@ -250,7 +250,7 @@ public class RecordsTest extends ActivityInstrumentationTestCase2<SplashActivity
 		}
 
 		assertTrue("Sync Off equals: " + isSyncOff(), isSyncOff());
-		//TODO: is sync icon off
+
 	}
 
 	/*

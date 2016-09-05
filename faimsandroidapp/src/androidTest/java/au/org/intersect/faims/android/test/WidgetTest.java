@@ -29,7 +29,6 @@ public class WidgetTest extends ActivityInstrumentationTestCase2<SplashActivity>
 		AppModuleUtil.roboConnectToServer(solo, AppModuleUtil.SERVER_NAME_TEST1, AppModuleUtil.SERVER_PORT_80);
 		AppModuleUtil.roboLoadModule(solo, AppModuleUtil.MODULE_WIDGET_TEST);
 		solo.clickOnText("Faims Admin");
-//		TODO: Select Bone here
 		solo.clickOnView(solo.getView((Object) "control/control/entityTypes"));
 		solo.clickOnText("Bone");
 		ModuleWidgetTestUtil.clickButton_Record_Feature(solo);
