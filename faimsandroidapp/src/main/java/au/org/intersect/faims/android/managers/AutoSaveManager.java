@@ -9,10 +9,12 @@ import android.os.Handler;
 import au.org.intersect.faims.android.app.FAIMSApplication;
 import au.org.intersect.faims.android.beanshell.BeanShellLinker;
 import au.org.intersect.faims.android.beanshell.callbacks.SaveCallback;
+import au.org.intersect.faims.android.beanshell.callbacks.SaveForceCallback;
 import au.org.intersect.faims.android.data.Attribute;
 import au.org.intersect.faims.android.data.IFAIMSRestorable;
 import au.org.intersect.faims.android.log.FLog;
 import au.org.intersect.faims.android.ui.activity.ShowModuleActivity;
+import au.org.intersect.faims.android.ui.view.TabGroup;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -45,6 +47,7 @@ public class AutoSaveManager implements IFAIMSRestorable {
 	private List<Geometry> geometry;
 	private List<? extends Attribute> attributes;
 	private SaveCallback callback;
+	private SaveForceCallback forceCallback;
 	private boolean newRecord;
 
 	private boolean enabled;
@@ -74,6 +77,7 @@ public class AutoSaveManager implements IFAIMSRestorable {
 		this.geometry = null;
 		this.attributes = null;
 		this.callback = null;
+		this.forceCallback = null;
 		this.newRecord = false;
 		this.enabled = false;
 		this.pauseCounter = 0;
@@ -119,6 +123,7 @@ public class AutoSaveManager implements IFAIMSRestorable {
 		this.geometry = null;
 		this.attributes = null;
 		this.callback = null;
+		this.forceCallback = null;
 		this.newRecord = false;
 		this.enabled = false;
 		this.pauseCounter = 0;
@@ -139,7 +144,20 @@ public class AutoSaveManager implements IFAIMSRestorable {
 		this.pauseCounter = 0;
 		setStatus(Status.ACTIVE);
 	}
-	
+
+	public void enable(String tabGroupRef, String uuid, List<Geometry> geometry, List<? extends Attribute> attributes, SaveForceCallback callback, boolean newRecord) {
+		FLog.d("enable autosave on tabgroup " + tabGroupRef + " to uuid " + uuid);
+		this.tabGroupRef = tabGroupRef;
+		this.uuid = uuid;
+		this.geometry = geometry;
+		this.attributes = attributes;
+		this.forceCallback = callback;
+		this.newRecord = newRecord;
+		this.enabled = true;
+		this.pauseCounter = 0;
+		setStatus(Status.ACTIVE);
+	}
+
 	public void disable(String tabGroupRef) {
 		if (enabled) {
 			FLog.d("disable autosave on " + tabGroupRef + " to uuid " + uuid);
@@ -157,6 +175,15 @@ public class AutoSaveManager implements IFAIMSRestorable {
 		autosave(true, disableAutoSave);
 	}
 
+	private boolean checkHasChanges(String ref) {
+		try {
+			final TabGroup tabGroup = linker.getTabGroup(ref);
+			return tabGroup.hasChanges();
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public synchronized void autosave(boolean blocking, boolean disableAutoSave) {
 		if (enabled) {			
 			setStatus(Status.SAVING);		
@@ -165,8 +192,10 @@ public class AutoSaveManager implements IFAIMSRestorable {
 			if (pauseCounter == 0) {
 				
 				if (lock()) {
+					final boolean hasChanges = checkHasChanges(tabGroupRef);
+
 					linker.saveTabGroupWithBlockingOption(tabGroupRef, uuid, geometry, attributes, new SaveCallback() {
-	
+
 						@Override
 						public void onError(String message) {
 							try {
@@ -202,6 +231,44 @@ public class AutoSaveManager implements IFAIMSRestorable {
 							}
 						}
 						
+					}, newRecord, blocking);
+
+					linker.saveTabGroupWithBlockingOption(tabGroupRef, uuid, geometry, attributes, new SaveForceCallback() {
+
+						@Override
+						public void onError(String message) {
+							try {
+								if (forceCallback != null) {
+									forceCallback.onError(message);
+								}
+							} catch (Exception e) {
+								linker.showWarning("Logic Error", "Error in save forced callback on error");
+								FLog.e("Error in save forced callback on error", e);
+							}
+						}
+
+						@Override
+						public void onSave(String uuid, boolean newRecord, boolean dummyHasChanges) {
+							try {
+								if (forceCallback != null) {
+									forceCallback.onSave(uuid, newRecord, hasChanges);
+								}
+							} catch (Exception e) {
+								linker.showWarning("Logic Error", "Error in save callback on save");
+								FLog.e("Error in save callback on save", e);
+							}
+							AutoSaveManager.this.geometry = null;
+							AutoSaveManager.this.attributes = null;
+							AutoSaveManager.this.newRecord = false;
+						}
+
+						@Override
+						public void onSaveAssociation(String entityId, String relationshpId) {
+							if (forceCallback != null) {
+								forceCallback.onSaveAssociation(entityId, relationshpId);
+							}
+						}
+
 					}, newRecord, blocking);
 				}
 			} else {
