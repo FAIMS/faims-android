@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="au.org.intersect.faims.android"
     android:versionCode="15"
-    android:versionName="2.2">
+    android:versionName="2.5">
 
     <uses-sdk
         android:minSdkVersion="15"
