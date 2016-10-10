@@ -115,7 +115,7 @@ public class TabGroupHelper {
 	}
 
 	private static void saveTabGroupInBackground(final BeanShellLinker linker, final String ref, final String uuid, final List<Geometry> geometry,
-												 final List<? extends Attribute> attributes, final SaveForceCallback callback, final boolean newRecord) {
+			final List<? extends Attribute> attributes, final SaveForceCallback callback, final boolean newRecord) {
 		final AutoSaveManager autoSaveManager = linker.getAutoSaveManager();
 		try {
 			final TabGroup tabGroup = linker.getTabGroup(ref);
@@ -301,7 +301,7 @@ public class TabGroupHelper {
 	}
 
 	private static void checkTabGroupForChangesAndSaveTabGroup(final BeanShellLinker linker, final TabGroup tabGroup, final String uuid, final List<Geometry> geometry,
-															   final List<? extends Attribute> attributes, final SaveForceCallback callback, final boolean newRecord) throws Exception {
+			final List<? extends Attribute> attributes, final SaveForceCallback callback, final boolean newRecord) throws Exception {
 		final AutoSaveManager autoSaveManager = linker.getAutoSaveManager();
 		if (tabGroup.hasChanges()) {
 			if (newRecord || tabGroup.hasRecord(uuid)) {
@@ -312,7 +312,7 @@ public class TabGroupHelper {
 			callback.onSave(uuid, newRecord, true);
 		} else {
 			autoSaveManager.reportSaved();
-			callback.onSave(uuid, newRecord, false);
+			callback.onSave(uuid, newRecord,false);
 		}
 	}
 
@@ -401,7 +401,7 @@ public class TabGroupHelper {
 	}
 
 	private static void collectAttributesAndSaveTabGroup(BeanShellLinker linker, final TabGroup tabGroup, String uuid, List<Geometry> geometry,
-														 List<? extends Attribute> attributes, final SaveForceCallback callback, boolean newRecord) throws Exception {
+			List<? extends Attribute> attributes, final SaveForceCallback callback, boolean newRecord) throws Exception {
 		synchronized(TabGroupHelper.class) {
 			if (tabGroup.getArchEntType() != null) {
 				collectEntityAttributesAndSaveEntity(linker, tabGroup, uuid, geometry, attributes, callback, newRecord, null);
@@ -456,7 +456,7 @@ public class TabGroupHelper {
 
 	@SuppressWarnings("unchecked")
 	private static void collectEntityAttributesAndSaveEntity(BeanShellLinker linker, final TabGroup tabGroup, String uuid, List<Geometry> geometry,
-															 List<? extends Attribute> attributes, final SaveForceCallback callback, boolean newRecord, List<String> excludeAttributes) {
+			List<? extends Attribute> attributes, final SaveForceCallback callback, boolean newRecord, List<String> excludeAttributes) {
 		List<EntityAttribute> entityAttributes = new ArrayList<EntityAttribute>();
 		if (attributes != null) {
 			entityAttributes.addAll((List<EntityAttribute>) attributes);

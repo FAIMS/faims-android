@@ -283,7 +283,8 @@ public class AutoSaveManager implements IFAIMSRestorable {
 
 	public void triggerAutoSave() {
 		if (enabled) {
-			postSaveCallback(0);
+			autosave(true,false);
+//			postSaveCallback(0);
 		}
 	}
 

@@ -681,7 +681,7 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 
 	public TabGroup showTabGroup(String label) {
 		try {
-			autoSaveManager.flush();
+			//autoSaveManager.flush();
 			
 			final TabGroup tabGroup = uiRenderer.showTabGroup(label);
 			if (tabGroup == null) {
