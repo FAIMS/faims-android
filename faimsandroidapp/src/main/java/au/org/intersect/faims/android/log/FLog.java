@@ -2,6 +2,8 @@ package au.org.intersect.faims.android.log;
 
 import android.util.Log;
 
+import au.org.intersect.faims.android.BuildConfig;
+
 public class FLog {
 	// note: could not extend final class Log
 	
@@ -13,11 +15,21 @@ public class FLog {
 	private static final int ERROR = 8;
 	private static final int VERBOSE = 16;
 	private static final int ALL = 31;
-	
+
 //	private static int enableLevel = ALL; // use this for debug builds
-	private static int enableLevel = WARNING | ERROR | VERBOSE; // use this for release builds
-	
+//	private static int enableLevel = WARNING | ERROR | VERBOSE; // use this for release builds
+	private static int enableLevel = 0;
+
 	private static boolean hasLevel(int type) {
+		// would prefer to not have to do this every time hasLevel is called but since the methods
+		// in this class are used statically a constructor is never called
+		if (enableLevel == 0) {
+			if (BuildConfig.DEBUG) {
+				enableLevel = ALL;
+			} else {
+				enableLevel = WARNING | ERROR | VERBOSE;
+			}
+		}
 		return (enableLevel & type) == type;
 	}
 	
