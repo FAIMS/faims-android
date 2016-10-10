@@ -82,6 +82,7 @@ android {
     packagingOptions {
         pickFirst 'META-INF/NOTICE.txt'
         pickFirst 'META-INF/LICENSE.txt'
+        pickFirst 'META-INF/LICENSE'
         pickFirst 'META-INF/DEPENDENCIES'
     }
     productFlavors {
