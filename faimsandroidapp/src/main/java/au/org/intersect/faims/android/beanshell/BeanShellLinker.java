@@ -55,6 +55,7 @@ import au.org.intersect.faims.android.beanshell.callbacks.ActionButtonCallback;
 import au.org.intersect.faims.android.beanshell.callbacks.DeleteCallback;
 import au.org.intersect.faims.android.beanshell.callbacks.FetchCallback;
 import au.org.intersect.faims.android.beanshell.callbacks.SaveCallback;
+import au.org.intersect.faims.android.beanshell.callbacks.SaveForceCallback;
 import au.org.intersect.faims.android.beanshell.callbacks.ViewTask;
 import au.org.intersect.faims.android.data.ArchEntity;
 import au.org.intersect.faims.android.data.Attribute;
@@ -608,7 +609,7 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 		}
 	}
 	
-	protected TabGroup getTabGroup(String ref) throws Exception {
+	public TabGroup getTabGroup(String ref) throws Exception {
 		TabGroup tabGroup = uiRenderer.getTabGroupByLabel(ref);
 		if (tabGroup == null) {
 			throw new Exception("Cannot find tab group " + ref);
@@ -680,7 +681,7 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 
 	public TabGroup showTabGroup(String label) {
 		try {
-			autoSaveManager.flush();
+			//autoSaveManager.flush();
 			
 			final TabGroup tabGroup = uiRenderer.showTabGroup(label);
 			if (tabGroup == null) {
@@ -767,7 +768,13 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 			boolean newRecord, boolean blocking) {
 		TabGroupHelper.saveTabGroupInBackground(this, tabGroupRef, uuid, geometry, attributes, callback, newRecord, blocking);
 	}
-	
+
+	public void saveTabGroupWithBlockingOption(String tabGroupRef, String uuid, List<Geometry> geometry,
+											   List<? extends Attribute> attributes, SaveForceCallback callback,
+											   boolean newRecord, boolean blocking) {
+		TabGroupHelper.saveTabGroupInBackground(this, tabGroupRef, uuid, geometry, attributes, callback, newRecord, blocking);
+	}
+
 	public void saveTabGroup(String ref, String uuid, List<Geometry> geometry, 
 			List<? extends Attribute> attributes, SaveCallback callback) {
 		TabGroupHelper.saveTabGroupInBackground(this, ref, uuid, geometry, attributes, callback, uuid == null, false);
@@ -786,7 +793,27 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 			TabGroupHelper.saveTabGroupInBackground(this, ref, uuid, geometry, attributes, callback, uuid == null, false);
 		}
 	}
-	
+
+	public void saveTabGroup(String ref, String uuid, List<Geometry> geometry,
+							 List<? extends Attribute> attributes, SaveForceCallback callback) {
+		TabGroupHelper.saveTabGroupInBackground(this, ref, uuid, geometry, attributes, callback, uuid == null, false);
+	}
+
+	public void saveTabGroup(String ref, String uuid, List<Geometry> geometry,
+							 List<? extends Attribute> attributes, SaveForceCallback callback,
+							 boolean enableAutoSave) {
+		if (enableAutoSave) {
+			boolean newRecord = uuid == null;
+			if (newRecord) {
+				uuid = databaseManager.sharedRecord().generateUUID();
+			}
+			autoSaveManager.enable(ref, uuid, geometry, attributes, callback, newRecord);
+		} else {
+			TabGroupHelper.saveTabGroupInBackground(this, ref, uuid, geometry, attributes, callback, uuid == null, false);
+		}
+	}
+
+
 	public void duplicateTabGroup(String ref, List<Geometry> geometry, 
 			List<? extends Attribute> attributes, List<String> excludeAttributes, SaveCallback callback) {
 		TabGroupHelper.duplicateTabGroupInBackground(this, ref, geometry, attributes, excludeAttributes, callback);
@@ -796,8 +823,13 @@ public class BeanShellLinker implements IFAIMSRestorable, ICreateUser, IVerifyUs
 		autoSaveManager.flush(true);
 	}
 
-	public void saveTab(String ref, String uuid, List<Geometry> geometry, 
-			List<? extends Attribute> attributes, SaveCallback callback) {
+	public void saveTab(String ref, String uuid, List<Geometry> geometry,
+						List<? extends Attribute> attributes, SaveCallback callback) {
+		TabGroupHelper.saveTabInBackground(this, ref, uuid, geometry, attributes, callback, uuid == null, false);
+	}
+
+	public void saveTab(String ref, String uuid, List<Geometry> geometry,
+						List<? extends Attribute> attributes, SaveForceCallback callback) {
 		TabGroupHelper.saveTabInBackground(this, ref, uuid, geometry, attributes, callback, uuid == null, false);
 	}
 
