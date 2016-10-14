@@ -286,7 +286,7 @@ public class SplashActivity extends RoboActivity {
 			Messenger messenger = new Messenger(updateModuleSettingHandler);
 			intent.putExtra("MESSENGER", messenger);
 			intent.putExtra("module", new Module(BuildConfig.COMMUNITY_APPNAME, BuildConfig.COMMUNITY_MODULE));
-			intent.putExtra("overwrite", false);
+			intent.putExtra("overwrite", true);
 			startService(intent);
 		} else {
 			showBusyDialog(Type.UPDATE_SETTINGS);
