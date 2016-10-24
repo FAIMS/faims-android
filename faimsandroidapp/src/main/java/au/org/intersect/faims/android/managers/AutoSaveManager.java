@@ -38,7 +38,7 @@ public class AutoSaveManager implements IFAIMSRestorable {
 	
 	private static final String TAG = "autosave:";
 	private static final int SAVE_AFTER_CHANGE_DELAY = 5000;
-	
+
 	@Inject
 	BeanShellLinker linker;
 	
@@ -185,12 +185,12 @@ public class AutoSaveManager implements IFAIMSRestorable {
 	}
 
 	public synchronized void autosave(boolean blocking, boolean disableAutoSave) {
-		if (enabled) {			
-			setStatus(Status.SAVING);		
+		if (enabled) {
+			setStatus(Status.SAVING);
 			clearSaveCallbacks();
-			
+
 			if (pauseCounter == 0) {
-				
+
 				if (lock()) {
 					final boolean hasChanges = checkHasChanges(tabGroupRef);
 
@@ -202,18 +202,25 @@ public class AutoSaveManager implements IFAIMSRestorable {
 								if (callback != null) {
 									callback.onError(message);
 								}
+								if (forceCallback != null) {
+									forceCallback.onError(message);
+								}
 							} catch (Exception e) {
 								linker.showWarning("Logic Error", "Error in save callback on error");
 								FLog.e("Error in save callback on error", e);
 							}
 						}
-	
+
 						@Override
 						public void onSave(String uuid, boolean newRecord) {
 							try {
 								if (callback != null) {
 									callback.onSave(uuid, newRecord);
 								}
+								if (forceCallback != null) {
+									forceCallback.onSave(uuid, newRecord, hasChanges);
+								}
+
 							} catch (Exception e) {
 								linker.showWarning("Logic Error", "Error in save callback on save");
 								FLog.e("Error in save callback on save", e);
@@ -222,51 +229,17 @@ public class AutoSaveManager implements IFAIMSRestorable {
 							AutoSaveManager.this.attributes = null;
 							AutoSaveManager.this.newRecord = false;
 						}
-	
+
 						@Override
 						public void onSaveAssociation(String entityId,
 								String relationshpId) {
 							if (callback != null) {
 								callback.onSaveAssociation(entityId, relationshpId);
 							}
-						}
-						
-					}, newRecord, blocking);
-
-					linker.saveTabGroupWithBlockingOption(tabGroupRef, uuid, geometry, attributes, new SaveForceCallback() {
-
-						@Override
-						public void onError(String message) {
-							try {
-								if (forceCallback != null) {
-									forceCallback.onError(message);
-								}
-							} catch (Exception e) {
-								linker.showWarning("Logic Error", "Error in save forced callback on error");
-								FLog.e("Error in save forced callback on error", e);
-							}
-						}
-
-						@Override
-						public void onSave(String uuid, boolean newRecord, boolean dummyHasChanges) {
-							try {
-								if (forceCallback != null) {
-									forceCallback.onSave(uuid, newRecord, hasChanges);
-								}
-							} catch (Exception e) {
-								linker.showWarning("Logic Error", "Error in save callback on save");
-								FLog.e("Error in save callback on save", e);
-							}
-							AutoSaveManager.this.geometry = null;
-							AutoSaveManager.this.attributes = null;
-							AutoSaveManager.this.newRecord = false;
-						}
-
-						@Override
-						public void onSaveAssociation(String entityId, String relationshpId) {
 							if (forceCallback != null) {
 								forceCallback.onSaveAssociation(entityId, relationshpId);
 							}
+
 						}
 
 					}, newRecord, blocking);
@@ -274,14 +247,14 @@ public class AutoSaveManager implements IFAIMSRestorable {
 			} else {
 				FLog.d("ignore autosave");
 			}
-			
+
 			if (disableAutoSave) {
 				disable(tabGroupRef);
 			}
 		}
 	}
 
-	public void triggerAutoSave() {
+	public synchronized void triggerAutoSave() {
 		if (enabled) {
 			autosave(true,false);
 //			postSaveCallback(0);
