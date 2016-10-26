@@ -885,7 +885,7 @@ public class ShowModuleActivity extends FragmentActivity implements
 									if (databaseManager.userRecord().userExists(user)) {
 										ShowModuleActivity.this.busyCreateUserDialog.dismiss();
 										ShowModuleActivity.this.beanShellLinker.execute(callback);
-										//								ShowModuleActivity.this.listeners.remove(this);
+										ShowModuleActivity.this.listeners.remove(this);
 									}
 								} catch (Exception e) {
 									showCreateUserErrorDialog(Result.FAILURE);
