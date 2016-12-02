@@ -9,6 +9,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import au.org.intersect.faims.android.database.Database;
+import au.org.intersect.faims.android.tasks.DatabaseRecordCountTask;
+import au.org.intersect.faims.android.ui.dialog.IModuleActionsResult;
+import au.org.intersect.faims.android.ui.dialog.ModuleActionsDialog;
 import roboguice.activity.RoboActivity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -26,6 +30,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -71,7 +76,7 @@ import au.org.intersect.faims.android.util.ModuleUtil;
 
 import com.google.inject.Inject;
 
-public class MainActivity extends RoboActivity {
+public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	
 	enum Type {
 		DOWNLOAD,
@@ -190,66 +195,106 @@ public class MainActivity extends RoboActivity {
 	    	showUpdateOrDownloadModuleDialog(moduleName);
     	}
 	}
-    
-    protected void showUpdateOrDownloadModuleDialog(final String selectedItem) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.confirm_download_or_update_module_title);
-		builder.setMessage(getString(R.string.confirm_download_or_update_module_message) + " " + selectedItem + "?");
 
-		builder.setPositiveButton("Cancel", new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				
+	public void moduleActionsUpdate(String selectedItem) {
+		showUpdateModuleDialog(selectedItem);
+	}
+
+	public void moduleActionsRestore(String selectedItem) {
+		choiceDialog = new ChoiceDialog(MainActivity.this,
+			getString(R.string.confirm_restore_module_title),
+			getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
+			new IDialogListener() {
+				@Override
+				public void handleDialogResponse(
+					DialogResultCode resultCode) {
+						if (resultCode == DialogResultCode.SELECT_YES) {
+							choiceDialog = new ChoiceDialog(MainActivity.this,
+								getString(R.string.confirm_download_warning_module_title),
+								getString(R.string.confirm_download_warning_module_message),
+								new IDialogListener() {
+									@Override
+									public void handleDialogResponse(
+										DialogResultCode resultCode) {
+											if (resultCode == DialogResultCode.SELECT_YES) {
+												downloadModule(true);
+											}
+										}
+								},
+								getString(R.string.confirm_restore_no),
+								getString(R.string.confirm_restore_yes));
+							choiceDialog.show();
+						}
+					}
+
+			});
+		choiceDialog.show();
+	}
+
+	public void moduleActionsForce(String selectedItem) {
+		List<Module> modules = ModuleUtil.getModules();
+		Module module = null;
+		for(Module m : modules) {
+			if (m.name.equals(selectedItem)) {
+				module = m;
 			}
-		});
-		
-		builder.setNeutralButton("Restore", new OnClickListener() {
-			
+		}
+		new DatabaseRecordCountTask(faimsClient, new ITaskListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				choiceDialog = new ChoiceDialog(MainActivity.this, 
-						getString(R.string.confirm_restore_module_title),
-						getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
-						new IDialogListener() {
+			public void handleTaskCompleted(Object result) {
+				showForceConfirmationDialog(result);
+			}
+		}, module).execute();
+	}
 
-							@Override
-							public void handleDialogResponse(
-									DialogResultCode resultCode) {
-								if (resultCode == DialogResultCode.SELECT_YES) {
-									choiceDialog = new ChoiceDialog(MainActivity.this, 
-											getString(R.string.confirm_download_warning_module_title),
-											getString(R.string.confirm_download_warning_module_message),
-											new IDialogListener() {
-	
-												@Override
-												public void handleDialogResponse(
-														DialogResultCode resultCode) {
-													if (resultCode == DialogResultCode.SELECT_YES) {
-														downloadModule(true);
-													}
-												}	
-									},
-									getString(R.string.confirm_restore_no),
-									getString(R.string.confirm_restore_yes));
-									choiceDialog.show();
-								}
-							}
-					
+	protected void showForceConfirmationDialog(Object resobj) {
+		Result result = (Result) resobj;
+		int serverEntities = 0;
+		int serverRelationships = 0;
+		int localEntities = 0;
+		int localRelationships = 0;
+
+		JSONObject json;
+		try {
+			json = (JSONObject) result.data;
+		} catch (Exception e) {
+			json = new JSONObject();
+		}
+		if (null != json) {
+			try {
+				serverEntities = json.getInt("entities");
+				serverRelationships = json.getInt("relationships");
+				localRelationships = json.getInt("localRelationships");
+				localEntities = json.getInt("localEntities");
+			} catch (Exception e) {
+				// error parsing json from server
+			}
+		} else {
+			// error parsing json from server
+		}
+
+		choiceDialog = new ChoiceDialog(MainActivity.this,
+				"Confirm forcing sync to server?",
+				//TODO count client side entities and relationships
+				Integer.toString(serverEntities) + " entities and " + Integer.toString(serverRelationships) + " relationships found on server, " +
+						Integer.toString(localEntities) + " entities and " + Integer.toString(localRelationships) + " relationships found on device.",
+				new IDialogListener() {
+					@Override
+					public void handleDialogResponse(DialogResultCode resultCode) {
+						//TODO: business logic for forcing sync here
+						Log.d("FORCE", "Result Code: " + resultCode.toString());
+					}
 				});
-				choiceDialog.show();
-			}
-		});
-		
-		builder.setNegativeButton("Update", new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				showUpdateModuleDialog(selectedItem);
-			}
-		});
-		
-		builder.create().show();
+		choiceDialog.show();
+
+	}
+
+    protected void showUpdateOrDownloadModuleDialog(final String selectedItem) {
+		ModuleActionsDialog moduleActionsDialog = new ModuleActionsDialog();
+		Bundle moduleActionsArgs = new Bundle();
+		moduleActionsArgs.putString("selectedItem", selectedItem);
+		moduleActionsDialog.setArguments(moduleActionsArgs);
+		moduleActionsDialog.show(this.getFragmentManager(),"moduleActionsDialog");
 	}
     
     protected void showUpdateModuleDialog(final String selectedItem) {
@@ -285,7 +330,7 @@ public class MainActivity extends RoboActivity {
     protected void removeModule() {
     	FileUtil.delete(selectedDownloadModule.getDirectoryPath());
     }
-    
+
     protected void downloadModule(final boolean overwrite) {
     	if (serverDiscovery.isServerHostValid()) {
     		showBusyDialog(Type.DOWNLOAD);

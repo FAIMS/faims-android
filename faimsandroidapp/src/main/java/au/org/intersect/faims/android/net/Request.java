@@ -66,4 +66,8 @@ public class Request {
 	public static String USER_SIGNUP_REQUEST(Module module) {
 		return "/android/module/" + module.key + "/signup";
 	}
+
+	public static String DATABASE_RECORD_COUNT(Module module) {
+		return "/android/module/" + module.key + "/db_record_count";
+	}
 }
