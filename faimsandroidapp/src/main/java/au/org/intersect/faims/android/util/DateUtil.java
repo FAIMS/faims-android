@@ -63,12 +63,12 @@ public class DateUtil {
 	}
 	
 	public static String getCurrentTimestampGMT() {
-		return getCurrentTimestampGMT("yyyy-MM-dd HH:mm:ss");
+		return getCurrentTimestampGMT("yyyy-MM-dd HH:mm:ss.SSS");
 	}
 
 	public static Date convertToDateGMT(String date){
 		try{
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ENGLISH);
 			formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 			return formatter.parse(date);
 		}catch(Exception e){
