@@ -107,6 +107,7 @@ public class ShowModuleMenuManager {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				try {
+					activityRef.get().invalidateOptionsMenu();
 					actionItem.actionOn();
 					updateActionBar(menu);
 				} catch (Exception e) {
