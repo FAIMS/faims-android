@@ -87,6 +87,11 @@ android {
     }
     productFlavors {
     }
+    lintOptions {
+        disable 'MissingTranslation'
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 dependencies {
