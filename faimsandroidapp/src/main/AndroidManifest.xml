@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="au.org.intersect.faims.android"
-    android:versionCode="20"
+    android:versionCode="21"
     android:versionName="2.5">
 
     <uses-sdk
