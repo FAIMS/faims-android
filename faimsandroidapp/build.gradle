@@ -50,7 +50,7 @@ android {
         }
     }
     compileSdkVersion 17
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId moduleProperties['appid']
         minSdkVersion 15
@@ -86,6 +86,11 @@ android {
         pickFirst 'META-INF/DEPENDENCIES'
     }
     productFlavors {
+    }
+    lintOptions {
+        disable 'MissingTranslation'
+        checkReleaseBuilds false
+        abortOnError false
     }
 }
 

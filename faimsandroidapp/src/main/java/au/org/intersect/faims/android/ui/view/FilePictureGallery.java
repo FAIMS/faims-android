@@ -53,7 +53,7 @@ public class FilePictureGallery extends CustomFileList {
 	    scrollView.addView(galleriesLayout);
 	    addView(scrollView);
 	    
-		cssManager.addCSS(this, "file-gallery");
+//		cssManager.addCSS(this, "file-gallery");
 		reset();
 	}
 	
@@ -128,7 +128,7 @@ public class FilePictureGallery extends CustomFileList {
 	
 		LinearLayout galleryLayout = new LinearLayout(galleriesLayout.getContext());
 		galleryLayout.setOrientation(LinearLayout.VERTICAL);
-		
+
 		final CustomImageView gallery = new CustomImageView(
 				galleriesLayout.getContext());
 		
@@ -158,7 +158,7 @@ public class FilePictureGallery extends CustomFileList {
 			}
 		});
 		
-		cssManager.addCSS(galleryLayout, "file-gallery");
+//		cssManager.addCSS(galleryLayout, "file-gallery");
 		
 		LinearLayout headerContainer = new LinearLayout(galleriesLayout.getContext());
 		headerContainer.setOrientation(LinearLayout.VERTICAL);
@@ -174,7 +174,7 @@ public class FilePictureGallery extends CustomFileList {
 		textView.setPadding(padding, padding, padding, padding);
 		
 		FrameLayout galleryContainer = new FrameLayout(galleriesLayout.getContext());
-		cssManager.addCSS(galleryContainer, "file-gallery-item");
+//		cssManager.addCSS(galleryContainer, "file-gallery-item");
 		galleryContainer.addView(gallery);
 		
 		LinearLayout iconContainer = new LinearLayout(galleriesLayout.getContext());
@@ -205,7 +205,7 @@ public class FilePictureGallery extends CustomFileList {
 		headerContainer.setBackgroundResource(R.drawable.label_selector);
 		headerContainer.addView(textView);
 		headerContainer.addView(iconContainer);
-		
+
 		galleryLayout.addView(headerContainer);
 		galleryLayout.addView(galleryContainer);
 		
