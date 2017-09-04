@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+//import jsqlite.Exception;
 import jsqlite.Stmt;
 import au.org.intersect.faims.android.data.Relationship;
 import au.org.intersect.faims.android.data.RelationshipAttribute;
@@ -355,5 +356,26 @@ public class RelationshipRecord extends SharedRecord {
 			closeDB(db);
 		}
 	}
-	
+
+	public int totalNonDeletedRelationships() throws Exception {
+		jsqlite.Database db = null;
+		Stmt stmt = null;
+		int result = 0;
+		try {
+			db = openDB();
+
+			String query = DatabaseQueries.TOTAL_LATEST_NONDELETED_RELN_RECORDS();
+			stmt = db.prepare(query);
+			if(stmt.step()){
+				result = stmt.column_int(0);
+			}
+			stmt.close();
+			stmt = null;
+
+			return result;
+		} finally {
+			closeStmt(stmt);
+			closeDB(db);
+		}
+	}
 }

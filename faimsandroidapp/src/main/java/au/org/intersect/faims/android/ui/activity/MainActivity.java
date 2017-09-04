@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import au.org.intersect.faims.android.tasks.DatabaseRecordCountTask;
+import au.org.intersect.faims.android.ui.dialog.IModuleActionsResult;
+import au.org.intersect.faims.android.ui.dialog.ModuleActionsDialog;
 import roboguice.activity.RoboActivity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -26,6 +29,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,6 +62,7 @@ import au.org.intersect.faims.android.net.ServerDiscovery;
 import au.org.intersect.faims.android.services.DownloadModuleService;
 import au.org.intersect.faims.android.services.UpdateModuleDataService;
 import au.org.intersect.faims.android.services.UpdateModuleSettingService;
+import au.org.intersect.faims.android.services.ForceSyncModuleDataService;
 import au.org.intersect.faims.android.tasks.FetchModulesListTask;
 import au.org.intersect.faims.android.tasks.ITaskListener;
 import au.org.intersect.faims.android.tasks.LocateServerTask;
@@ -71,12 +76,13 @@ import au.org.intersect.faims.android.util.ModuleUtil;
 
 import com.google.inject.Inject;
 
-public class MainActivity extends RoboActivity {
+public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	
 	enum Type {
 		DOWNLOAD,
 		UPDATE_SETTINGS,
-		UPDATE_DATA
+		UPDATE_DATA,
+		FORCE_SYNC
 	}
 	
 	public static class DownloadUpdateModuleHandler extends Handler {
@@ -115,7 +121,7 @@ public class MainActivity extends RoboActivity {
 	
 	@Inject
 	ServerDiscovery serverDiscovery;
-	
+
 	private ModuleListAdapter moduleListAdapter;
 	
 	protected Module selectedDownloadModule;
@@ -134,7 +140,8 @@ public class MainActivity extends RoboActivity {
 	protected final DownloadUpdateModuleHandler downloadHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.DOWNLOAD);
 	protected final DownloadUpdateModuleHandler updateModuleSettingHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.UPDATE_SETTINGS);
 	protected final DownloadUpdateModuleHandler updateModuleDataHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.UPDATE_DATA);
-	
+	protected final DownloadUpdateModuleHandler forcedSyncModuleHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.FORCE_SYNC);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,66 +197,107 @@ public class MainActivity extends RoboActivity {
 	    	showUpdateOrDownloadModuleDialog(moduleName);
     	}
 	}
-    
-    protected void showUpdateOrDownloadModuleDialog(final String selectedItem) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle(R.string.confirm_download_or_update_module_title);
-		builder.setMessage(getString(R.string.confirm_download_or_update_module_message) + " " + selectedItem + "?");
 
-		builder.setPositiveButton("Cancel", new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				
+	public void moduleActionsUpdate(String selectedItem) {
+		showUpdateModuleDialog(selectedItem);
+	}
+
+	public void moduleActionsRestore(String selectedItem) {
+		choiceDialog = new ChoiceDialog(MainActivity.this,
+			getString(R.string.confirm_restore_module_title),
+			getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
+			new IDialogListener() {
+				@Override
+				public void handleDialogResponse(
+					DialogResultCode resultCode) {
+						if (resultCode == DialogResultCode.SELECT_YES) {
+							choiceDialog = new ChoiceDialog(MainActivity.this,
+								getString(R.string.confirm_download_warning_module_title),
+								getString(R.string.confirm_download_warning_module_message),
+								new IDialogListener() {
+									@Override
+									public void handleDialogResponse(
+										DialogResultCode resultCode) {
+											if (resultCode == DialogResultCode.SELECT_YES) {
+												downloadModule(true);
+											}
+										}
+								},
+								getString(R.string.confirm_restore_no),
+								getString(R.string.confirm_restore_yes));
+							choiceDialog.show();
+						}
+					}
+
+			});
+		choiceDialog.show();
+	}
+
+	public void moduleActionsForce(String selectedItem) {
+		List<Module> modules = ModuleUtil.getModules();
+		Module module = null;
+		for(Module m : modules) {
+			if (m.name.equals(selectedItem)) {
+				module = m;
 			}
-		});
-		
-		builder.setNeutralButton("Restore", new OnClickListener() {
-			
+		}
+		new DatabaseRecordCountTask(faimsClient, new ITaskListener() {
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				choiceDialog = new ChoiceDialog(MainActivity.this, 
-						getString(R.string.confirm_restore_module_title),
-						getString(R.string.confirm_restore_module_message) + " " + selectedItem + "?",
-						new IDialogListener() {
+			public void handleTaskCompleted(Object result) {
+				showForceConfirmationDialog(result);
+			}
+		}, module).execute();
+	}
 
-							@Override
-							public void handleDialogResponse(
-									DialogResultCode resultCode) {
-								if (resultCode == DialogResultCode.SELECT_YES) {
-									choiceDialog = new ChoiceDialog(MainActivity.this, 
-											getString(R.string.confirm_download_warning_module_title),
-											getString(R.string.confirm_download_warning_module_message),
-											new IDialogListener() {
-	
-												@Override
-												public void handleDialogResponse(
-														DialogResultCode resultCode) {
-													if (resultCode == DialogResultCode.SELECT_YES) {
-														downloadModule(true);
-													}
-												}	
-									},
-									getString(R.string.confirm_restore_no),
-									getString(R.string.confirm_restore_yes));
-									choiceDialog.show();
-								}
-							}
-					
+	private JSONObject getjson(Result result) {
+		return (JSONObject) result.data;
+	}
+
+	protected void showForceConfirmationDialog(Object resobj) {
+		Result result = (Result) resobj;
+		int serverEntities = 0;
+		int serverRelationships = 0;
+		int localEntities = 0;
+		int localRelationships = 0;
+
+		final JSONObject json = getjson(result);
+		if (null != json) {
+			try {
+				serverEntities = json.getInt("entities");
+				serverRelationships = json.getInt("relationships");
+				localRelationships = json.getInt("localRelationships");
+				localEntities = json.getInt("localEntities");
+			} catch (Exception e) {
+				// error parsing json from server
+			}
+		} else {
+			// error parsing json from server
+		}
+
+		choiceDialog = new ChoiceDialog(MainActivity.this,
+				"Confirm forcing sync to server?",
+				Integer.toString(serverEntities) + " entities and " + Integer.toString(serverRelationships) + " relationships found on server, " +
+						Integer.toString(localEntities) + " entities and " + Integer.toString(localRelationships) + " relationships found on device.",
+				new IDialogListener() {
+					@Override
+					public void handleDialogResponse(DialogResultCode resultCode) {
+						Log.d("FORCE", "Result Code: " + resultCode.toString());
+						if (resultCode == DialogResultCode.SELECT_YES) {
+							Log.d("FORCE", "In block");
+							forceSyncModuleData(true);
+						}
+					}
 				});
-				choiceDialog.show();
-			}
-		});
-		
-		builder.setNegativeButton("Update", new OnClickListener() {
-			
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				showUpdateModuleDialog(selectedItem);
-			}
-		});
-		
-		builder.create().show();
+		choiceDialog.show();
+
+	}
+
+	protected void showUpdateOrDownloadModuleDialog(final String selectedItem) {
+		ModuleActionsDialog moduleActionsDialog = new ModuleActionsDialog();
+		Bundle moduleActionsArgs = new Bundle();
+		moduleActionsArgs.putString("selectedItem", selectedItem);
+		moduleActionsDialog.setArguments(moduleActionsArgs);
+		moduleActionsDialog.show(this.getFragmentManager(),"moduleActionsDialog");
 	}
     
     protected void showUpdateModuleDialog(final String selectedItem) {
@@ -285,7 +333,7 @@ public class MainActivity extends RoboActivity {
     protected void removeModule() {
     	FileUtil.delete(selectedDownloadModule.getDirectoryPath());
     }
-    
+
     protected void downloadModule(final boolean overwrite) {
     	if (serverDiscovery.isServerHostValid()) {
     		showBusyDialog(Type.DOWNLOAD);
@@ -384,7 +432,41 @@ public class MainActivity extends RoboActivity {
     	}
     	
     }
-	
+
+	protected void forceSyncModuleData(final boolean overwrite) {
+		if (serverDiscovery.isServerHostValid()) {
+			showBusyDialog(Type.FORCE_SYNC);
+
+			// start service
+			Intent intent = new Intent(MainActivity.this, ForceSyncModuleDataService.class);
+
+			Messenger messenger = new Messenger(forcedSyncModuleHandler);
+			intent.putExtra("MESSENGER", messenger);
+			intent.putExtra("module", selectedDownloadModule);
+			intent.putExtra("overwrite", overwrite);
+			startService(intent);
+		} else {
+			showBusyLocatingServerDialog();
+
+			locateTask = new LocateServerTask(serverDiscovery, new ITaskListener() {
+
+				@Override
+				public void handleTaskCompleted(Object result) {
+					MainActivity.this.busyDialog.dismiss();
+
+					if ((Boolean) result) {
+						forceSyncModuleData(overwrite);
+					} else {
+						showLocateServerDownloadArchiveFailureDialog(overwrite);
+					}
+				}
+
+			}).execute();
+		}
+
+	}
+
+
 	private void showFailureDialog(Result result, Type type) {
 		if (result.errorCode == FAIMSClientErrorCode.BUSY_ERROR) {
 			showBusyErrorDialog(type);
@@ -414,6 +496,8 @@ public class MainActivity extends RoboActivity {
 								updateModuleSettings(false);
 							} else if (type == Type.UPDATE_DATA) {
 								updateModuleData(false);
+							} else if (type == Type.FORCE_SYNC) {
+								forceSyncModuleData(false);
 							}
 						} else {
 							if (type == Type.DOWNLOAD) {
@@ -435,6 +519,7 @@ public class MainActivity extends RoboActivity {
 		case DOWNLOAD: return getString(R.string.download_busy_error_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_busy_error_message);
 		case UPDATE_DATA: return getString(R.string.update_data_busy_error_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_busy_error_message);
 		}
     	return null;
 	}
@@ -522,6 +607,8 @@ public class MainActivity extends RoboActivity {
 								updateModuleSettings(false);
 							} else if (type == Type.UPDATE_DATA) {
 								updateModuleData(false);
+							} else if (type == Type.FORCE_SYNC) {
+								forceSyncModuleData(false);
 							}
 						} else {
 							if (type == Type.DOWNLOAD) {
@@ -543,6 +630,7 @@ public class MainActivity extends RoboActivity {
 		case DOWNLOAD: return getString(R.string.download_server_error_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_server_error_message);
 		case UPDATE_DATA: return getString(R.string.update_data_server_error_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_server_error_message);
 		}
     	return null;
 	}
@@ -562,6 +650,8 @@ public class MainActivity extends RoboActivity {
 								updateModuleSettings(false);
 							} else if (type == Type.UPDATE_DATA) {
 								updateModuleData(false);
+							} else if (type == Type.FORCE_SYNC) {
+								forceSyncModuleData(false);
 							}
 						} else {
 							if (type == Type.DOWNLOAD) {
@@ -583,6 +673,7 @@ public class MainActivity extends RoboActivity {
 		case DOWNLOAD: return getString(R.string.download_interrupted_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_interrupted_message);
 		case UPDATE_DATA: return getString(R.string.update_data_interrupted_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_interrupted_message);
 		}
     	return null;
 	}
@@ -618,6 +709,14 @@ public class MainActivity extends RoboActivity {
 					    		
 					    		stopService(intent);
 							}
+						} else if (type == Type.FORCE_SYNC) {
+							if (resultCode == DialogResultCode.CANCEL) {
+								// stop service
+								Intent intent = new Intent(MainActivity.this, ForceSyncModuleDataService.class);
+
+								stopService(intent);
+							}
+
 						}
 					}
 			
@@ -626,7 +725,10 @@ public class MainActivity extends RoboActivity {
     }
     
     private String getBusyTitle(Type type) {
-    	return getString(R.string.busy_title);
+		switch(type) {
+		case FORCE_SYNC: return getString(R.string.forced_title);
+		default: return getString(R.string.busy_title);
+		}
 	}
 
 	private String getBusyMessage(Type type) {
@@ -634,6 +736,7 @@ public class MainActivity extends RoboActivity {
 		case DOWNLOAD: return getString(R.string.download_busy_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_busy_message);
 		case UPDATE_DATA: return getString(R.string.update_data_busy_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_busy_message);
 		}
     	return null;
 	}
