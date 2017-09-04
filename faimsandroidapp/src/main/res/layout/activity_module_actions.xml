@@ -38,8 +38,7 @@
             android:layout_height="wrap_content"
             android:measureWithLargestChild="true"
             android:orientation="horizontal"
-            android:paddingTop="0dip"
-            xmlns:android="http://schemas.android.com/apk/res/android">
+            android:paddingTop="0dip">
 
             <Button
                 android:id="@+id/module_actions_update_button"

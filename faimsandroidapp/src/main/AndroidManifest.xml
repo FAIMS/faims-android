@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="au.org.intersect.faims.android"
-    android:versionCode="21"
+    android:versionCode="22"
     android:versionName="2.5">
 
     <uses-sdk
@@ -76,6 +76,7 @@
         <service android:name=".services.UploadDatabaseService" />
         <service android:name=".services.SyncDatabaseService" />
         <service android:name=".services.SyncFilesService" />
+        <service android:name=".services.ForceSyncModuleDataService" />
 
         <activity
             android:name="group.pals.android.lib.ui.filechooser.FileChooserActivity"

@@ -52,6 +52,7 @@ public class DatabaseRecordCountTask extends AsyncTask<Void, Void, Void> {
                 json = (JSONObject) result.data;
                 json.put("localRelationships", databaseManager.relationshipRecord().totalNonDeletedRelationships());
                 json.put("localEntities", databaseManager.entityRecord().totalEntities());
+                json.put("module", this.module.toJson().toString());
                 result.data = json;
             } catch (Exception e) {
                 Log.d("JSON", e.getMessage());

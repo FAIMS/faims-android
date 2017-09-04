@@ -19,6 +19,8 @@ public class MergeRecord extends Database {
 			db = openDB(jsqlite.Constants.SQLITE_OPEN_READWRITE);
 			String query = DatabaseQueries.DUMP_DATABASE_TO(file.getAbsolutePath());
 			db.exec(query, createCallback());
+		} catch (Exception e) {
+			FLog.d(e.getMessage().toString());
 		} finally {
 			closeDB(db);
 		}

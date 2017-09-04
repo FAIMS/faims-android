@@ -18,6 +18,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Messenger;
+import android.util.Log;
+
 import au.org.intersect.faims.android.app.FAIMSApplication;
 import au.org.intersect.faims.android.data.FileInfo;
 import au.org.intersect.faims.android.data.Module;
@@ -198,7 +200,22 @@ public abstract class DownloadUploadService extends IntentService {
 		serviceResult = Result.SUCCESS;
 		return true;
 	}
-	
+
+	protected boolean uploadAllFiles(String name, String uploadUri, File baseDirectory) throws Exception {
+		// new File((new File(info.filename)).getName())
+		databaseManager.init(serviceModule.getDirectoryPath("db.sqlite"));
+		ArrayList<FileInfo> files = databaseManager.fileRecord().getAllTypeFiles(name);
+		for (FileInfo info : files) {
+			if (uploadFile(name, uploadUri, serviceModule.getDirectoryPath(info.filename), new File(baseDirectory.getPath() + "/files/app"), null)) {
+				databaseManager.fileRecord().updateFile(info.filename, FileRecord.UPLOADED);
+			} else {
+				return false;
+			}
+		}
+		serviceResult = Result.SUCCESS;
+		return true;
+	}
+
 	protected boolean uploadSyncFiles(String name, String uploadUri, File baseDirectory) throws Exception {
 		ArrayList<FileInfo> files = databaseManager.fileRecord().getFilesToUpload(name);
 		for (FileInfo info : files) {

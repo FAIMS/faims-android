@@ -350,7 +350,9 @@ public final class DatabaseQueries {
 	public static String INSERT_FILE = "insert or replace into File (Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 	
 	public static String UPDATE_FILE = "update File set State = ? where Filename = ?";
-	
+
+	public static String GET_ALL_TYPE_FILES = "select Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize from File where Type = ?;";
+
 	public static String GET_UPLOAD_FILES = "select Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize from File where Type = ? and State = 'attached';";
 	
 	public static String GET_DOWNLOAD_FILES = "select Filename, MD5Checksum, Size, Type, State, Timestamp, Deleted, ThumbnailFilename, ThumbnailMD5Checksum, ThumbnailSize from File where Type = ? and State is null;";

@@ -9,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import au.org.intersect.faims.android.database.Database;
 import au.org.intersect.faims.android.tasks.DatabaseRecordCountTask;
 import au.org.intersect.faims.android.ui.dialog.IModuleActionsResult;
 import au.org.intersect.faims.android.ui.dialog.ModuleActionsDialog;
@@ -63,6 +62,7 @@ import au.org.intersect.faims.android.net.ServerDiscovery;
 import au.org.intersect.faims.android.services.DownloadModuleService;
 import au.org.intersect.faims.android.services.UpdateModuleDataService;
 import au.org.intersect.faims.android.services.UpdateModuleSettingService;
+import au.org.intersect.faims.android.services.ForceSyncModuleDataService;
 import au.org.intersect.faims.android.tasks.FetchModulesListTask;
 import au.org.intersect.faims.android.tasks.ITaskListener;
 import au.org.intersect.faims.android.tasks.LocateServerTask;
@@ -81,7 +81,8 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	enum Type {
 		DOWNLOAD,
 		UPDATE_SETTINGS,
-		UPDATE_DATA
+		UPDATE_DATA,
+		FORCE_SYNC
 	}
 	
 	public static class DownloadUpdateModuleHandler extends Handler {
@@ -120,7 +121,7 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	
 	@Inject
 	ServerDiscovery serverDiscovery;
-	
+
 	private ModuleListAdapter moduleListAdapter;
 	
 	protected Module selectedDownloadModule;
@@ -139,7 +140,8 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	protected final DownloadUpdateModuleHandler downloadHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.DOWNLOAD);
 	protected final DownloadUpdateModuleHandler updateModuleSettingHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.UPDATE_SETTINGS);
 	protected final DownloadUpdateModuleHandler updateModuleDataHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.UPDATE_DATA);
-	
+	protected final DownloadUpdateModuleHandler forcedSyncModuleHandler = new DownloadUpdateModuleHandler(MainActivity.this, Type.FORCE_SYNC);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -247,6 +249,10 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		}, module).execute();
 	}
 
+	private JSONObject getjson(Result result) {
+		return (JSONObject) result.data;
+	}
+
 	protected void showForceConfirmationDialog(Object resobj) {
 		Result result = (Result) resobj;
 		int serverEntities = 0;
@@ -254,12 +260,7 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		int localEntities = 0;
 		int localRelationships = 0;
 
-		JSONObject json;
-		try {
-			json = (JSONObject) result.data;
-		} catch (Exception e) {
-			json = new JSONObject();
-		}
+		final JSONObject json = getjson(result);
 		if (null != json) {
 			try {
 				serverEntities = json.getInt("entities");
@@ -275,21 +276,23 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 
 		choiceDialog = new ChoiceDialog(MainActivity.this,
 				"Confirm forcing sync to server?",
-				//TODO count client side entities and relationships
 				Integer.toString(serverEntities) + " entities and " + Integer.toString(serverRelationships) + " relationships found on server, " +
 						Integer.toString(localEntities) + " entities and " + Integer.toString(localRelationships) + " relationships found on device.",
 				new IDialogListener() {
 					@Override
 					public void handleDialogResponse(DialogResultCode resultCode) {
-						//TODO: business logic for forcing sync here
 						Log.d("FORCE", "Result Code: " + resultCode.toString());
+						if (resultCode == DialogResultCode.SELECT_YES) {
+							Log.d("FORCE", "In block");
+							forceSyncModuleData(true);
+						}
 					}
 				});
 		choiceDialog.show();
 
 	}
 
-    protected void showUpdateOrDownloadModuleDialog(final String selectedItem) {
+	protected void showUpdateOrDownloadModuleDialog(final String selectedItem) {
 		ModuleActionsDialog moduleActionsDialog = new ModuleActionsDialog();
 		Bundle moduleActionsArgs = new Bundle();
 		moduleActionsArgs.putString("selectedItem", selectedItem);
@@ -429,7 +432,41 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
     	}
     	
     }
-	
+
+	protected void forceSyncModuleData(final boolean overwrite) {
+		if (serverDiscovery.isServerHostValid()) {
+			showBusyDialog(Type.FORCE_SYNC);
+
+			// start service
+			Intent intent = new Intent(MainActivity.this, ForceSyncModuleDataService.class);
+
+			Messenger messenger = new Messenger(forcedSyncModuleHandler);
+			intent.putExtra("MESSENGER", messenger);
+			intent.putExtra("module", selectedDownloadModule);
+			intent.putExtra("overwrite", overwrite);
+			startService(intent);
+		} else {
+			showBusyLocatingServerDialog();
+
+			locateTask = new LocateServerTask(serverDiscovery, new ITaskListener() {
+
+				@Override
+				public void handleTaskCompleted(Object result) {
+					MainActivity.this.busyDialog.dismiss();
+
+					if ((Boolean) result) {
+						forceSyncModuleData(overwrite);
+					} else {
+						showLocateServerDownloadArchiveFailureDialog(overwrite);
+					}
+				}
+
+			}).execute();
+		}
+
+	}
+
+
 	private void showFailureDialog(Result result, Type type) {
 		if (result.errorCode == FAIMSClientErrorCode.BUSY_ERROR) {
 			showBusyErrorDialog(type);
@@ -459,6 +496,8 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 								updateModuleSettings(false);
 							} else if (type == Type.UPDATE_DATA) {
 								updateModuleData(false);
+							} else if (type == Type.FORCE_SYNC) {
+								forceSyncModuleData(false);
 							}
 						} else {
 							if (type == Type.DOWNLOAD) {
@@ -480,6 +519,7 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		case DOWNLOAD: return getString(R.string.download_busy_error_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_busy_error_message);
 		case UPDATE_DATA: return getString(R.string.update_data_busy_error_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_busy_error_message);
 		}
     	return null;
 	}
@@ -567,6 +607,8 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 								updateModuleSettings(false);
 							} else if (type == Type.UPDATE_DATA) {
 								updateModuleData(false);
+							} else if (type == Type.FORCE_SYNC) {
+								forceSyncModuleData(false);
 							}
 						} else {
 							if (type == Type.DOWNLOAD) {
@@ -588,6 +630,7 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		case DOWNLOAD: return getString(R.string.download_server_error_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_server_error_message);
 		case UPDATE_DATA: return getString(R.string.update_data_server_error_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_server_error_message);
 		}
     	return null;
 	}
@@ -607,6 +650,8 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 								updateModuleSettings(false);
 							} else if (type == Type.UPDATE_DATA) {
 								updateModuleData(false);
+							} else if (type == Type.FORCE_SYNC) {
+								forceSyncModuleData(false);
 							}
 						} else {
 							if (type == Type.DOWNLOAD) {
@@ -628,6 +673,7 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		case DOWNLOAD: return getString(R.string.download_interrupted_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_interrupted_message);
 		case UPDATE_DATA: return getString(R.string.update_data_interrupted_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_interrupted_message);
 		}
     	return null;
 	}
@@ -663,6 +709,14 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 					    		
 					    		stopService(intent);
 							}
+						} else if (type == Type.FORCE_SYNC) {
+							if (resultCode == DialogResultCode.CANCEL) {
+								// stop service
+								Intent intent = new Intent(MainActivity.this, ForceSyncModuleDataService.class);
+
+								stopService(intent);
+							}
+
 						}
 					}
 			
@@ -671,7 +725,10 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
     }
     
     private String getBusyTitle(Type type) {
-    	return getString(R.string.busy_title);
+		switch(type) {
+		case FORCE_SYNC: return getString(R.string.forced_title);
+		default: return getString(R.string.busy_title);
+		}
 	}
 
 	private String getBusyMessage(Type type) {
@@ -679,6 +736,7 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		case DOWNLOAD: return getString(R.string.download_busy_message);
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_busy_message);
 		case UPDATE_DATA: return getString(R.string.update_data_busy_message);
+		case FORCE_SYNC: return getString(R.string.forced_sync_busy_message);
 		}
     	return null;
 	}
