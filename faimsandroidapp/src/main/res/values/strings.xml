@@ -78,7 +78,7 @@
     <string name="update_data_server_error_message">Could not update module maps because there was a network error. Please check your connection to the server and try again.</string>
     <string name="create_user_server_error_message">Could not create new user because the server is not contactable.  Please check your connection to the server and try again</string>
     <string name="forced_sync_server_error_message">Could not upload module data because there was a network error. Please check your connection to the server and try again.</string>
-
+    <string name="forced_sync_incompat_server_message">Server does not support forced sync.</string>
     <string name="interrupted_title">Cancelled</string>
     <string name="download_interrupted_message">Download module cancelled. Would you like to try again?</string>
     <string name="update_settings_interrupted_message">Update module settings cancelled. Would you like to try again?</string>
