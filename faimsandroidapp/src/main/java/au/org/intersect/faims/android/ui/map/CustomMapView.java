@@ -2874,7 +2874,7 @@ public class CustomMapView extends MapView implements IView {
 				GeometryStyle polygonStyle = GeometryStyle.loadGeometryStyleFromJSON(layer.getJSONObject("polygonStyle"));
 				GeometryTextStyle textStyle = null;
 				if (layer.getJSONObject("textLayer") != null) {
-					textStyle = GeometryTextStyle.loadGeometryStyleFromJSON(layer.getJSONObject("textStyle"));
+					textStyle = GeometryTextStyle.loadGeometryStyleFromJSON(layer.getJSONObject("textLayer").getJSONObject("textStyle"));
 				}
 				newLayer = addSpatialLayer(layer.getString("name"), layer.getString("dbPath"), layer.getString("tableName"), layer.getString("idColumn"),
 						layer.getString("labelColumn"), pointStyle, lineStyle, polygonStyle, textStyle);
@@ -2891,25 +2891,37 @@ public class CustomMapView extends MapView implements IView {
 				newLayer = addDatabaseLayer(layer.getString("name"), layer.getBoolean("isEntity"), layer.getString("queryName"), layer.optString("querySql"),
 						pointStyle, lineStyle, polygonStyle, textStyle);
 			} else if (layer.getString("type").equals("TrackLogDatabaseLayer")) {
-				GeometryStyle pointStyle = GeometryStyle.loadGeometryStyleFromJSON(layer.getJSONObject("pointStyle"));
-				GeometryStyle lineStyle = GeometryStyle.loadGeometryStyleFromJSON(layer.getJSONObject("lineStyle"));
-				GeometryStyle polygonStyle = GeometryStyle.loadGeometryStyleFromJSON(layer.getJSONObject("polygonStyle"));
-				GeometryTextStyle textStyle = null;
-				if (layer.getJSONObject("textLayer") != null) {
-					textStyle = GeometryTextStyle.loadGeometryStyleFromJSON(layer.getJSONObject("textStyle"));
+				// Wrapped in try {} due to known bug with TrackLogDatabaseLayer serialization
+				try {
+					GeometryStyle pointStyle = GeometryStyle.loadGeometryStyleFromJSON(layer.getJSONObject("pointStyle"));
+					GeometryStyle lineStyle = GeometryStyle.loadGeometryStyleFromJSON(layer.getJSONObject("lineStyle"));
+					GeometryStyle polygonStyle = GeometryStyle.loadGeometryStyleFromJSON(layer.getJSONObject("polygonStyle"));
+					GeometryTextStyle textStyle = null;
+					if (layer.getJSONObject("textLayer") != null) {
+						//					textStyle = GeometryTextStyle.loadGeometryStyleFromJSON(layer.getJSONObject("textStyle"));
+						textStyle = GeometryTextStyle.loadGeometryStyleFromJSON(layer.getJSONObject("textLayer").getJSONObject("textStyle"));
+					}
+					for (int j = 0; j < layer.getJSONArray("users").length(); j++) {
+						putUserCheckList(User.loadUserFromJSON(layer.getJSONArray("users").getJSONObject(j)),
+								layer.getJSONArray("users").getJSONObject(j).getBoolean("checked"));
+					}
+					newLayer = addDataBaseLayerForTrackLog(layer.getString("name"), getUserCheckedList(), layer.getString("queryName"), layer.optString("querySql"),
+							pointStyle, lineStyle, polygonStyle, textStyle);
+				} catch (Exception e) {
+					FLog.e("Couldn't restore Tracklog Layer from JSON map config", e);
 				}
-				for (int j=0; j<layer.getJSONArray("users").length(); j++) {
-					putUserCheckList(User.loadUserFromJSON(layer.getJSONArray("users").getJSONObject(j)),
-							layer.getJSONArray("users").getJSONObject(j).getBoolean("checked"));
-				}
-				newLayer = addDataBaseLayerForTrackLog(layer.getString("name"), getUserCheckedList(), layer.getString("queryName"), layer.optString("querySql"),
-						pointStyle, lineStyle, polygonStyle, textStyle);
 			} else {
 				continue;
 			}
-			getLayer(newLayer).setVisible(layer.getBoolean("visible"));
-			if (layer.getString("name").equals(selectedLayer)) {
-				setSelectedLayer(newLayer);
+			// Wrapped in try {} due to known bug with TrackLogDatabaseLayer serialization
+			// This will fail if loading of a layer fails and it's the currently selected layer
+			try {
+				getLayer(newLayer).setVisible(layer.getBoolean("visible"));
+				if (layer.getString("name").equals(selectedLayer)) {
+					setSelectedLayer(newLayer);
+				}
+			} catch (Exception e) {
+				continue;
 			}
 		}
 	}
