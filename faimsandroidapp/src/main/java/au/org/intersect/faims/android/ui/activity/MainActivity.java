@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import au.org.intersect.faims.android.tasks.DatabaseRecordCountTask;
+import au.org.intersect.faims.android.ui.dialog.ErrorDialog;
 import au.org.intersect.faims.android.ui.dialog.IModuleActionsResult;
 import au.org.intersect.faims.android.ui.dialog.ModuleActionsDialog;
 import roboguice.activity.RoboActivity;
@@ -82,7 +83,8 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		DOWNLOAD,
 		UPDATE_SETTINGS,
 		UPDATE_DATA,
-		FORCE_SYNC
+		FORCE_SYNC,
+		FORCE_SYNC_ABORT
 	}
 	
 	public static class DownloadUpdateModuleHandler extends Handler {
@@ -260,35 +262,39 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		int localEntities = 0;
 		int localRelationships = 0;
 
-		final JSONObject json = getjson(result);
-		if (null != json) {
-			try {
-				serverEntities = json.getInt("entities");
-				serverRelationships = json.getInt("relationships");
-				localRelationships = json.getInt("localRelationships");
-				localEntities = json.getInt("localEntities");
-			} catch (Exception e) {
+		if (result.resultCode == FAIMSClientResultCode.FAILURE) {
+			showFailureDialog(result, Type.FORCE_SYNC_ABORT);
+		} else {
+			final JSONObject json = getjson(result);
+			if (null != json) {
+				try {
+					serverEntities = json.getInt("entities");
+					serverRelationships = json.getInt("relationships");
+					localRelationships = json.getInt("localRelationships");
+					localEntities = json.getInt("localEntities");
+				} catch (Exception e) {
+					// error parsing json from server
+				}
+			} else {
 				// error parsing json from server
 			}
-		} else {
-			// error parsing json from server
-		}
 
-		choiceDialog = new ChoiceDialog(MainActivity.this,
-				"Confirm forcing sync to server?",
-				Integer.toString(serverEntities) + " entities and " + Integer.toString(serverRelationships) + " relationships found on server, " +
-						Integer.toString(localEntities) + " entities and " + Integer.toString(localRelationships) + " relationships found on device.",
-				new IDialogListener() {
-					@Override
-					public void handleDialogResponse(DialogResultCode resultCode) {
-						Log.d("FORCE", "Result Code: " + resultCode.toString());
-						if (resultCode == DialogResultCode.SELECT_YES) {
-							Log.d("FORCE", "In block");
-							forceSyncModuleData(true);
+			choiceDialog = new ChoiceDialog(MainActivity.this,
+					"Confirm forcing sync to server?",
+					Integer.toString(serverEntities) + " entities and " + Integer.toString(serverRelationships) + " relationships found on server, " +
+							Integer.toString(localEntities) + " entities and " + Integer.toString(localRelationships) + " relationships found on device.",
+					new IDialogListener() {
+						@Override
+						public void handleDialogResponse(DialogResultCode resultCode) {
+							Log.d("FORCE", "Result Code: " + resultCode.toString());
+							if (resultCode == DialogResultCode.SELECT_YES) {
+								Log.d("FORCE", "In block");
+								forceSyncModuleData(true);
+							}
 						}
-					}
-				});
-		choiceDialog.show();
+					});
+			choiceDialog.show();
+		}
 
 	}
 
@@ -593,32 +599,40 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 	}
 
 	private void showServerErrorDialog(final Type type) {
-    	choiceDialog = new ChoiceDialog(MainActivity.this,
-				getServerErrorTitle(type),
-				getServerErrorMessage(type),
-				new IDialogListener() {
+		if (type == Type.FORCE_SYNC_ABORT) {
+			ErrorDialog errorDialog = new ErrorDialog(MainActivity.this,
+					getServerErrorTitle(type),
+					getServerErrorMessage(type)
+			);
+			errorDialog.show();
+		} else {
+			choiceDialog = new ChoiceDialog(MainActivity.this,
+					getServerErrorTitle(type),
+					getServerErrorMessage(type),
+					new IDialogListener() {
 
-					@Override
-					public void handleDialogResponse(DialogResultCode resultCode) {
-						if (resultCode == DialogResultCode.SELECT_YES) {
-							if (type == Type.DOWNLOAD) {
-								downloadModule(false);
-							} else if (type == Type.UPDATE_SETTINGS) {
-								updateModuleSettings(false);
-							} else if (type == Type.UPDATE_DATA) {
-								updateModuleData(false);
-							} else if (type == Type.FORCE_SYNC) {
-								forceSyncModuleData(false);
-							}
-						} else {
-							if (type == Type.DOWNLOAD) {
-								removeModule();
+						@Override
+						public void handleDialogResponse(DialogResultCode resultCode) {
+							if (resultCode == DialogResultCode.SELECT_YES) {
+								if (type == Type.DOWNLOAD) {
+									downloadModule(false);
+								} else if (type == Type.UPDATE_SETTINGS) {
+									updateModuleSettings(false);
+								} else if (type == Type.UPDATE_DATA) {
+									updateModuleData(false);
+								} else if (type == Type.FORCE_SYNC) {
+									forceSyncModuleData(false);
+								}
+							} else {
+								if (type == Type.DOWNLOAD) {
+									removeModule();
+								}
 							}
 						}
-					}
-    		
-    	});
-    	choiceDialog.show();
+
+					});
+			choiceDialog.show();
+		}
     }
     
     private String getServerErrorTitle(Type type) {
@@ -631,6 +645,7 @@ public class MainActivity extends RoboActivity implements IModuleActionsResult {
 		case UPDATE_SETTINGS: return getString(R.string.update_settings_server_error_message);
 		case UPDATE_DATA: return getString(R.string.update_data_server_error_message);
 		case FORCE_SYNC: return getString(R.string.forced_sync_server_error_message);
+		case FORCE_SYNC_ABORT: return getString(R.string.forced_sync_incompat_server_message);
 		}
     	return null;
 	}
