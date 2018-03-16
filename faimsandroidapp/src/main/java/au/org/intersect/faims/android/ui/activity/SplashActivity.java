@@ -286,7 +286,7 @@ public class SplashActivity extends RoboActivity {
 			Messenger messenger = new Messenger(updateModuleSettingHandler);
 			intent.putExtra("MESSENGER", messenger);
 			intent.putExtra("module", new Module(BuildConfig.COMMUNITY_APPNAME, BuildConfig.COMMUNITY_MODULE));
-			intent.putExtra("overwrite", true);
+//			intent.putExtra("overwrite", true);
 			startService(intent);
 		} else {
 			showBusyDialog(Type.UPDATE_SETTINGS);
@@ -319,7 +319,7 @@ public class SplashActivity extends RoboActivity {
 			Messenger messenger = new Messenger(updateModuleDataHandler);
 			intent.putExtra("MESSENGER", messenger);
 			intent.putExtra("module", new Module(BuildConfig.COMMUNITY_APPNAME, BuildConfig.COMMUNITY_MODULE));
-			intent.putExtra("overwrite", false);
+//			intent.putExtra("overwrite", false);
 			startService(intent);
 		} else {
 			showBusyDialog(Type.UPDATE_DATA);
@@ -355,7 +355,7 @@ public class SplashActivity extends RoboActivity {
 			serviceModule.setHost(BuildConfig.COMMUNITY_SERVER);
 			intent.putExtra("MESSENGER", messenger);
 			intent.putExtra("module", serviceModule);
-			intent.putExtra("overwrite", true);
+//			intent.putExtra("overwrite", true);
 			startService(intent);
 		} else {
 			showBusyDialog(Type.DOWNLOAD);
