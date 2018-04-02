@@ -188,8 +188,8 @@ public class SplashActivity extends RoboActivity {
 
 	private void showErrorDialog(final Type type) {
 		choiceDialog = new ChoiceDialog(SplashActivity.this,
-				"Error connecting to server",
-				"Please ensure that you are connected to the internet.  Do you wish to retry?",
+				"Server Access Issue",
+				"You are currently offline. If you wish to sync data, press Yes. If you wish to work offline, press No.",
 				new IDialogListener() {
 
 					@Override

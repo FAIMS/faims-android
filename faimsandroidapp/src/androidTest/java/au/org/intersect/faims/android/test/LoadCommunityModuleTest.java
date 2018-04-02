@@ -40,11 +40,11 @@ public class LoadCommunityModuleTest extends ActivityInstrumentationTestCase2<Sp
 		solo.setWiFiData(false);
 		initCommunityModule();
 		int count = 0;
-		while ( !solo.searchText("Please ensure that you are connected to the internet.  Do you wish to retry?") && count < 10) {
+		while ( !solo.searchText("You are currently offline. If you wish to sync data, press Yes. If you wish to work offline, press No") && count < 10) {
 			solo.sleep(500);
 			count++;
 		}
-		assertTrue("Missing 'Error connecting to server' message", solo.searchText("Please ensure that you are connected to the internet.  Do you wish to retry?"));
+		assertTrue("Missing 'Server Access Issue' message", solo.searchText("You are currently offline. If you wish to sync data, press Yes. If you wish to work offline, press No."));
 		solo.clickOnButton("NO");
 		loadCommunityModule(false);
 		solo.setWiFiData(true);
