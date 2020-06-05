@@ -7,4 +7,4 @@ This code is maintained through 2020, but is nearing the end of its useful life 
 
 This code is licensed under the GNU GPL v3 license - see LICENSE.txt
 
-This project has been funded by the National eResearch Collaboration Tools and Resources (NeCTAR) eResearch Tools scheme, the Australian Research Council, and the state of New South Wales Research Attraction and Acceleration Program (RAAP). See https://www.faims.edu.au for other supporters.
+This project has been funded by the National eResearch Collaboration Tools and Resources (NeCTAR) eResearch Tools scheme, the Australian Research Council, and the state of New South Wales Research Attraction and Acceleration Program (RAAP). See faims.edu.au for a complete list of supporters.
